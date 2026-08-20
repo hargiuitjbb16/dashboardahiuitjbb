@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DASHBOARD AHI UIT JBB</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="pln">⚡</div><div><b>PLN</b><span>UIT JBB</span></div></div>
+  <div class="danantara">◉ <b>Danantara</b><small>Indonesia</small></div>
+  <nav>
+    <a class="active">Dashboard</a>
+    <a class="sub active-sub">AHI Power Inspect</a>
+    <a class="sub disabled">AHI Evaluasi <small>(Segera Hadir)</small></a>
+    <a>Data Aset</a>
+    <a>Laporan</a>
+  </nav>
+  <div class="sidebar-bottom"><div class="mini-card"><small>Data Terakhir (Upload CSV)</small><strong id="sideDate">Membaca...</strong></div><div class="user">● &nbsp; Admin UIT JBB</div></div>
+</aside>
+
+<main>
+<header>
+  <div><h1>DASHBOARD AHI UIT JBB</h1><p>Asset Health Index – Peralatan Utama Gardu Induk</p></div>
+  <div class="header-actions"><div class="date-card">Data Terakhir (Upload CSV)<b id="lastDate">Membaca...</b></div><button id="exportBtn">⇩ Export CSV</button></div>
+</header>
+
+<section class="filters">
+  <div class="filter"><label>Kelompok Tegangan</label><select id="voltageGroup"><option value="70-500">Transmisi (70–500 kV)</option><option value="incoming">Incoming (&lt;30 kV)</option></select></div>
+  <div class="filter"><label>Unit Induk</label><select id="unitInduk"></select></div>
+  <div class="filter"><label>UPT</label><select id="upt"></select></div>
+  <div class="filter"><label>ULTG</label><select id="ultg"></select></div>
+  <div class="filter"><label>GI</label><select id="gi"></select></div>
+  <div class="filter"><label>Bay</label><select id="bay"></select></div>
+  <div class="filter"><label>Phasa</label><select id="phasa"></select></div>
+  <div class="filter"><label>Jenis Peralatan</label><select id="jenis"></select></div>
+  <div class="filter"><label>Kategori AHI</label><select id="ahi"></select></div>
+  <button class="apply" id="applyBtn">Terapkan Filter</button><button class="reset" id="resetBtn">Reset</button>
+</section>
+
+<section class="kpis" id="kpis"></section>
+<section class="grid charts">
+  <div class="panel"><div class="panel-title">Distribusi AHI</div><div id="ahiDonut" class="donut-wrap"></div></div>
+  <div class="panel wide"><div class="panel-title">AHI Berdasarkan Aset <span>Jumlah &amp; Persentase</span></div><div id="assetAhiTable" class="mini-table"></div></div>
+  <div class="panel"><div class="panel-title">Distribusi Umur</div><div id="ageDonut" class="donut-wrap"></div></div>
+  <div class="panel wide"><div class="panel-title">Umur Aset per Jenis Peralatan</div><div id="ageBars"></div></div>
+</section>
+
+<section class="panel detail">
+  <div class="detail-head"><div><div class="panel-title">Detail Aset</div><small id="resultCount"></small></div><input id="search" placeholder="Cari Techidentno / Merk / GI / Bay..."></div>
+  <div class="table-wrap"><table id="assetTable"><thead></thead><tbody></tbody></table></div>
+  <div class="pager"><button id="prev">‹</button><span id="pageInfo"></span><button id="next">›</button><select id="pageSize"><option>10</option><option>25</option><option>50</option><option>100</option></select></div>
+</section>
+</main></div>
+<script src="app.js"></script>
+</body></html>
