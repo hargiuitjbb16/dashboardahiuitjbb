@@ -26,3 +26,11 @@ CSV harus tetap menggunakan struktur/header Power Inspect seperti file awal. Nam
 
 
 Dashboard hanya menghitung dan menampilkan 9 jenis aset yang disepakati. AHI Berdasarkan Aset ditampilkan sebagai stacked visual.
+
+
+## Aturan Kelompok Tegangan
+- Power Transformer, Current Transformer, Potential Transformer, Circuit Breaker, Disconnecting Switch, dan Lightning Arrester:
+  - Transmisi = tegangan tepat 150 kV atau 500 kV.
+  - Incoming = selain 150 kV dan 500 kV, termasuk "-".
+- Neutral Grounding Resistance, Reactor, dan Capacitor:
+  - masuk ke semua kelompok tegangan (Transmisi maupun Incoming), tanpa melihat nilai tegangan.
