@@ -1,4 +1,4 @@
-const DATA_URL="https://raw.githubusercontent.com/harquijbb16/dashboardahiuitjbb/main/data/Monitoring-AHI.csv";
+const DATA_URL="https://raw.githubusercontent.com/harguitjbb16/dashboardahiuitjbb/main/data/Monitoring-AHI.csv";
 let raw=[],filtered=[],page=1,pageSize=10;
 const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor"];
 const AHI=[["1 - Very Good","c1"],["2 - Good","c2"],["3 - Fair","c3"],["4 - Poor","c4"],["5 - Critical","c5"]];
@@ -117,8 +117,29 @@ async function updateDate(){
 }
 
 $("applyBtn").onclick=apply;$("resetBtn").onclick=()=>{document.querySelectorAll("select").forEach(s=>s.value="");$("voltageGroup").value="transmisi";apply()};$("voltageGroup").onchange=apply;$("search").oninput=()=>{page=1;table()};$("pageSize").onchange=e=>{pageSize=+e.target.value;page=1;table()};$("prev").onclick=()=>{if(page>1){page--;table()}};$("next").onclick=()=>{let n=filtered.length;if(page<Math.ceil(n/pageSize)){page++;table()}};$("exportBtn").onclick=()=>{let out=cols.join(";")+"\n"+filtered.map(r=>cols.map(c=>c==="Usia Aset"?age(r):c==="Kategori Umur"?ageCat(r):r[c]||"").map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+out],{type:"text/csv"}));a.download="AHI_Power_Inspect_Filtered.csv";a.click()};
-Promise.all([fetch(DATA_URL+"?v="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.text()}),updateDate()]).then(([t])=>{
-      raw=parseCSV(t);
-      if(!raw.length)throw Error("CSV kosong/tidak dapat diparse");
-      populate();apply();
-    }).catch((err)=>{console.error("CSV load error:",err);document.body.innerHTML="<div style='padding:40px;font-family:Arial;color:#14233d'><h2>CSV belum terbaca</h2><p>Dashboard gagal membaca file data/Monitoring-AHI.csv.</p><p><b>Pastikan file tersebut tetap berada di folder data pada branch main.</b></p></div>"});
+async function loadCSV(){
+  const urls=[
+    DATA_URL+"?v="+Date.now(),
+    "data/Monitoring-AHI.csv?v="+Date.now()
+  ];
+  let lastErr;
+  for(const u of urls){
+    try{
+      const r=await fetch(u,{cache:"no-store"});
+      if(!r.ok)throw Error("HTTP "+r.status);
+      const t=await r.text();
+      const parsed=parseCSV(t);
+      if(parsed.length)return parsed;
+      throw Error("CSV kosong/tidak dapat diparse");
+    }catch(e){lastErr=e;}
+  }
+  throw lastErr||Error("CSV tidak dapat dibaca");
+}
+Promise.all([loadCSV(),updateDate()]).then(([rows])=>{
+  raw=rows;
+  populate();
+  apply();
+}).catch((err)=>{
+  console.error("CSV load error:",err);
+  document.body.innerHTML="<div style='padding:40px;font-family:Arial;color:#14233d'><h2>CSV belum terbaca</h2><p>Dashboard gagal membaca file data/Monitoring-AHI.csv.</p><p><b>Pastikan file tersebut tetap berada di folder data pada branch main.</b></p><p style='color:#6b7280'>Error: "+String(err.message||err)+"</p></div>";
+});
