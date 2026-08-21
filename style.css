@@ -6,3 +6,6 @@
 .brand-logos-top{display:flex;align-items:center;gap:12px}
 .brand-logos-top img:first-child{height:44px;width:auto;object-fit:contain}
 .brand-logos-top img:last-child{height:34px;width:auto;object-fit:contain;max-width:155px}
+
+/* Single logo group: sidebar only */
+.header-brand,.brand-logos-top{display:none!important}
