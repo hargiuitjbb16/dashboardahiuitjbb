@@ -22,21 +22,22 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}
 .table-wrap{border:1px solid #dce5ee;border-radius:7px;overflow:auto;max-height:430px;position:relative}.table{border-collapse:separate;border-spacing:0;min-width:1850px;width:max-content;font-size:10px}.table th,.table td{padding:9px 10px;border-right:1px solid #e6edf4;border-bottom:1px solid #e6edf4;white-space:nowrap;background:#fff}.table th{background:#f7f9fc;font-weight:800;color:#29415e;position:sticky;top:0;z-index:4}.table th:nth-child(-n+7){z-index:8}.table td:nth-child(-n+7),.table th:nth-child(-n+7){position:sticky}.table th:nth-child(1),.table td:nth-child(1){left:0}.table th:nth-child(2),.table td:nth-child(2){left:78px}.table th:nth-child(3),.table td:nth-child(3){left:184px}.table th:nth-child(4),.table td:nth-child(4){left:260px}.table th:nth-child(5),.table td:nth-child(5){left:375px}.table th:nth-child(6),.table td:nth-child(6){left:510px}.table th:nth-child(7),.table td:nth-child(7){left:650px;box-shadow:4px 0 5px -4px #9aa8b8}.table td:nth-child(-n+7){z-index:3}.table th:nth-child(-n+7){z-index:9}
 @media(max-width:1250px){.donut-grid{grid-template-columns:repeat(4,1fr)}.filters{grid-template-columns:repeat(4,1fr)}.kpis{grid-template-columns:repeat(3,1fr)}.section-grid{grid-template-columns:1fr}}
 
-/* FINAL: individual AHI bar charts */
+/* FINAL: 3x3 proportional AHI bar charts */
 .ahi-panel{padding:16px 18px 18px!important}
 .ahi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.ahi-chart-card{background:#fff;border:1px solid #dfe7f0;border-radius:10px;padding:11px 12px 10px;min-height:190px;box-shadow:0 1px 3px rgba(20,43,74,.04)}
-.ahi-chart-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.ahi-icon{width:28px;height:28px;border:1px solid #d9e5f1;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#0877d1;background:#f4f9fe;font-size:16px;font-weight:800}
+.ahi-chart-card{background:#fff;border:1px solid #dfe7f0;border-radius:10px;padding:11px 12px 10px;min-height:220px;box-shadow:0 1px 3px rgba(20,43,74,.04)}
+.ahi-chart-head{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.ahi-icon{width:28px;height:28px;border:1px solid #d9e5f1;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#0877d1;background:#f4f9fe;font-size:15px;font-weight:800}
 .ahi-chart-title{font-size:10.5px;font-weight:800;color:#173b62;line-height:1.15}
 .ahi-chart-total{margin-left:auto;font-size:10px;font-weight:800;color:#647990}
-.ahi-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;height:122px;align-items:end;border-bottom:1px solid #dfe7ef;padding:0 3px}
-.ahi-bar-col{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.ahi-scale{font-size:7px;color:#8a99a9;margin:2px 0 0 0;text-align:right}
+.ahi-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;height:145px;align-items:stretch;padding:3px 5px 0;position:relative;border-bottom:1px solid #dbe4ed;background:repeating-linear-gradient(to bottom,transparent 0,transparent 35px,#edf1f5 36px)}
+.ahi-bar-col{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0;position:relative}
 .ahi-bar-value{font-size:8px;font-weight:800;color:#213b58;min-height:12px;margin-bottom:3px}
-.ahi-bar-track{height:92px;width:100%;max-width:28px;display:flex;align-items:flex-end;background:#f1f4f7;border-radius:4px 4px 0 0;overflow:hidden}
-.ahi-bar-fill{width:100%;border-radius:4px 4px 0 0;min-height:1px}
+.ahi-bar-track{height:112px;width:100%;max-width:30px;display:flex;align-items:flex-end;justify-content:center;background:transparent;overflow:visible}
+.ahi-bar-fill{width:100%;border-radius:4px 4px 0 0;min-height:0;box-shadow:0 1px 1px rgba(0,0,0,.06)}
 .ahi-bar-label{font-size:7px;color:#687b91;font-weight:700;margin-top:5px;white-space:nowrap}
-.ahi-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;font-size:7.5px;color:#647990}
+.ahi-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:7.5px;color:#647990}
 .ahi-legend span{display:flex;align-items:center;gap:3px}
 .ahi-legend i{width:7px;height:7px;border-radius:2px;display:inline-block}
 @media(max-width:1250px){.ahi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -120,13 +121,28 @@ function renderCharts(){
    const total=a.length;
    const counts=AHI.map(([n])=>a.filter(r=>norm(r["AHI"])===norm(n)).length);
    const max=Math.max(1,...counts);
+   const step=max<=10?2:max<=50?10:max<=500?100:max<=2000?500:Math.ceil(max/4/100)*100;
+   const scale=fmt(Math.ceil(max/step)*step);
    return `<div class="ahi-chart-card">
-     <div class="ahi-chart-head"><div class="ahi-icon">${icons[t]||"•"}</div><div class="ahi-chart-title">${t}</div><div class="ahi-chart-total">${fmt(total)} aset</div></div>
-     <div class="ahi-bars">${AHI.map(([name,color],i)=>{
-       const h=counts[i]?Math.max(2,counts[i]/max*100):0;
-       return `<div class="ahi-bar-col"><div class="ahi-bar-value">${fmt(counts[i])}</div><div class="ahi-bar-track"><div class="ahi-bar-fill" style="height:${h}%;background:${color}"></div></div><div class="ahi-bar-label">${name.split(" - ")[0]}</div></div>`;
-     }).join("")}</div>
-     <div class="ahi-legend">${AHI.map(([name,color])=>`<span><i style="background:${color}"></i>${name.replace(/^\\d+\\s-\\s/,"")}</span>`).join("")}</div>
+     <div class="ahi-chart-head">
+       <div class="ahi-icon">${icons[t]||"•"}</div>
+       <div class="ahi-chart-title">${t}</div>
+       <div class="ahi-chart-total">${fmt(total)} aset</div>
+     </div>
+     <div class="ahi-scale">Skala maks. ${scale}</div>
+     <div class="ahi-bars">
+       ${AHI.map(([name,color],i)=>{
+         const h=counts[i] ? Math.max(1.5,counts[i]/max*100) : 0;
+         return `<div class="ahi-bar-col">
+           <div class="ahi-bar-value">${fmt(counts[i])}</div>
+           <div class="ahi-bar-track"><div class="ahi-bar-fill" style="height:${h}%;background:${color}"></div></div>
+           <div class="ahi-bar-label">${name.split(" - ")[0]}</div>
+         </div>`;
+       }).join("")}
+     </div>
+     <div class="ahi-legend">
+       ${AHI.map(([name,color])=>`<span><i style="background:${color}"></i>${name.replace(/^\\d+\\s-\\s/,"")}</span>`).join("")}
+     </div>
    </div>`;
  }).join("");
 }
