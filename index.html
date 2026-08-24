@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AHI Power Inspect — Parameter Pemicu</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#17324f;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:12px}
+.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:205px;background:#fff;border-right:1px solid #dce5ee;padding:10px 0;display:flex;flex-direction:column}
+.logo{height:55px;display:flex;align-items:center;gap:6px;padding:0 8px;border-bottom:1px solid #e7edf3}.logo img:first-child{width:68px}.logo img:last-child{width:105px}
+.nav{padding:10px 6px}.nav a{display:block;padding:11px 9px;border-radius:8px;color:#183b5e;text-decoration:none;margin-bottom:3px}.nav a.active{background:#e5f0ff;color:#0877d1;font-weight:800}
+.side-date{margin:auto 6px 0;border:1px solid #dce5ee;border-radius:9px;padding:10px}.side-date small{display:block;color:#64788f}.side-date b{display:block;margin-top:4px}
+main{margin-left:205px;padding:10px 14px 24px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dce5ee;padding:0 0 10px}.brand h1{margin:0;color:#14375c;font-size:25px}.brand p{margin:4px 0 0;color:#6b8097}.date{border:1px solid #d5e0eb;background:#fff;border-radius:9px;padding:8px 12px;text-align:right}.date b{display:block;margin-top:3px}
+.card{background:#fff;border:1px solid #dce5ee;border-radius:9px;margin-top:10px;padding:10px}.filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.field label{display:block;font-size:9px;font-weight:800;color:#60758d;text-transform:uppercase}.field select{width:100%;height:34px;margin-top:4px;border:1px solid #cbd9e8;border-radius:7px;background:#fff;padding:0 8px}.btn{height:34px;border:0;border-radius:7px;padding:0 15px;background:#0877d1;color:#fff;font-weight:800;margin-top:13px;cursor:pointer}.btn.secondary{background:#fff;color:#23415f;border:1px solid #cbd9e8;margin-left:5px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}.kpi{background:#fff;border:1px solid #dce5ee;border-radius:9px;padding:11px}.kpi small{color:#60758d;font-weight:700}.kpi b{display:block;font-size:23px;margin-top:5px}.vg{color:#20a46b}.good{color:#d59e00}.fair{color:#f07800}.poor{color:#e53935}.critical{color:#111}
+.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:10px;margin-top:10px}.panel{background:#fff;border:1px solid #dce5ee;border-radius:9px;padding:12px}.title{font-size:15px;font-weight:900;color:#183b5e}.sub{font-size:10px;color:#70849a;margin-top:3px}
+.param-layout{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:center;min-height:330px}.donut-wrap{display:flex;justify-content:center;align-items:center}.donut{width:245px;height:245px;border-radius:50%;background:conic-gradient(#20a46b 0deg 0deg,#d7e1ea 0deg 360deg);position:relative;cursor:crosshair;box-shadow:0 1px 5px #17324f14}.donut:after{content:"";position:absolute;inset:48px;background:#fff;border-radius:50%;box-shadow:0 0 0 1px #eef3f7}.center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2}.center b{font-size:25px;color:#17324f}.center span{font-size:10px;color:#71859a;margin-top:2px}
+.legend{display:grid;gap:7px}.legend-row{display:grid;grid-template-columns:10px 1fr auto auto;gap:7px;align-items:center;padding:7px;border-radius:6px;cursor:pointer}.legend-row:hover{background:#f3f7fb}.swatch{width:9px;height:9px;border-radius:50%}.legend-name{font-weight:700}.legend-val{font-weight:800}.legend-pct{color:#6b8097;min-width:45px;text-align:right}.hint{font-size:9px;color:#7a8da1;margin-top:10px}
+.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.detail-head h3{margin:0;font-size:15px}.search{width:330px;height:34px;border:1px solid #cbd9e8;border-radius:7px;padding:0 10px}.table-wrap{overflow:auto;max-height:430px;margin-top:8px;border:1px solid #e4eaf1;border-radius:7px}table{border-collapse:collapse;width:100%;min-width:1500px;font-size:10px}th,td{padding:8px;border-bottom:1px solid #e7edf3;white-space:nowrap;text-align:left}th{position:sticky;top:0;background:#eef4f9;color:#29415e;z-index:2}.empty{text-align:center;padding:30px;color:#71859a}
+@media(max-width:1200px){.filters{grid-template-columns:repeat(4,1fr)}.kpis{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}.param-layout{grid-template-columns:280px 1fr}}
+@media(max-width:800px){.sidebar{width:175px}.logo img:first-child{width:58px}.logo img:last-child{width:92px}main{margin-left:175px}.filters{grid-template-columns:repeat(2,1fr)}.kpis{grid-template-columns:repeat(2,1fr)}.param-layout{grid-template-columns:1fr}.search{width:220px}}
+
+<style>
+/* AHI Power Inspect blue accent — intentionally not the generic Dashboard accent */
+body.power-inspect-blue{--pi-blue:#0877d1}
+.nav a.active{background:#e5f0ff;color:#0877d1;font-weight:800}
+.title{color:#0b4f92}
+.equipment-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.equipment-card{border:1px solid #dce5ee;border-radius:8px;padding:9px;background:#fff;min-width:0}
+.equipment-name{font-weight:800;color:#1165bd;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.equipment-total{font-size:9px;color:#71859a;margin-top:2px}
+.eq-bars{height:150px;display:flex;align-items:flex-end;gap:8px;margin-top:7px;border-bottom:1px solid #dce5ee}
+.eq-col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.eq-value{font-size:9px;font-weight:800;color:#17324f;height:16px}
+.eq-track{height:112px;width:100%;background:#f1f5f9;border-radius:4px 4px 0 0;display:flex;align-items:flex-end;overflow:hidden}
+.eq-fill{width:100%;border-radius:4px 4px 0 0}
+.eq-label{font-size:8px;color:#687b91;font-weight:800;margin-top:4px}
+.eq-legend{display:flex;gap:7px;flex-wrap:wrap;font-size:8px;color:#647990;margin-top:7px}
+.eq-legend span{display:flex;align-items:center;gap:3px}.eq-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.param-panel{border-top:3px solid #0877d1}
+@media(max-width:1250px){.equipment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.equipment-grid{grid-template-columns:1fr}}
+</style>
+</style>
+
+<style>
+.parameter-equipment-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.parameter-equipment-card{border:1px solid #dce5ee;border-radius:8px;background:#fff;padding:10px;min-height:235px}
+.pe-title{font-size:11px;font-weight:900;color:#1165bd;margin-bottom:5px}
+.pe-sub{font-size:8px;color:#74879a;margin-bottom:5px}
+.pe-body{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center}
+.pe-donut{width:135px;height:135px;border-radius:50%;margin:auto;position:relative;background:#edf2f7}
+.pe-donut:after{content:"";position:absolute;inset:30px;background:#fff;border-radius:50%}
+.pe-center{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pe-center b{font-size:16px;color:#17324f}.pe-center span{font-size:8px;color:#71859a}
+.pe-legend{max-height:170px;overflow:auto;padding-right:3px}
+.pe-row{display:flex;align-items:center;gap:5px;font-size:8px;margin:4px 0;color:#52677d}
+.pe-dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+.pe-row b{margin-left:auto;color:#17324f}
+.pe-empty{font-size:9px;color:#8a9aac;text-align:center;padding:18px 5px}
+@media(max-width:1250px){.parameter-equipment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.parameter-equipment-grid{grid-template-columns:1fr}.pe-body{grid-template-columns:130px 1fr}}
+</style>
+</head>
+<body class="power-inspect-blue">
+<div class="app">
+<aside class="sidebar">
+  <div class="logo"><img src="assets/pln-logo.webp" alt="PLN"><img src="assets/danantara.png" alt="Danantara"></div>
+  <nav class="nav">
+    <a>Dashboard</a><a class="active">AHI Power Inspect</a><a>AHI Evaluasi</a><a>Data Aset</a><a>Laporan</a>
+  </nav>
+  <div class="side-date"><small>Data Terakhir (Upload CSV)</small><b id="sideDate">Memuat...</b></div>
+</aside>
+<main>
+<header class="header">
+  <div class="brand"><h1>AHI POWER INSPECT</h1><p>Asset Health Index – Monitoring Peralatan Utama Gardu Induk</p></div>
+  <div class="date">Data Terakhir (Upload CSV)<b id="lastDate">Memuat...</b></div>
+</header>
+
+<section class="card filters" id="filters"></section>
+<section class="kpis" id="kpis"></section>
+
+
+<section class="panel" style="margin-top:10px">
+  <div class="title">AHI BERDASARKAN JENIS PERALATAN</div>
+  <div class="sub">Jumlah aset pada setiap kategori AHI</div>
+  <div class="equipment-grid" id="equipmentGrid"></div>
+</section>
+
+<section class="panel param-panel" style="margin-top:10px">
+  <div class="title">PARAMETER PEMICU PER JENIS PERALATAN</div>
+  <div class="sub">Distribusi parameter pemicu untuk masing-masing jenis peralatan berdasarkan filter aktif</div>
+  <div class="parameter-equipment-grid" id="parameterEquipmentGrid"></div>
+</section>
+
+<div class="grid">
+
+<section class="panel">
+  <div class="title">AHI BERDASARKAN KATEGORI</div>
+  <div class="sub">Ringkasan aset hasil filter</div>
+  <div id="ahiSummary" style="margin-top:18px"></div>
+</section>
+</div>
+
+<section class="card" style="margin-top:10px">
+  <div class="detail-head"><div><h3>DETAIL ASET</h3><small id="count">Menampilkan 0 data</small></div><input id="search" class="search" placeholder="Cari Techidentno / Merk / GI / Bay / parameter..."></div>
+  <div class="table-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+</section>
+</main>
+</div>
+
+<script>
+const DATA_URL="data/Monitoring-AHI.csv";
+const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor"];
+const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
+const PARAM_COLORS=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#0097a7","#795548","#607d8b","#455a64"];
+let raw=[],filtered=[],activeParam="",search="";
+
+function norm(v){return String(v??"").normalize("NFKC").replace(/^\\uFEFF/,"").replace(/\\u00a0/g," ").trim().replace(/\\s+/g," ").toLowerCase()}
+function fmt(n){return Number(n||0).toLocaleString("id-ID")}
+function esc(v){return String(v??"—").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function typeOf(r){
+ const s=norm(r["Jenis Aset"]||r["Jenis Asset"]);
+ return TYPES.find(t=>norm(t)===s)||r["Jenis Aset"]||r["Jenis Asset"]||"";
+}
+function parseCSV(t){
+ t=t.replace(/^\\uFEFF/,"");const first=t.split(/\\r?\\n/).find(x=>x.trim())||"";
+ const delim=((first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length)?";":",";
+ const rows=[];let row=[],cell="",q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}
+  else if(c===delim&&!q){row.push(cell);cell=""}
+  else if((c==="\\n"||c==="\\r")&&!q){if(c==="\\r"&&t[i+1]==="\\n")i++;row.push(cell);if(row.some(v=>v.trim()))rows.push(row);row=[];cell=""}
+  else cell+=c;
+ }
+ if(cell!==""||row.length){row.push(cell);if(row.some(v=>v.trim()))rows.push(row)}
+ if(!rows.length)return[];const h=rows.shift().map(v=>v.trim());
+ return rows.map(r=>Object.fromEntries(h.map((k,i)=>[k,String(r[i]??"").trim()])));
+}
+function parameterParts(v){
+ let s=String(v??"").trim();if(!s||s==="-"||s==="—")return[];
+ s=s.replace(/\\s*;\\s*/g,",").replace(/\\s*\\|\\s*/g,",");
+ return s.split(/\\s*,\\s*/).map(x=>x.trim()).filter(x=>x&&x!=="-"&&x!=="—");
+}
+function currentParam(r){return r["Parameter Pemicu"]||r["PARAMETER PEMICU"]||""}
+function getFilters(){
+ const s=[...document.querySelectorAll("#filters select")];
+ return {unit:s[0]?.value||"",upt:s[1]?.value||"",ultg:s[2]?.value||"",gi:s[3]?.value||"",bay:s[4]?.value||"",phasa:s[5]?.value||"",type:s[6]?.value||"",ahi:s[7]?.value||""};
+}
+function makeSelect(label,key,values){
+ const d=document.createElement("div");d.className="field";d.innerHTML="<label>"+label+"</label>";
+ const s=document.createElement("select");s.dataset.key=key;s.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option>${esc(v)}</option>`).join("");d.append(s);return d;
+}
+function uniq(key,arr=raw){return [...new Set(arr.map(r=>r[key]).filter(v=>String(v).trim()!==""))].sort((a,b)=>String(a).localeCompare(String(b)))}
+function buildFilters(){
+ const f=document.getElementById("filters");f.innerHTML="";
+ f.append(makeSelect("Unit Induk","unit",uniq("Unit Induk")));
+ f.append(makeSelect("UPT","upt",uniq("Unit Pelaksana")));
+ f.append(makeSelect("ULTG","ultg",uniq("Ultg")));
+ f.append(makeSelect("GI","gi",uniq("Gardu Induk")));
+ f.append(makeSelect("Bay","bay",uniq("Bay")));
+ f.append(makeSelect("Phasa","phasa",uniq("Phasa")));
+ f.append(makeSelect("Jenis Peralatan","type",TYPES));
+ f.append(makeSelect("Kategori AHI","ahi",AHI.map(x=>x[0])));
+ const b=document.createElement("button");b.className="btn";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);
+ const reset=document.createElement("button");reset.className="btn secondary";reset.textContent="Reset";reset.onclick=()=>{f.querySelectorAll("select").forEach(s=>s.value="");activeParam="";apply()};f.append(reset);
+}
+function filteredRows(){
+ const f=getFilters();
+ return raw.filter(r=>
+  (!f.unit||r["Unit Induk"]===f.unit)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&
+  (!f.ultg||r["Ultg"]===f.ultg)&&(!f.gi||r["Gardu Induk"]===f.gi)&&
+  (!f.bay||r["Bay"]===f.bay)&&(!f.phasa||r["Phasa"]===f.phasa)&&
+  (!f.type||typeOf(r)===f.type)&&(!f.ahi||norm(r["AHI"])===norm(f.ahi))
+ );
+}
+
+function renderEquipment(){
+ const icons={"Power Transformer":"▥","Current Transformer":"⌁","Potential Transformer":"♙","Circuit Breaker":"▣","Disconnecting Switch":"◇","Lightning Arrester":"ϟ","Neutral Grounding Resistance":"⌁","Reactor":"◫","Capacitor":"▤"};
+ document.getElementById("equipmentGrid").innerHTML=TYPES.map(t=>{
+   const a=filtered.filter(r=>typeOf(r)===t);
+   const total=a.length;
+   const counts=AHI.map(([n])=>a.filter(r=>norm(r["AHI"])===norm(n)).length);
+   const max=Math.max(1,...counts);
+   return `<div class="equipment-card">
+     <div class="equipment-name">${esc(t)}</div>
+     <div class="equipment-total">${fmt(total)} aset</div>
+     <div class="eq-bars">
+       ${AHI.map(([name,color],i)=>{
+         const h=counts[i] ? Math.max(2,counts[i]/max*100) : 0;
+         return `<div class="eq-col">
+           <div class="eq-value">${fmt(counts[i])}</div>
+           <div class="eq-track"><div class="eq-fill" style="height:${h}%;background:${color}"></div></div>
+           <div class="eq-label">${name.split(" - ")[0]}</div>
+         </div>`;
+       }).join("")}
+     </div>
+     <div class="eq-legend">${AHI.map(([name,color])=>`<span><i style="background:${color}"></i>${name.replace(/^\\d+\\s-\\s/,"")}</span>`).join("")}</div>
+   </div>`;
+ }).join("");
+}
+function renderKpis(){
+ const a=filtered,c=[0,0,0,0,0];a.forEach(r=>{const n=Number(String(r["AHI"]||"").match(/[1-5]/)?.[0]||0);if(n)c[n-1]++});
+ document.getElementById("kpis").innerHTML=[["TOTAL ASET",a.length,""],...AHI.map((x,i)=>[x[0],c[i],["vg","good","fair","poor","critical"][i]])].map(x=>`<div class="kpi"><small>${x[0]}</small><b class="${x[2]}">${fmt(x[1])}</b></div>`).join("");
+}
+function renderParam(){
+ const grid=document.getElementById("parameterEquipmentGrid");
+ const colors=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#0097a7","#795548","#607d8b","#455a64","#8e44ad","#16a085"];
+ grid.innerHTML=TYPES.map(type=>{
+   const rows=filtered.filter(r=>typeOf(r)===type);
+   const counts=new Map();
+   rows.forEach(r=>parameterParts(currentParam(r)).forEach(x=>counts.set(x,(counts.get(x)||0)+1)));
+   const entries=[...counts.entries()].sort((a,b)=>b[1]-a[1]);
+   const total=entries.reduce((s,x)=>s+x[1],0);
+   if(!entries.length){
+     return `<div class="parameter-equipment-card">
+       <div class="pe-title">${esc(type)}</div>
+       <div class="pe-sub">${fmt(rows.length)} aset</div>
+       <div class="pe-empty">Tidak ada data Parameter Pemicu</div>
+     </div>`;
+   }
+   let acc=0, stops=[];
+   entries.forEach(([name,val],i)=>{
+     const a=(acc/total)*360,b=((acc+val)/total)*360; 
+     stops.push(`${colors[i%colors.length]} ${a}deg ${b}deg`); acc+=val;
+   });
+   const gradient=`conic-gradient(${stops.join(",")})`;
+   return `<div class="parameter-equipment-card">
+     <div class="pe-title">${esc(type)}</div>
+     <div class="pe-sub">${fmt(rows.length)} aset • ${fmt(total)} parameter tercatat</div>
+     <div class="pe-body">
+       <div class="pe-donut" style="background:${gradient}">
+         <div class="pe-center"><b>${fmt(total)}</b><span>parameter</span></div>
+       </div>
+       <div class="pe-legend">
+         ${entries.map(([name,val],i)=>`<div class="pe-row">
+           <i class="pe-dot" style="background:${colors[i%colors.length]}"></i>
+           <span>${esc(name)}</span><b>${fmt(val)}</b>
+         </div>`).join("")}
+       </div>
+     </div>
+   </div>`;
+ }).join("");
+}
+
+function renderAhi(){
+ const total=filtered.length,c=[0,0,0,0,0];filtered.forEach(r=>{const n=Number(String(r["AHI"]||"").match(/[1-5]/)?.[0]||0);if(n)c[n-1]++});
+ document.getElementById("ahiSummary").innerHTML=AHI.map((x,i)=>`<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;font-weight:700"><span>${x[0]}</span><span>${fmt(c[i])} • ${total?(c[i]/total*100).toFixed(1):"0,0"}%</span></div><div style="height:13px;background:#edf2f6;border-radius:6px;overflow:hidden;margin-top:5px"><div style="width:${total?c[i]/total*100:0}%;height:100%;background:${x[1]}"></div></div></div>`).join("");
+}
+const cols=["Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Phasa","Jenis Aset","Merk","Serial ID","Status Asset","Tipe Aset","Tegangan","Tahun Buat","Usia Aset","Kategori Umur","AHI","Parameter Pemicu"];
+function renderTable(){
+ let rows=filtered;
+ const q=norm(search);if(q)rows=rows.filter(r=>cols.some(c=>norm(r[c]).includes(q)));
+ if(activeParam&&activeParam!=="Lainnya")rows=rows.filter(r=>parameterParts(currentParam(r)).some(p=>norm(p)===norm(activeParam)));
+ document.getElementById("count").textContent=`Menampilkan ${Math.min(50,rows.length).toLocaleString("id-ID")} dari ${rows.length.toLocaleString("id-ID")} data${activeParam?` • ${activeParam}`:""}`;
+ document.getElementById("thead").innerHTML="<tr>"+cols.map(c=>`<th>${c}</th>`).join("")+"</tr>";
+ document.getElementById("tbody").innerHTML=rows.slice(0,50).map(r=>"<tr>"+cols.map(c=>`<td>${esc(c==="Usia Aset"?(r[c]||"—"):r[c])}</td>`).join("")+"</tr>").join("")||'<tr><td class="empty" colspan="17">Tidak ada data.</td></tr>';
+}
+function render(){renderKpis();renderEquipment();renderParam();renderAhi();renderTable()}
+function apply(){filtered=filteredRows();render()}
+document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});
+async function load(){
+ try{
+  const r=await fetch(DATA_URL+"?v="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);
+  raw=parseCSV(await r.text());buildFilters();apply();
+  const d=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});document.getElementById("lastDate").textContent=d;document.getElementById("sideDate").textContent=d;
+ }catch(e){
+  document.getElementById("lastDate").textContent="CSV belum terbaca";document.getElementById("sideDate").textContent="CSV belum terbaca";
+  document.getElementById("count").textContent="Gagal membaca data/Monitoring-AHI.csv";
+ }
+}
+load();
+</script>
+</body>
+</html>
