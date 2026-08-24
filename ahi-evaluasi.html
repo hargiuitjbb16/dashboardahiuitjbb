@@ -206,9 +206,9 @@ document.getElementById("search").addEventListener("input",e=>{search=e.target.v
 async function fetchMonth(month){
  const file=MONTH_FILES[month]; if(!file)return null;
  const urls=[
-   "https://cdn.jsdelivr.net/gh/hargiuijbb16/dashboardahiuitjbb@main/data/evaluasi/"+file+"?v="+Date.now(),
-   "https://raw.githubusercontent.com/hargiuijbb16/dashboardahiuitjbb/main/data/evaluasi/"+file+"?v="+Date.now(),
-   "https://raw.githubusercontent.com/hargiuijbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/"+file+"?v="+Date.now(),
+   "https://cdn.jsdelivr.net/gh/hargiuitjbb16/dashboardahiuitjbb@main/data/evaluasi/"+file+"?v="+Date.now(),
+   "https://raw.githubusercontent.com/hargiuitjbb16/dashboardahiuitjbb/main/data/evaluasi/"+file+"?v="+Date.now(),
+   "https://raw.githubusercontent.com/hargiuitjbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/"+file+"?v="+Date.now(),
    "data/evaluasi/"+file+"?v="+Date.now(),
    "./data/evaluasi/"+file+"?v="+Date.now()
  ];
