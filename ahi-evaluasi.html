@@ -181,16 +181,62 @@ function cards(counts,total){
 function renderLegend(){$("legend").innerHTML=AHI.map(x=>`<span><i style="background:${x[1]}"></i>${x[0]}</span>`).join("")}
 function renderTrend(){
  const f=filterState();
- const months=MONTHS.slice(0,Math.max(5,MONTHS.findIndex(x=>x===currentMonth)+1));
- const series=AHI.map((x,i)=>({name:x[0],color:x[1],values:months.map(m=>HIST[m]?HIST[m][i]:(dataByMonth[m]?countRows(dataByMonth[m].filter(r=>includeVoltage(r,f.group)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&(!f.ultg||norm(r["Ultg"])===norm(f.ultg))&&(!f.gi||r["Gardu Induk"]===f.gi)&&(!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&(!f.type||canonical(r["Jenis Aset"])===f.type)))[i]:null)}));
- const vals=series.flatMap(s=>s.values.filter(v=>v!=null));const max=Math.max(1,...vals),nice=Math.ceil(max/5/100)*100;
+ const idx=Math.max(5,MONTHS.indexOf(currentMonth)+1);
+ const months=MONTHS.slice(0,idx);
+ const filteredForTrend=(m)=>{
+   if(HIST[m]) return null;
+   const rs=dataByMonth[m]||[];
+   return rs.filter(r=>{
+     if(!includeVoltage(r,f.group)) return false;
+     if(f.ui && r["Unit Induk"]!==f.ui) return false;
+     if(f.upt && r["Unit Pelaksana"]!==f.upt) return false;
+     if(f.ultg && norm(r["Ultg"])!==norm(f.ultg)) return false;
+     if(f.gi && r["Gardu Induk"]!==f.gi) return false;
+     if(f.bay && r["Bay"]!==f.bay) return false;
+     if(f.ph && r["Phasa"]!==f.ph) return false;
+     if(f.type && canonical(r["Jenis Aset"])!==f.type) return false;
+     if(f.ahi && norm(ahiOf(r))!==norm(f.ahi)) return false;
+     return true;
+   });
+ };
+ const series=AHI.map((x,i)=>({
+   name:x[0],color:x[1],
+   values:months.map(m=>{
+     if(HIST[m]) return HIST[m][i];
+     const rs=filteredForTrend(m);
+     return rs===null?null:countRows(rs)[i];
+   })
+ }));
+ const vals=series.flatMap(s=>s.values.filter(v=>v!=null));
+ const max=Math.max(1,...vals);
+ const nice=Math.max(100,Math.ceil(max/5/100)*100);
  $("grid").innerHTML=[5,4,3,2,1,0].map(i=>`<div class="gline"><span>${fmt(Math.round(nice*i/5))}</span></div>`).join("");
  $("months").innerHTML=months.map(m=>`<span>${m.slice(0,3)}</span>`).join("");
  const svg=$("svg");svg.innerHTML="";
- const W=1200,H=300,padX=8,step=months.length>1?(W-padX*2)/(months.length-1):0;
- series.forEach((s,si)=>{let pts=[];s.values.forEach((v,j)=>{if(v==null)return;const x=padX+j*step,y=H-(v/nice*(H-8));pts.push([x,y,v,months[j]]);});
-   if(pts.length>1){const p=document.createElementNS("http://www.w3.org/2000/svg","polyline");p.setAttribute("points",pts.map(q=>q[0]+","+q[1]).join(" "));p.setAttribute("fill","none");p.setAttribute("stroke",s.color);p.setAttribute("stroke-width","3");svg.appendChild(p)}
-   pts.forEach(q=>{const c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",q[0]);c.setAttribute("cy",q[1]);c.setAttribute("r","5");c.setAttribute("fill",s.color);c.setAttribute("stroke","#fff");c.setAttribute("stroke-width","2");c.classList.add("dot");c.onmouseenter=e=>showTip(e,q[3],s.name,q[2],s.color);c.onmouseleave=()=>{$("tooltip").style.display="none"};svg.appendChild(c)})
+ const W=1200,H=300,padX=8;
+ const step=months.length>1?(W-padX*2)/(months.length-1):0;
+ series.forEach(s=>{
+   const pts=[];
+   s.values.forEach((v,j)=>{
+     if(v==null)return;
+     const x=padX+j*step, y=H-(v/nice*(H-8));
+     pts.push([x,y,v,months[j]]);
+   });
+   if(pts.length>1){
+     const p=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+     p.setAttribute("points",pts.map(q=>q[0]+","+q[1]).join(" "));
+     p.setAttribute("fill","none");p.setAttribute("stroke",s.color);
+     p.setAttribute("stroke-width","3");svg.appendChild(p);
+   }
+   pts.forEach(q=>{
+     const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+     c.setAttribute("cx",q[0]);c.setAttribute("cy",q[1]);c.setAttribute("r","5");
+     c.setAttribute("fill",s.color);c.setAttribute("stroke","#fff");c.setAttribute("stroke-width","2");
+     c.classList.add("dot");
+     c.onmouseenter=e=>showTip(e,q[3],s.name,q[2],s.color);
+     c.onmouseleave=()=>{$("tooltip").style.display="none"};
+     svg.appendChild(c);
+   });
  });
 }
 function showTip(e,month,name,value,color){const t=$("tooltip");t.innerHTML=`<div class="tt-title">${month}</div><div class="tt-row"><span style="color:${color};font-weight:800">${esc(name)}</span><b>${fmt(value)}</b></div>`;t.style.display="block";t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px"}
