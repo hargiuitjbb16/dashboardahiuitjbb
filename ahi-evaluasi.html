@@ -171,7 +171,22 @@ function render(){renderKpi();renderTrend();renderTable()}
 document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});document.getElementById("exportBtn").onclick=()=>{let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q))),out=detailCols.join(";")+"\\n"+arr.map(r=>detailCols.map(c=>`"${String(field(r,c)).replaceAll('"','""')}"`).join(";")).join("\\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\\ufeff"+out],{type:"text/csv"}));a.download=`AHI_Evaluasi_${period}_2026.csv`;a.click()};
 async function fetchMonth(month){
  const file=MONTH_FILES[month]; if(!file)return null;
- try{const r=await fetch("data/evaluasi/"+file+"?v="+Date.now(),{cache:"no-store"});if(!r.ok)return null;const rows=parseCSV(await r.text());return rows.length?{rows,file}:null}catch(e){console.warn("Gagal memuat",month,e);return null}
+ const urls=[
+   "data/evaluasi/"+file+"?v="+Date.now(),
+   "./data/evaluasi/"+file+"?v="+Date.now(),
+   "https://raw.githubusercontent.com/hargiuijbb16/dashboardahiuitjbb/main/data/evaluasi/"+file+"?v="+Date.now(),
+   "https://raw.githubusercontent.com/hargiuijbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/"+file+"?v="+Date.now()
+ ];
+ for(const url of urls){
+   try{
+     const r=await fetch(url,{cache:"no-store"});
+     if(!r.ok) continue;
+     const text=await r.text();
+     const rows=parseCSV(text);
+     if(rows.length) return {rows,file};
+   }catch(e){console.warn("Gagal memuat",url,e);}
+ }
+ return null;
 }
 async function load(){
  try{
