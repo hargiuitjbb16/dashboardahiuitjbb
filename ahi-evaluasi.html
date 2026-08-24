@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AHI Evaluasi - Dashboard AHI UIT JBB</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#142033;--muted:#667085;--line:#dfe5ee;--nav:#0f1d33;--nav2:#142844;--accent:#1683ff;--vg:#18a957;--good:#d7a900;--fair:#f08a00;--poor:#e34234;--critical:#252a33}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.sidebar{position:fixed;inset:0 auto 0 0;width:220px;background:linear-gradient(180deg,var(--nav),#0b1628);color:#fff;padding:24px 14px}
+.brand{font-weight:800;font-size:22px;margin:4px 12px 30px}.brand span{color:#53a6ff}.nav a{display:block;color:#cbd5e1;text-decoration:none;padding:12px 14px;border-radius:9px;margin:5px 0;font-weight:600}.nav a:hover,.nav a.active{background:#1e3557;color:#fff}.nav a.active{box-shadow:inset 3px 0 #4aa3ff}
+.main{margin-left:220px;padding:26px 28px 50px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.title h1{margin:0;font-size:26px}.title p{margin:6px 0 0;color:var(--muted)}
+.filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:10px;box-shadow:0 2px 10px #00000008}.filter label{display:block;font-size:11px;font-weight:800;color:#667085;margin:0 0 5px;text-transform:uppercase}.filter select{width:100%;height:38px;border:1px solid #cfd7e3;border-radius:8px;background:#fff;padding:0 10px;color:#172033}.actions{display:flex;gap:8px;align-items:end}.btn{height:38px;border:0;border-radius:8px;padding:0 15px;font-weight:800;cursor:pointer;background:#e8edf4;color:#233044}.btn.primary{background:var(--accent);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:16px 0}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;box-shadow:0 2px 10px #00000008}.card .k{font-size:11px;color:var(--muted);font-weight:800}.card .v{font-size:25px;font-weight:900;margin-top:5px}.card .s{font-size:11px;color:var(--muted);margin-top:3px}
+.chart-card,.table-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 2px 10px #00000008;margin-bottom:16px}.chart-head{display:flex;justify-content:space-between;align-items:center}.chart-head h2,.table-head h2{font-size:16px;margin:0}.legend{display:flex;gap:15px;flex-wrap:wrap;font-size:12px;font-weight:700;color:#475467}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}.trend{position:relative;height:360px;margin-top:8px}.grid{position:absolute;inset:20px 50px 42px 60px;display:flex;flex-direction:column;justify-content:space-between}.gline{border-top:1px dashed #d9e0ea;position:relative}.gline span{position:absolute;left:-52px;top:-9px;font-size:10px;color:#7a8494}.svg{position:absolute;inset:20px 50px 42px 60px;width:calc(100% - 110px);height:calc(100% - 62px);overflow:visible}.months{position:absolute;left:60px;right:50px;bottom:15px;display:grid;grid-template-columns:repeat(12,1fr);font-size:11px;color:#667085;text-align:center}.tooltip{position:fixed;display:none;z-index:20;background:#111827;color:#fff;border-radius:9px;padding:9px 11px;font-size:12px;box-shadow:0 8px 25px #0004;pointer-events:none;min-width:180px}.tt-title{font-weight:800;margin-bottom:5px}.tt-row{display:flex;justify-content:space-between;gap:15px}.dot{cursor:pointer}
+.table-wrap{overflow:auto;max-height:520px}.table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;min-width:1400px}.table th{position:sticky;top:0;background:#eef3f8;color:#3d4858;text-align:left;padding:9px 8px;border-bottom:1px solid #d8e0ea;white-space:nowrap;z-index:2}.table td{padding:8px;border-bottom:1px solid #edf0f4;white-space:nowrap}.table tr:hover td{background:#f8fbff}.empty{text-align:center!important;padding:40px!important;color:#7a8494}
+@media(max-width:1100px){.sidebar{width:190px}.main{margin-left:190px}.filters{grid-template-columns:repeat(3,1fr)}.cards{grid-template-columns:repeat(3,1fr)}} 
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand">AHI <span>UIT JBB</span></div>
+  <nav class="nav">
+    <a href="./index.html">Dashboard</a>
+    <a href="./index.html">AHI Power Inspect</a>
+    <a class="active" href="./ahi-evaluasi.html">AHI Evaluasi</a>
+  </nav>
+</aside>
+<main class="main">
+  <div class="top"><div class="title"><h1>AHI Evaluasi</h1><p>Asset Health Index — Evaluasi Bulanan</p></div><div id="status" style="font-size:12px;color:#667085">Menyiapkan data...</div></div>
+  <section class="filters" id="filters"></section>
+  <section class="cards" id="cards"></section>
+
+  <section class="chart-card">
+    <div class="chart-head"><h2>Trend Distribusi AHI</h2><div class="legend" id="legend"></div></div>
+    <div class="trend">
+      <div class="grid" id="grid"></div>
+      <svg class="svg" id="svg" viewBox="0 0 1200 300" preserveAspectRatio="none"></svg>
+      <div class="months" id="months"></div>
+    </div>
+  </section>
+
+  <section class="table-card">
+    <div class="chart-head table-head"><h2>Detail Aset</h2><div id="tableInfo" style="font-size:12px;color:#667085"></div></div>
+    <div class="table-wrap"><table class="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+  </section>
+</main>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const MONTHS=["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
+const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor"];
+const AHI=[["Very Good","#18a957"],["Good","#d7a900"],["Fair","#f08a00"],["Poor","#e34234"],["Critical","#252a33"]];
+const HIST={
+JANUARI:[386,1029,803,18257,7476],
+FEBRUARI:[364,1730,797,18441,13167],
+MARET:[337,997,796,18646,7232],
+APRIL:[245,1144,912,17260,6954],
+MEI:[225,1123,1710,18282,6759]
+};
+const FILES={JUNI:"AHI_EVAL_JUNI.csv",JULI:"AHI_EVAL_JULI.csv",AGUSTUS:"AHI_EVAL_AGUSTUS.csv",SEPTEMBER:"AHI_EVAL_SEPTEMBER.csv",OKTOBER:"AHI_EVAL_OKTOBER.csv",NOVEMBER:"AHI_EVAL_NOVEMBER.csv",DESEMBER:"AHI_EVAL_DESEMBER.csv"};
+const DETAIL=["Jenis Aset","Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Phasa","Teg Operasi","Merek","Tipe","USIA","STATUS USIA","TINGKAT RESIKO","AHI FINAL","Parameter Pemicu","P0/P1","Rencana","Target Tanggal Penyelesaian"];
+let dataByMonth={}, currentMonth="AGUSTUS", currentRows=[];
+
+const $=id=>document.getElementById(id);
+const norm=v=>String(v??"").trim().toUpperCase().replace(/\s+/g," ");
+const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const fmt=n=>Number(n||0).toLocaleString("id-ID");
+function canonical(v){
+ const n=norm(v);
+ if(n.includes("POWER")||n==="TRAFO")return "Power Transformer";
+ if(n.includes("CURRENT")||n==="CT")return "Current Transformer";
+ if(n.includes("POTENTIAL")||n.includes("VOLTAGE")||n==="CVT/PT"||n==="PT")return "Potential Transformer";
+ if(n.includes("CIRCUIT")||n==="PMT")return "Circuit Breaker";
+ if(n.includes("DISCONNECT")||n==="PMS")return "Disconnecting Switch";
+ if(n.includes("LIGHTNING")||n==="LA")return "Lightning Arrester";
+ if(n.includes("NEUTRAL")||n==="NGR")return "Neutral Grounding Resistance";
+ if(n.includes("REACTOR"))return "Reactor";
+ if(n.includes("CAPACITOR")||n.includes("KAPASITOR"))return "Capacitor";
+ return String(v||"");
+}
+function parseCSV(text){
+ const rows=[];let row=[],cell="",q=false;
+ for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+   if(c=='"'){if(q&&n=='"'){cell+='"';i++}else q=!q}
+   else if(c==","&&!q){row.push(cell);cell=""}
+   else if((c=="\n"||c=="\r")&&!q){if(c=="\r"&&n=="\n")i++;row.push(cell);cell="";if(row.some(x=>x.trim()!==""))rows.push(row);row=[]}
+   else cell+=c;
+ }
+ if(cell!==""||row.length){row.push(cell);if(row.some(x=>x.trim()!==""))rows.push(row)}
+ const headers=(rows.shift()||[]).map(x=>x.replace(/^\uFEFF/,"").trim());
+ return rows.map(r=>{const o={};headers.forEach((h,i)=>o[h]=(r[i]??"").trim());return o});
+}
+function monthFile(m){return `data/evaluasi/${FILES[m]||""}`}
+async function loadMonth(m){
+ if(HIST[m])return null;
+ if(dataByMonth[m])return dataByMonth[m];
+ const fn=FILES[m];if(!fn)return [];
+ const r=await fetch(`data/evaluasi/${fn}?v=1`,{cache:"no-store"});
+ if(!r.ok)throw Error(`${fn}: HTTP ${r.status}`);
+ const txt=await r.text();const rows=parseCSV(txt);
+ dataByMonth[m]=rows;return rows;
+}
+function includeVoltage(r,g){
+ const a=canonical(r["Jenis Aset"]);
+ if(["Neutral Grounding Resistance","Reactor","Capacitor"].includes(a))return true;
+ const x=norm(r["Teg Operasi"]||r["Tegangan"]).replace(/\s/g,"");
+ const kv=parseFloat(x.replace(/[^0-9.]/g,""));
+ return g==="transmisi" ? kv>=70 : (kv<=20 || x==="" || x==="-");
+}
+function uniq(rows,k){return [...new Set(rows.map(r=>r[k]).filter(v=>String(v??"").trim()!==""))].sort((a,b)=>String(a).localeCompare(String(b),"id"))}
+function opts(sel,vals,keep){sel.innerHTML='<option value="">Semua</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if(vals.includes(keep))sel.value=keep}
+function baseRows(f,exclude){
+ return currentRows.filter(r=>{
+  if(!includeVoltage(r,f.group))return false;
+  if(exclude!=="ui"&&f.ui&&r["Unit Induk"]!==f.ui)return false;
+  if(exclude!=="upt"&&f.upt&&r["Unit Pelaksana"]!==f.upt)return false;
+  if(exclude!=="ultg"&&f.ultg&&norm(r["Ultg"])!==norm(f.ultg))return false;
+  if(exclude!=="gi"&&f.gi&&r["Gardu Induk"]!==f.gi)return false;
+  if(exclude!=="bay"&&f.bay&&r["Bay"]!==f.bay)return false;
+  return true;
+ });
+}
+function filterState(){
+ const s=[...document.querySelectorAll("#filters select")];
+ return {group:s[0].value,ui:s[1].value,upt:s[2].value,ultg:s[3].value,gi:s[4].value,bay:s[5].value,ph:s[6].value,type:s[7].value,ahi:s[8].value};
+}
+function cascading(){
+ const s=[...document.querySelectorAll("#filters select")],f=filterState();
+ opts(s[1],uniq(baseRows(f,"ui"),"Unit Induk"),f.ui);f.ui=s[1].value;
+ opts(s[2],uniq(baseRows(f,"upt"),"Unit Pelaksana"),f.upt);f.upt=s[2].value;
+ opts(s[3],uniq(baseRows(f,"ultg"),"Ultg"),f.ultg);f.ultg=s[3].value;
+ opts(s[4],uniq(baseRows(f,"gi"),"Gardu Induk"),f.gi);f.gi=s[4].value;
+ opts(s[5],uniq(baseRows(f,"bay"),"Bay"),f.bay);f.bay=s[5].value;
+}
+function buildFilters(){
+ const labels=["Kelompok Tegangan","Unit Induk","UPT","ULTG","GI","Bay","Phasa","Jenis Aset","Kategori AHI"];
+ const f=$("filters");f.innerHTML="";
+ labels.forEach((lab,i)=>{const d=document.createElement("div");d.className="filter";const l=document.createElement("label");l.textContent=lab;const s=document.createElement("select");d.append(l,s);f.append(d);
+   if(i===0)s.innerHTML='<option value="transmisi">Transmisi (≥70 kV)</option><option value="incoming">Incoming (≤20 kV / -)</option>';
+   else if(i===7)s.innerHTML='<option value="">Semua</option>'+TYPES.map(x=>`<option>${x}</option>`).join("");
+   else if(i===8)s.innerHTML='<option value="">Semua</option>'+AHI.map(x=>`<option>${x[0]}</option>`).join("");
+   else s.innerHTML='<option value="">Semua</option>';
+   s.addEventListener("change",()=>{if(i<=5)cascading();render();});
+ });
+ const d=document.createElement("div");d.className="actions";
+ const b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan";b.onclick=render;
+ const r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{f.querySelectorAll("select").forEach((s,i)=>s.value=i===0?"transmisi":"");cascading();render()};
+ d.append(b,r);f.append(d);cascading();
+}
+function ahiOf(r){
+ const k=Object.keys(r).find(k=>norm(k)==="AHI FINAL");
+ if(k)return norm(r[k]);
+ const m=currentMonth;
+ const k2=Object.keys(r).find(k=>norm(k)===`AHI FINAL ${m}`);
+ return k2?norm(r[k2]):"";
+}
+function countRows(rows){
+ return AHI.map(([name])=>rows.filter(r=>norm(ahiOf(r))===norm(name)).length);
+}
+function applyRows(){
+ const f=filterState();
+ currentRows=currentRows; // explicit
+ return currentRows.filter(r=>{
+  if(!includeVoltage(r,f.group))return false;
+  if(f.ui&&r["Unit Induk"]!==f.ui)return false;
+  if(f.upt&&r["Unit Pelaksana"]!==f.upt)return false;
+  if(f.ultg&&norm(r["Ultg"])!==norm(f.ultg))return false;
+  if(f.gi&&r["Gardu Induk"]!==f.gi)return false;
+  if(f.bay&&r["Bay"]!==f.bay)return false;
+  if(f.ph&&r["Phasa"]!==f.ph)return false;
+  if(f.type&&canonical(r["Jenis Aset"])!==f.type)return false;
+  if(f.ahi&&norm(ahiOf(r))!==norm(f.ahi))return false;
+  return true;
+ });
+}
+function cards(counts,total){
+ const labels=[["Total Aset",total,"Semua"],...AHI.map((x,i)=>[`${i+1} ${x[0]}`,counts[i],"Kategori AHI"])];
+ $("cards").innerHTML=labels.map(x=>`<div class="card"><div class="k">${x[0]}</div><div class="v">${fmt(x[1])}</div><div class="s">${x[2]}</div></div>`).join("");
+}
+function renderLegend(){$("legend").innerHTML=AHI.map(x=>`<span><i style="background:${x[1]}"></i>${x[0]}</span>`).join("")}
+function renderTrend(){
+ const f=filterState();
+ const months=MONTHS.slice(0,Math.max(5,MONTHS.findIndex(x=>x===currentMonth)+1));
+ const series=AHI.map((x,i)=>({name:x[0],color:x[1],values:months.map(m=>HIST[m]?HIST[m][i]:(dataByMonth[m]?countRows(dataByMonth[m].filter(r=>includeVoltage(r,f.group)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&(!f.ultg||norm(r["Ultg"])===norm(f.ultg))&&(!f.gi||r["Gardu Induk"]===f.gi)&&(!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&(!f.type||canonical(r["Jenis Aset"])===f.type)))[i]:null)}));
+ const vals=series.flatMap(s=>s.values.filter(v=>v!=null));const max=Math.max(1,...vals),nice=Math.ceil(max/5/100)*100;
+ $("grid").innerHTML=[5,4,3,2,1,0].map(i=>`<div class="gline"><span>${fmt(Math.round(nice*i/5))}</span></div>`).join("");
+ $("months").innerHTML=months.map(m=>`<span>${m.slice(0,3)}</span>`).join("");
+ const svg=$("svg");svg.innerHTML="";
+ const W=1200,H=300,padX=8,step=months.length>1?(W-padX*2)/(months.length-1):0;
+ series.forEach((s,si)=>{let pts=[];s.values.forEach((v,j)=>{if(v==null)return;const x=padX+j*step,y=H-(v/nice*(H-8));pts.push([x,y,v,months[j]]);});
+   if(pts.length>1){const p=document.createElementNS("http://www.w3.org/2000/svg","polyline");p.setAttribute("points",pts.map(q=>q[0]+","+q[1]).join(" "));p.setAttribute("fill","none");p.setAttribute("stroke",s.color);p.setAttribute("stroke-width","3");svg.appendChild(p)}
+   pts.forEach(q=>{const c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",q[0]);c.setAttribute("cy",q[1]);c.setAttribute("r","5");c.setAttribute("fill",s.color);c.setAttribute("stroke","#fff");c.setAttribute("stroke-width","2");c.classList.add("dot");c.onmouseenter=e=>showTip(e,q[3],s.name,q[2],s.color);c.onmouseleave=()=>{$("tooltip").style.display="none"};svg.appendChild(c)})
+ });
+}
+function showTip(e,month,name,value,color){const t=$("tooltip");t.innerHTML=`<div class="tt-title">${month}</div><div class="tt-row"><span style="color:${color};font-weight:800">${esc(name)}</span><b>${fmt(value)}</b></div>`;t.style.display="block";t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px"}
+function renderTable(rows){
+ $("thead").innerHTML="<tr>"+DETAIL.map(x=>`<th>${x}</th>`).join("")+"</tr>";
+ if(!rows.length){$("tbody").innerHTML=`<tr><td class="empty" colspan="${DETAIL.length}">Tidak ada data sesuai filter.</td></tr>`;return}
+ $("tbody").innerHTML=rows.slice(0,3000).map(r=>"<tr>"+DETAIL.map(k=>`<td>${esc(k==="AHI FINAL"?ahiOf(r):(r[k]??""))}</td>`).join("")+"</tr>").join("");
+}
+async function render(){
+ const f=filterState();currentMonth=$("periodSelect")?.value||currentMonth;
+ const rows=applyRows();const c=countRows(rows);cards(c,rows.length);renderLegend();renderTrend();renderTable(rows);$("tableInfo").textContent=`${fmt(rows.length)} aset • ${currentMonth} 2026`;
+}
+async function loadSelected(){
+ const period=$("periodSelect").value;currentMonth=period;
+ try{currentRows=await loadMonth(period)||[];$("status").textContent=HIST[period]?"Januari–Mei menggunakan data historis":"Data "+period+" berhasil dimuat";cascading();render()}
+ catch(e){currentRows=[];$("status").textContent="Gagal memuat "+period+" ("+e.message+")";render()}
+}
+function addPeriodFilter(){
+ const f=$("filters"),d=document.createElement("div");d.className="filter";d.innerHTML='<label>Periode</label><select id="periodSelect">'+MONTHS.map(m=>`<option>${m}</option>`).join("")+"</select>";f.insertBefore(d,f.lastElementChild);
+ $("periodSelect").value="AGUSTUS";$("periodSelect").addEventListener("change",loadSelected);
+}
+(async()=>{buildFilters();addPeriodFilter();await loadSelected()})();
+</script>
+</body>
+</html>
