@@ -71,9 +71,39 @@ function ageCat(r){let a=age(r),rule=AGE_RULES[r["Jenis Aset"]];if(a===null||!ru
 function fmt(n){return Number(n||0).toLocaleString("id-ID")}
 function pct(n,d){return d?((n/d)*100).toFixed(1).replace(".",",")+"%":"0,0%"}
 function ahiNorm(v){return norm(v).replace(/\s+/g," ")}
-function fill(id,values){let s=$(id);s.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option>${v}</option>`).join("")}
-function unique(f){return [...new Set(raw.map(r=>r[f]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id"))}
-function populate(){fill("unitInduk",unique("Unit Induk"));fill("upt",unique("Unit Pelaksana"));fill("ultg",unique("Ultg"));fill("gi",unique("Gardu Induk"));fill("bay",unique("Bay"));fill("phasa",unique("Phasa"));fill("jenis",TYPES);fill("ahi",AHI.map(x=>x[0]))}
+function fill(id,values,keep=""){
+ let s=$(id),old=keep||s.value;
+ s.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option>${v}</option>`).join("");
+ if(values.includes(old))s.value=old;else s.value="";
+}
+function hierarchyRows(){
+ let ui=$("unitInduk").value,upt=$("upt").value,ultg=$("ultg").value,gi=$("gi").value;
+ return {ui,upt,ultg,gi};
+}
+function refreshHierarchyFilters(){
+ let {ui,upt,ultg,gi}=hierarchyRows();
+ let uiVals=unique("Unit Induk");
+ fill("unitInduk",uiVals,ui);
+ let rUpt=raw.filter(r=>!ui||r["Unit Induk"]===ui);
+ fill("upt",[...new Set(rUpt.map(r=>r["Unit Pelaksana"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),upt);
+ let rUltg=rUpt.filter(r=>!upt||r["Unit Pelaksana"]===upt);
+ fill("ultg",[...new Set(rUltg.map(r=>r["Ultg"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ultg);
+ let rGi=rUltg.filter(r=>!ultg||r["Ultg"]===ultg);
+ fill("gi",[...new Set(rGi.map(r=>r["Gardu Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),gi);
+ let rBay=rGi.filter(r=>!gi||r["Gardu Induk"]===gi);
+ fill("bay",[...new Set(rBay.map(r=>r["Bay"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),$("bay").value);
+}
+function populate(){
+ fill("unitInduk",unique("Unit Induk"));
+ fill("upt",unique("Unit Pelaksana"));
+ fill("ultg",unique("Ultg"));
+ fill("gi",unique("Gardu Induk"));
+ fill("bay",unique("Bay"));
+ fill("phasa",unique("Phasa"));
+ fill("jenis",TYPES);fill("ahi",AHI.map(x=>x[0]));
+ ["unitInduk","upt","ultg","gi"].forEach(id=>$(id).addEventListener("change",refreshHierarchyFilters));
+ refreshHierarchyFilters();
+}
 function apply(){let vg=$("voltageGroup").value,v={unitInduk:$("unitInduk").value,upt:$("upt").value,ultg:$("ultg").value,gi:$("gi").value,bay:$("bay").value,phasa:$("phasa").value,jenis:$("jenis").value,ahi:$("ahi").value};filtered=raw.filter(r=>canonicalType(r["Jenis Aset"])!==""&&includeByVoltageGroup(r,vg)&&(!v.unitInduk||r["Unit Induk"]===v.unitInduk)&&(!v.upt||r["Unit Pelaksana"]===v.upt)&&(!v.ultg||r.Ultg===v.ultg)&&(!v.gi||r["Gardu Induk"]===v.gi)&&(!v.bay||r.Bay===v.bay)&&(!v.phasa||r.Phasa===v.phasa)&&(!v.jenis||r["Jenis Aset"]===v.jenis)&&(!v.ahi||ahiNorm(r.AHI)===ahiNorm(v.ahi)));page=1;render()}
 function render(){kpis();assetAhiVisual();ageDonut();ageBars();table()}
 function kpis(){let valid=filtered.filter(r=>/^([1-5]) - /.test(r.AHI)),total=valid.length,counts=AHI.map(([n])=>valid.filter(r=>ahiNorm(r.AHI)===ahiNorm(n)).length),arr=[["TOTAL ASET",total,"100%","total"],...AHI.map((a,i)=>[a[0],counts[i],pct(counts[i],total),["good","good2","fair","poor","critical"][i]])];$("kpis").innerHTML=arr.map(x=>`<div class="kpi ${x[3]}"><div class="label">${x[0]}</div><div class="num">${fmt(x[1])}</div><div class="pct">${x[2]}</div></div>`).join("")}
@@ -116,7 +146,7 @@ async function updateDate(){
   }
 }
 
-$("applyBtn").onclick=apply;$("resetBtn").onclick=()=>{document.querySelectorAll("select").forEach(s=>s.value="");$("voltageGroup").value="transmisi";apply()};$("voltageGroup").onchange=apply;$("search").oninput=()=>{page=1;table()};$("pageSize").onchange=e=>{pageSize=+e.target.value;page=1;table()};$("prev").onclick=()=>{if(page>1){page--;table()}};$("next").onclick=()=>{let n=filtered.length;if(page<Math.ceil(n/pageSize)){page++;table()}};$("exportBtn").onclick=()=>{let out=cols.join(";")+"\n"+filtered.map(r=>cols.map(c=>c==="Usia Aset"?age(r):c==="Kategori Umur"?ageCat(r):r[c]||"").map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+out],{type:"text/csv"}));a.download="AHI_Power_Inspect_Filtered.csv";a.click()};
+$("applyBtn").onclick=apply;$("resetBtn").onclick=()=>{document.querySelectorAll("select").forEach(s=>s.value="");$("voltageGroup").value="transmisi";refreshHierarchyFilters();apply()};$("voltageGroup").onchange=apply;$("search").oninput=()=>{page=1;table()};$("pageSize").onchange=e=>{pageSize=+e.target.value;page=1;table()};$("prev").onclick=()=>{if(page>1){page--;table()}};$("next").onclick=()=>{let n=filtered.length;if(page<Math.ceil(n/pageSize)){page++;table()}};$("exportBtn").onclick=()=>{let out=cols.join(";")+"\n"+filtered.map(r=>cols.map(c=>c==="Usia Aset"?age(r):c==="Kategori Umur"?ageCat(r):r[c]||"").map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+out],{type:"text/csv"}));a.download="AHI_Power_Inspect_Filtered.csv";a.click()};
 async function loadCSV(){
   const urls=[
     DATA_URL+"?v="+Date.now(),

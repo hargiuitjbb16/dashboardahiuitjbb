@@ -41,7 +41,34 @@ const canonical=v=>TYPES.find(x=>norm(x)===norm(v))||"";const fmt=n=>Number(n||0
 function parseCSV(t){t=t.replace(/^\\uFEFF/,"");let first=t.split(/\\r?\\n/).find(x=>x.trim())||"",delim=((first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length)?";":",";let rows=[],row=[],cell="",q=false;for(let i=0;i<t.length;i++){let c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===delim&&!q){row.push(cell);cell=""}else if((c=="\\n"||c=="\\r")&&!q){if(c=="\\r"&&t[i+1]=="\\n")i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=""}else cell+=c}if(cell||row.length){row.push(cell);if(row.some(x=>x.trim()))rows.push(row)}if(!rows.length)return[];let h=rows.shift().map(x=>x.trim());return rows.map(r=>Object.fromEntries(h.map((x,i)=>[x,String(r[i]??"").trim()])))}
 function uniq(k){return [...new Set(raw.map(r=>r[k]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)))}
 function includeVoltage(r,g){let t=canonical(r["Jenis Aset"]);if(ALLV.includes(t))return true;if(!SPLIT.includes(t))return false;let v=norm(r["Tegangan"]).replace(/\\s/g,"");return g==="transmisi"?(v==="150kv"||v==="500kv"):(v!=="150kv"&&v!=="500kv")}
-function populate(){let defs=[["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (70 kV ke atas)","Incoming (20 kV ke bawah / -)"]],["Unit Induk",uniq("Unit Induk")],["UPT",uniq("Unit Pelaksana")],["ULTG",uniq("Ultg")],["GI",uniq("Gardu Induk")],["Bay",uniq("Bay")],["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])],["Periode",MONTHS]];let f=document.getElementById("filters");f.innerHTML="";defs.forEach((d,i)=>{let div=document.createElement("div");div.className="filter";let l=document.createElement("label");l.textContent=d[0];let s=document.createElement("select");s.dataset.i=i;s.innerHTML=(i===9?d[1].map(v=>`<option value="${v}">${v} 2026</option>`):'<option value="">Semua</option>'+d[1].map((v,j)=>`<option value="${v}">${d[2]?.[j]||v}</option>`).join(""));if(i===0)s.value="transmisi";if(i===9)s.value="Januari";s.onchange=()=>{if(i===9)period=s.value};div.append(l,s);f.append(div)});let b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);let r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{f.querySelectorAll("select").forEach((s,i)=>s.value=i===0?"transmisi":i===9?"Januari":"");period="Januari";apply()};f.append(r)}
+function setCascadeOptions(sel,values,keep=""){
+ let old=keep||sel.value;
+ sel.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+ sel.value=values.includes(old)?old:"";
+}
+function refreshHierarchyFilters(){
+ const s=[...document.querySelectorAll("#filters select")]; if(s.length<10)return;
+ const ui=s[1],upt=s[2],ultg=s[3],gi=s[4],bay=s[5];
+ setCascadeOptions(ui,[...new Set(raw.map(r=>r["Unit Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ui.value);
+ const rUpt=raw.filter(r=>!ui.value||r["Unit Induk"]===ui.value);
+ setCascadeOptions(upt,[...new Set(rUpt.map(r=>r["Unit Pelaksana"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),upt.value);
+ const rUltg=rUpt.filter(r=>!upt.value||r["Unit Pelaksana"]===upt.value);
+ setCascadeOptions(ultg,[...new Set(rUltg.map(r=>r["Ultg"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ultg.value);
+ const rGi=rUltg.filter(r=>!ultg.value||r["Ultg"]===ultg.value);
+ setCascadeOptions(gi,[...new Set(rGi.map(r=>r["Gardu Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),gi.value);
+ const rBay=rGi.filter(r=>!gi.value||r["Gardu Induk"]===gi.value);
+ setCascadeOptions(bay,[...new Set(rBay.map(r=>r["Bay"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),bay.value);
+}
+function populate(){
+ let defs=[["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (70 kV ke atas)","Incoming (20 kV ke bawah / -)"]],["Unit Induk",[]],["UPT",[]],["ULTG",[]],["GI",[]],["Bay",[]],["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])],["Periode",MONTHS]];
+ let f=document.getElementById("filters");f.innerHTML="";
+ defs.forEach((d,i)=>{let div=document.createElement("div");div.className="filter";let l=document.createElement("label");l.textContent=d[0];let sel=document.createElement("select");sel.dataset.i=i;let vals=d[1];sel.innerHTML=(i===9?vals.map(v=>`<option value="${esc(v)}">${esc(v)} 2026</option>`):'<option value="">Semua</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(""));if(i===0)sel.value="transmisi";if(i===9)sel.value="Januari";div.append(l,sel);f.append(div)});
+ let sels=[...f.querySelectorAll("select")];
+ let b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);
+ let r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{sels.forEach((x,i)=>x.value=i===0?"transmisi":i===9?"Januari":"");period="Januari";refreshHierarchyFilters();apply()};f.append(r);
+ [1,2,3,4].forEach(i=>sels[i].addEventListener("change",refreshHierarchyFilters));
+ refreshHierarchyFilters();
+}
 function getFilters(){let s=[...document.querySelectorAll("#filters select")];return{g:s[0].value,ui:s[1].value,upt:s[2].value,ultg:s[3].value,gi:s[4].value,bay:s[5].value,ph:s[6].value,type:s[7].value,ahi:s[8].value,period:s[9].value}}
 function apply(){let f=getFilters();period=f.period||"Januari";filtered=raw.filter(r=>includeVoltage(r,f.g)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&(!f.ultg||r["Ultg"]===f.ultg)&&(!f.gi||r["Gardu Induk"]===f.gi)&&(!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&(!f.type||canonical(r["Jenis Aset"])===f.type)&&(!f.ahi||norm(r["AHI"])===norm(f.ahi)));render()}
 function histCounts(m){let o={};for(const [s,v] of Object.entries(HIST[m]||{})){let t=HISTMAP[s];if(t)o[t]=v.slice()}return o}
@@ -58,5 +85,5 @@ function esc(v){return String(v??"—").replace(/[&<>"']/g,m=>({"&":"&amp;","<":
 function renderTable(){let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q)));document.getElementById("periodTitle").textContent=period+" 2026";document.getElementById("count").textContent=`Menampilkan ${Math.min(50,arr.length).toLocaleString("id-ID")} dari ${arr.length.toLocaleString("id-ID")} data`;document.getElementById("thead").innerHTML="<tr>"+detailCols.map(c=>`<th>${c}</th>`).join("")+"</tr>";document.getElementById("tbody").innerHTML=arr.slice(0,50).map(r=>"<tr>"+detailCols.map(c=>`<td>${c==="AHI FINAL"?badge(field(r,c)):esc(field(r,c))}</td>`).join("")+"</tr>").join("")}
 function render(){renderKpi();renderTrend();renderTable()}
 document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});document.getElementById("exportBtn").onclick=()=>{let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q))),out=detailCols.join(";")+"\\n"+arr.map(r=>detailCols.map(c=>`"${String(field(r,c)).replaceAll('"','""')}"`).join(";")).join("\\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\\ufeff"+out],{type:"text/csv"}));a.download=`AHI_Evaluasi_${period}_2026.csv`;a.click()};
-async function load(){try{let t=await fetch("data/Monitoring-AHI.csv?v="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(r.status);return r.text()});raw=parseCSV(t);populate();apply();let s=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});document.getElementById("lastDate").textContent=s;document.getElementById("sideDate").textContent=s}catch(e){populate();apply();document.getElementById("lastDate").textContent="CSV belum terbaca";document.getElementById("sideDate").textContent="CSV belum terbaca"}}load();
+async function load(){try{let t=await fetch("data/AHI-EVALUASI.csv?v="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(r.status);return r.text()});raw=parseCSV(t);populate();apply();let s=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});document.getElementById("lastDate").textContent=s;document.getElementById("sideDate").textContent=s}catch(e){populate();apply();document.getElementById("lastDate").textContent="CSV belum terbaca";document.getElementById("sideDate").textContent="CSV belum terbaca"}}load();
 </script></body></html>

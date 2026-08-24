@@ -111,11 +111,48 @@ function fmt(n){return Number(n||0).toLocaleString("id-ID")}
 function group(r,g){let t=canonical(r["Jenis Aset"]);if(!t)return false;if(ALLV.includes(t))return true;let v=norm(r["Tegangan"]).replace(/\s/g,"");return g==="transmisi"?(v==="150kv"||v==="500kv"):(v!=="150kv"&&v!=="500kv")}
 function valAge(r){let y=Number(String(r["Tahun Buat"]||"").match(/\d{4}/)?.[0]);return y?Math.max(0,new Date().getFullYear()-y):null}
 function getAhi(r){let v=norm(r["AHI"]);return AHI.find(([x])=>norm(x)===v)?.[0]||String(r["AHI"]||"")}
+function hierarchyRows(excludeLevel){
+ let s=[...document.querySelectorAll("#filters select")];
+ let f={ui:s[1]?.value||"",upt:s[2]?.value||"",ultg:s[3]?.value||"",gi:s[4]?.value||""};
+ return raw.filter(r=>
+   (!f.ui||r["Unit Induk"]===f.ui)&&
+   (!f.upt||r["Unit Pelaksana"]===f.upt)&&
+   (!f.ultg||r["Ultg"]===f.ultg)&&
+   (!f.gi||r["Gardu Induk"]===f.gi)
+ );
+}
+function setSelectOptions(select, values, keepValue=""){
+ const old=keepValue||select.value;
+ select.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option value="${String(v).replace(/"/g,'&quot;')}">${v}</option>`).join("");
+ if(values.includes(old)) select.value=old; else select.value="";
+}
+function refreshHierarchyFilters(){
+ const s=[...document.querySelectorAll("#filters select")]; if(s.length<9)return;
+ const ui=s[1],upt=s[2],ultg=s[3],gi=s[4],bay=s[5];
+ const uiRows=raw;
+ setSelectOptions(ui,[...new Set(uiRows.map(r=>r["Unit Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ui.value);
+ const rUpt=raw.filter(r=>!ui.value||r["Unit Induk"]===ui.value);
+ setSelectOptions(upt,[...new Set(rUpt.map(r=>r["Unit Pelaksana"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),upt.value);
+ const rUltg=rUpt.filter(r=>!upt.value||r["Unit Pelaksana"]===upt.value);
+ setSelectOptions(ultg,[...new Set(rUltg.map(r=>r["Ultg"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ultg.value);
+ const rGi=rUltg.filter(r=>!ultg.value||r["Ultg"]===ultg.value);
+ setSelectOptions(gi,[...new Set(rGi.map(r=>r["Gardu Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),gi.value);
+ const rBay=rGi.filter(r=>!gi.value||r["Gardu Induk"]===gi.value);
+ setSelectOptions(bay,[...new Set(rBay.map(r=>r["Bay"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),bay.value);
+}
 function populate(){
- const defs=[["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (150 kV & 500 kV)","Incoming (selain 150/500 kV)"]],["Unit Induk",uniq("Unit Induk")],["UPT",uniq("Unit Pelaksana")],["ULTG",uniq("Ultg")],["GI",uniq("Gardu Induk")],["Bay",uniq("Bay")],["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])]];
+ const defs=[["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (150 kV & 500 kV)","Incoming (selain 150/500 kV)"]],["Unit Induk",[]],["UPT",[]],["ULTG",[]],["GI",[]],["Bay",[]],["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])]];
  let f=document.getElementById("filters");f.innerHTML="";
- defs.forEach((d,i)=>{let lab=d[0],vals=d[1],labels=d[2]||vals;let div=document.createElement("div");div.className="filter";let l=document.createElement("label");l.textContent=lab;let s=document.createElement("select");s.dataset.key=lab;s.innerHTML='<option value="">Semua</option>'+vals.map((v,j)=>`<option value="${v}">${labels[j]||v}</option>`).join("");div.append(l,s);f.append(div)});
- let b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan Filter";b.onclick=apply;b.className+=" apply";f.append(b);let r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{f.querySelectorAll("select").forEach((x,i)=>x.value=i===0?"transmisi":"");apply()};f.append(r);
+ defs.forEach((d,i)=>{let lab=d[0],vals=d[1],labels=d[2]||vals;let div=document.createElement("div");div.className="filter";let l=document.createElement("label");l.textContent=lab;let sel=document.createElement("select");sel.dataset.key=lab;sel.innerHTML='<option value="">Semua</option>'+vals.map((v,j)=>`<option value="${v}">${labels[j]||v}</option>`).join("");div.append(l,sel);f.append(div)});
+ const selects=[...f.querySelectorAll("select")];
+ selects[0].value="transmisi";
+ const b=document.createElement("button");b.className="btn primary apply";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);
+ const r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{selects.forEach((x,i)=>x.value=i===0?"transmisi":"");refreshHierarchyFilters();apply()};f.append(r);
+ selects[1].addEventListener("change",()=>{refreshHierarchyFilters()});
+ selects[2].addEventListener("change",()=>{refreshHierarchyFilters()});
+ selects[3].addEventListener("change",()=>{refreshHierarchyFilters()});
+ selects[4].addEventListener("change",()=>{refreshHierarchyFilters()});
+ refreshHierarchyFilters();
 }
 function uniq(k){return [...new Set(raw.map(r=>r[k]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)))}
 function filters(){let s=[...document.querySelectorAll("#filters select")];return {g:s[0].value,ui:s[1].value,upt:s[2].value,ultg:s[3].value,gi:s[4].value,bay:s[5].value,ph:s[6].value,type:s[7].value,ahi:s[8].value}}
