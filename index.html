@@ -44,29 +44,139 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}
 @media(max-width:600px){.ahi-grid,.trigger-grid{grid-template-columns:1fr}}
 
 
-/* Kategori pemicu: per jenis peralatan, masing-masing dipisah Poor dan Critical */
-.trigger-grid-perasset{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
-.trigger-asset-card{border:1px solid #dfe7f0;border-radius:10px;background:#fff;padding:10px;min-width:0}
-.trigger-asset-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.trigger-asset-title{font-size:11px;font-weight:800;color:#17324f;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.trigger-asset-total{font-size:8px;color:#73859a;font-weight:700}
-.trigger-levels{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.trigger-level-card{border:1px solid #e5ebf2;border-radius:8px;padding:7px;min-width:0}
-.trigger-level-card.poor-card{border-top:3px solid #e53935}.trigger-level-card.critical-card{border-top:3px solid #111}
-.trigger-level-head{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-bottom:5px}
-.trigger-level-title{font-size:8px;font-weight:800}.poor-card .trigger-level-title{color:#e53935}.critical-card .trigger-level-title{color:#111}
-.trigger-level-total{font-size:7px;color:#73859a;font-weight:800}
-.trigger-mini-body{display:flex;flex-direction:column;align-items:center}
-.trigger-donut{width:88px;height:88px;border-radius:50%;position:relative;margin:4px auto 6px}
-.trigger-donut:after{content:"";position:absolute;inset:22px;background:#fff;border-radius:50%}
-.trigger-center{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.trigger-center b{font-size:12px;color:#17324f}.trigger-center span{font-size:6px;color:#71859a;font-weight:700;margin-top:1px}
-.trigger-legend{width:100%;max-height:105px;overflow:auto;padding-right:2px}
-.trigger-item{display:flex;align-items:center;gap:4px;margin:3px 0;font-size:7px;color:#52677d}
-.trigger-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}.trigger-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trigger-value{font-weight:800;color:#17324f}
-.trigger-empty{font-size:7px;color:#8998a8;text-align:center;padding:20px 3px;min-height:88px;display:flex;align-items:center}
-@media(max-width:1000px){.trigger-grid-perasset{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:700px){.trigger-grid-perasset{grid-template-columns:1fr}.trigger-levels{grid-template-columns:1fr 1fr}}
+/* Kategori pemicu: ringkas, rapi, 3 kolom, Poor/Critical berdampingan */
+.trigger-panel{margin-top:10px}
+.trigger-grid-perasset{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+.trigger-asset-card{
+  border:1px solid #dfe7f0;
+  border-radius:10px;
+  background:#fff;
+  padding:10px;
+  min-width:0;
+  box-shadow:0 1px 2px rgba(20,45,70,.03);
+}
+.trigger-asset-head{
+  display:flex;
+  align-items:center;
+  min-height:22px;
+  margin-bottom:7px;
+}
+.trigger-asset-title{
+  font-size:11px;
+  font-weight:800;
+  color:#17324f;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.trigger-levels{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+.trigger-level-card{
+  border:1px solid #e5ebf2;
+  border-radius:8px;
+  padding:7px;
+  min-width:0;
+  background:#fff;
+}
+.trigger-level-card.poor-card{border-top:3px solid #e53935}
+.trigger-level-card.critical-card{border-top:3px solid #111}
+.trigger-level-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:4px;
+  margin-bottom:2px;
+}
+.trigger-level-title{font-size:8px;font-weight:800}
+.poor-card .trigger-level-title{color:#e53935}
+.critical-card .trigger-level-title{color:#111}
+.trigger-level-total{font-size:7px;color:#73859a;font-weight:800;white-space:nowrap}
+.trigger-mini-body{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:94px;
+}
+.trigger-donut{
+  width:78px;
+  height:78px;
+  border-radius:50%;
+  position:relative;
+  margin:4px auto;
+}
+.trigger-donut:after{
+  content:"";
+  position:absolute;
+  inset:20px;
+  background:#fff;
+  border-radius:50%;
+}
+.trigger-center{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.trigger-center b{font-size:12px;color:#17324f}
+.trigger-center span{font-size:6px;color:#71859a;font-weight:700;margin-top:1px}
+.trigger-legend{
+  width:100%;
+  max-height:92px;
+  overflow:auto;
+  padding-right:2px;
+  border-top:1px solid #f0f3f6;
+  padding-top:3px;
+}
+.trigger-item{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin:3px 0;
+  font-size:7px;
+  color:#52677d;
+  cursor:help;
+}
+.trigger-dot{
+  width:7px;height:7px;border-radius:50%;flex:0 0 7px
+}
+.trigger-label{
+  flex:1;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.trigger-value{font-weight:800;color:#17324f}
+.trigger-pct{color:#73859a;min-width:30px;text-align:right}
+.trigger-empty{
+  font-size:7px;
+  color:#8998a8;
+  text-align:center;
+  padding:20px 3px;
+  min-height:94px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+@media(max-width:1150px){
+  .trigger-grid-perasset{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .trigger-grid-perasset{grid-template-columns:1fr}
+  .trigger-levels{grid-template-columns:1fr 1fr}
+}
+
 </style>
 </head>
 <body>
@@ -382,30 +492,34 @@ function normalizeTriggerCategory(raw){
   let s=String(raw??"").replace(/\s+/g," ").trim();
   if(!s) return "";
 
-  // Remove the AHI result/level suffix, e.g.
-  // "(T 0.0.5 - Critical)", "(R 0.0.5 - Poor)", "(5 - Critical)".
+  // Buang keterangan hasil/level di belakang.
   s=s.replace(/\s*-\s*\([^)]*(?:critical|poor)[^)]*\)\s*$/i,"").trim();
   s=s.replace(/\s*\([^)]*(?:critical|poor)[^)]*\)\s*$/i,"").trim();
 
-  // Keep meaningful SF6 subtests as separate categories.
-  const sf6=s.match(/^(Pengujian Gas SF6)\s*-\s*(Purity|SO2|Dew Point)\b/i);
-  if(sf6) return `${sf6[1]} - ${sf6[2]}`;
+  // Jika ada angka hasil tanpa kata Critical/Poor, buang kurung numeriknya juga.
+  s=s.replace(/\s*\([^)]*(?:\d+\s*[,.]?\s*\d*|\d+\s*\/\s*\d+)[^)]*\)\s*$/i,"").trim();
 
-  // Keep other explicitly meaningful subcategories if present.
-  const keepSub=[
-    /^(Pengujian Gas SF6)\s*-\s*(.+)$/i,
-    /^(Tan Delta dan Kapasitansi Bushing Trafo)\s*-\s*(.+)$/i
-  ];
-  for(const re of keepSub){
-    const m=s.match(re);
-    if(m && m[2] && !/^[A-Z0-9._/]+$/.test(m[2].trim())) return `${m[1]} - ${m[2].trim()}`;
+  // Kunci ke master kategori yang sudah disepakati.
+  // Longest match mencegah "Pengujian Gas SF6 - Purity/SO2/Dew Point"
+  // tergabung menjadi satu kategori.
+  const allMaster=Object.values(TRIGGER_MASTER).flat().sort((x,y)=>y.length-x.length);
+  const ns=norm(s);
+  for(const master of allMaster){
+    const nm=norm(master);
+    if(ns===nm || ns.startsWith(nm+" ") || ns.startsWith(nm+" -") || ns.startsWith(nm+"(")){
+      return master;
+    }
   }
 
-  // Normal asset-inspection pattern:
-  // "Nama Pemeriksaan - nomor seri/kode - phase"
-  // becomes just "Nama Pemeriksaan".
+  // Fallback untuk data baru: hapus bagian serial/kode/phase setelah " - ".
+  // Kategori yang tidak dikenal tetap satu nama, bukan satu kategori per serial.
   const parts=s.split(/\s+-\s+/).map(x=>x.trim()).filter(Boolean);
-  if(parts.length>1) s=parts[0];
+  if(parts.length>1){
+    const tail=parts.slice(1).join(" ");
+    if(/^(?:[A-Z0-9]+[\/._-]?)+$/i.test(tail) || /\b(?:phase|phasa)\b/i.test(tail)){
+      s=parts[0];
+    }
+  }
 
   return s.replace(/\s{2,}/g," ").replace(/[-_:]+$/,"").trim();
 }
@@ -425,6 +539,7 @@ function triggerLevel(raw){
 function renderTriggers(){
   const box=document.getElementById("triggerCharts");
   const palette=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#00a6a6","#795548","#5b8def","#d14d72","#2e9d5b","#8c6b43"];
+
   box.innerHTML=TYPES.map(t=>{
     const rows=filtered.filter(r=>canonical(r["Jenis Aset"])===t);
     const groups={poor:new Map(),critical:new Map()};
@@ -438,48 +553,62 @@ function renderTriggers(){
     });
 
     function donut(level,title,accent){
-      const items=[...groups[level].entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"id"));
+      const items=[...groups[level].entries()]
+        .sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"id"));
       const total=items.reduce((s,x)=>s+x[1],0);
+
       if(!items.length){
-        return `<div class="trigger-level">
-          <div class="trigger-level-title ${level}"><span>${title}</span><span>0</span></div>
-          <div class="trigger-empty">Tidak ada pemicu ${title}.</div>
+        return `<div class="trigger-level-card ${level}-card">
+          <div class="trigger-level-head">
+            <span class="trigger-level-title">${title}</span>
+            <span class="trigger-level-total">0</span>
+          </div>
+          <div class="trigger-empty">Tidak ada data ${title}.</div>
         </div>`;
       }
+
       let deg=0;
       const slices=items.map((it,i)=>{
         const next=deg+(it[1]/total)*360;
         const seg=`${palette[i%palette.length]} ${deg.toFixed(2)}deg ${next.toFixed(2)}deg`;
-        deg=next; return seg;
+        deg=next;
+        return seg;
       }).join(",");
-      return `<div class="trigger-level">
-        <div class="trigger-level-title ${level}"><span>${title}</span><span>${fmt(total)} pemicu</span></div>
-        <div class="trigger-donut-wrap">
-          <div class="trigger-donut" title="${title}" style="background:conic-gradient(${slices})">
+
+      return `<div class="trigger-level-card ${level}-card">
+        <div class="trigger-level-head">
+          <span class="trigger-level-title">${title}</span>
+          <span class="trigger-level-total">${fmt(total)} pemicu</span>
+        </div>
+        <div class="trigger-mini-body">
+          <div class="trigger-donut" style="background:conic-gradient(${slices});cursor:crosshair"
+               data-tooltip="${html(title)}">
             <div class="trigger-center"><b>${fmt(total)}</b><span>PEMICU</span></div>
           </div>
-          <div class="trigger-legend">
-            ${items.map((it,i)=>`<div class="trigger-item" title="${html(it[0])}">
-              <i class="trigger-dot" style="background:${palette[i%palette.length]}"></i>
-              <span class="trigger-label">${html(it[0])}</span>
-              <span class="trigger-value">${fmt(it[1])}</span>
-              <span class="trigger-pct">${pct(it[1],total)}</span>
-            </div>`).join("")}
-          </div>
+        </div>
+        <div class="trigger-legend">
+          ${items.map((it,i)=>`<div class="trigger-item" title="${html(it[0])}">
+            <i class="trigger-dot" style="background:${palette[i%palette.length]}"></i>
+            <span class="trigger-label">${html(it[0])}</span>
+            <span class="trigger-value">${fmt(it[1])}</span>
+            <span class="trigger-pct">${pct(it[1],total)}</span>
+          </div>`).join("")}
         </div>
       </div>`;
     }
 
-    return `<div class="trigger-asset">
-      <div class="trigger-asset-title">${html(t)}</div>
-      <div class="trigger-pair">
+    return `<article class="trigger-asset-card">
+      <div class="trigger-asset-head">
+        <div class="trigger-asset-title">${html(t)}</div>
+      </div>
+      <div class="trigger-levels">
         ${donut("poor","4 - Poor","#e53935")}
         ${donut("critical","5 - Critical","#111")}
       </div>
-      <div class="trigger-note">Nomor seri, kode aset, phase, dan level hasil tidak membuat kategori baru.</div>
-    </div>`;
+    </article>`;
   }).join("");
 }
+
 
 const cols=["Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Penempatan","Phasa","Techidentno","Jenis Aset","Merk","Serial ID","Status Asset","Tipe Aset","Tegangan","Tahun Buat","Usia Aset","Kategori Umur","AHI","Parameter Pemicu"];
 
