@@ -36,12 +36,37 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}
 .age-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:8px;color:#647990;margin:5px 0 8px}.age-legend i{width:7px;height:7px;border-radius:2px;display:inline-block}
 .age-row{display:grid;grid-template-columns:115px 1fr;gap:7px;align-items:center;margin:7px 0}.age-name{font-size:8px;color:#52677d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:13px;background:#edf2f7;border-radius:5px;overflow:hidden;display:flex}.seg{height:100%;font-size:7px;color:#fff;text-align:center;line-height:13px;overflow:hidden}.young{background:#20a46b}.old{background:#f2b400}.veryold{background:#e53935}
 .trigger-panel{margin-top:10px}.trigger-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}.trigger-card{border:1px solid #e1e8f0;border-radius:8px;padding:8px;min-width:0}.trigger-head{display:flex;gap:5px;align-items:center}.trigger-title{font-size:9px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trigger-total{font-size:8px;color:#73859a}.trigger-body{display:grid;grid-template-columns:100px 1fr;gap:8px;align-items:center;margin-top:7px}.trigger-donut{width:88px;height:88px;border-radius:50%;position:relative;margin:auto}.trigger-donut:after{content:"";position:absolute;inset:21px;background:#fff;border-radius:50%}.trigger-center{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center}.trigger-center b{font-size:13px;color:#17324f}.trigger-center span{font-size:6px;color:#71859a}.trigger-legend{max-height:105px;overflow:auto}.trigger-item{display:flex;align-items:center;gap:4px;margin:3px 0;font-size:7px;color:#52677d}.trigger-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}.trigger-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trigger-value{font-weight:800;color:#17324f}.trigger-empty{font-size:8px;color:#8a9aac;padding:12px 2px}
-.detail{margin-top:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#718399}.search{width:260px;height:30px;border:1px solid #d2ddea;border-radius:7px;padding:0 10px}
+.detail{margin-top:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#718399}.search{width:260px;height:30px;border:1px solid #d2ddea;border-radius:7px;padding:0 10px}.pagination{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 4px 2px;flex-wrap:wrap}.page-btn{min-width:30px;height:28px;padding:0 8px;border:1px solid #d2ddea;background:#fff;color:#24415f;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700}.page-btn:hover{background:#eef6ff;border-color:#9ec9ee}.page-btn.active{background:#0877d1;color:#fff;border-color:#0877d1}.page-btn:disabled{opacity:.45;cursor:default}.page-info{font-size:10px;color:#718399;margin:0 6px}
 .table-wrap{overflow:auto;max-height:620px;margin-top:8px}.table{width:100%;border-collapse:collapse;font-size:8px;min-width:1300px}.table th{position:sticky;top:0;background:#eef4fa;color:#24415f;text-align:left;padding:6px;border-bottom:1px solid #dce6f0;white-space:nowrap}.table td{padding:6px;border-bottom:1px solid #edf1f5;white-space:nowrap;color:#38516d}
 .status{padding:10px 12px;border-radius:8px;margin:10px 0;display:none;font-weight:700}.status.ok{display:block;background:#edf9f3;color:#147b4d;border:1px solid #cceedd}.status.error{display:block;background:#fff0f0;color:#c62828;border:1px solid #ffd1d1}.status.info{display:block;background:#eef6ff;color:#1769aa;border:1px solid #cfe5fb}
 @media(max-width:1250px){.filters{grid-template-columns:repeat(4,minmax(0,1fr))}.kpis{grid-template-columns:repeat(3,1fr)}.section-grid{grid-template-columns:1fr}.ahi-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){.sidebar{width:175px}.logo img:first-child{width:58px}.logo img:last-child{width:92px}main{margin-left:175px;width:calc(100% - 175px);padding:10px}.filters{grid-template-columns:repeat(2,1fr)}.kpis{grid-template-columns:repeat(2,1fr)}.ahi-grid,.trigger-grid{grid-template-columns:repeat(2,1fr)}.actions{display:none}}
 @media(max-width:600px){.ahi-grid,.trigger-grid{grid-template-columns:1fr}}
+
+
+/* Kategori pemicu: per jenis peralatan, masing-masing dipisah Poor dan Critical */
+.trigger-grid-perasset{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.trigger-asset-card{border:1px solid #dfe7f0;border-radius:10px;background:#fff;padding:10px;min-width:0}
+.trigger-asset-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.trigger-asset-title{font-size:11px;font-weight:800;color:#17324f;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trigger-asset-total{font-size:8px;color:#73859a;font-weight:700}
+.trigger-levels{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.trigger-level-card{border:1px solid #e5ebf2;border-radius:8px;padding:7px;min-width:0}
+.trigger-level-card.poor-card{border-top:3px solid #e53935}.trigger-level-card.critical-card{border-top:3px solid #111}
+.trigger-level-head{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-bottom:5px}
+.trigger-level-title{font-size:8px;font-weight:800}.poor-card .trigger-level-title{color:#e53935}.critical-card .trigger-level-title{color:#111}
+.trigger-level-total{font-size:7px;color:#73859a;font-weight:800}
+.trigger-mini-body{display:flex;flex-direction:column;align-items:center}
+.trigger-donut{width:88px;height:88px;border-radius:50%;position:relative;margin:4px auto 6px}
+.trigger-donut:after{content:"";position:absolute;inset:22px;background:#fff;border-radius:50%}
+.trigger-center{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.trigger-center b{font-size:12px;color:#17324f}.trigger-center span{font-size:6px;color:#71859a;font-weight:700;margin-top:1px}
+.trigger-legend{width:100%;max-height:105px;overflow:auto;padding-right:2px}
+.trigger-item{display:flex;align-items:center;gap:4px;margin:3px 0;font-size:7px;color:#52677d}
+.trigger-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}.trigger-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trigger-value{font-weight:800;color:#17324f}
+.trigger-empty{font-size:7px;color:#8998a8;text-align:center;padding:20px 3px;min-height:88px;display:flex;align-items:center}
+@media(max-width:1000px){.trigger-grid-perasset{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.trigger-grid-perasset{grid-template-columns:1fr}.trigger-levels{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -75,13 +100,13 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}
 </section>
 
 <section class="panel trigger-panel">
- <div class="panel-title">KATEGORI PEMICU PER JENIS PERALATAN <span>Distribusi Parameter Pemicu AHI</span></div>
- <div class="trigger-grid" id="triggerCharts"></div>
+ <div class="panel-title">KATEGORI PEMICU AHI PER JENIS PERALATAN <span>Setiap jenis peralatan memiliki donut 4 - Poor dan 5 - Critical</span></div>
+ <div class="trigger-grid-perasset" id="triggerCharts"></div>
 </section>
 
 <section class="panel detail">
  <div class="detail-head"><div><h3>Detail Aset</h3><small id="count">Menampilkan 0 data</small></div><input class="search" id="search" placeholder="Cari Techidentno / Merk / GI / Bay / parameter..."></div>
- <div class="table-wrap"><table class="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+ <div class="table-wrap"><table class="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div><div class="pagination" id="pagination"></div>
 </section>
 </main>
 </div>
@@ -102,7 +127,8 @@ const TYPES=["Power Transformer","Current Transformer","Potential Transformer","
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
 const TRIGGER_COLORS=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#00a6a6","#64748b","#d14d72","#8c6b43","#5b8def","#2e9d5b"];
 
-let raw=[],filtered=[],search="";
+let raw=[],filtered=[],search="",currentPage=1;
+const PAGE_SIZE=50;
 
 function norm(s){return String(s??"").normalize("NFKC").replace(/^\uFEFF/,"").replace(/\u00a0/g," ").trim().replace(/\s+/g," ").toLowerCase()}
 function html(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
@@ -194,6 +220,7 @@ function getFilters(){
 }
 
 function apply(){
+ currentPage=1;
  const f=getFilters();
  filtered=raw.filter(r=>
    group(r,f.g)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&
@@ -236,26 +263,82 @@ function renderAges(){
  }).join("");
 }
 
-function renderTriggers(){
- const box=document.getElementById("triggerCharts");
- box.innerHTML=TYPES.map(t=>{
-  const rows=filtered.filter(r=>canonical(r["Jenis Aset"])===t),map=new Map();
+function triggerCategory(v){
+  let s=String(v??"").replace(/\s+/g," ").trim();
+  if(!s) return "";
+  // Ambil hanya nama/kategori sebelum nilai pengujian dalam tanda kurung:
+  // contoh: "Pengujian Opening Time (62.85, 4 - Poor)" -> "Pengujian Opening Time"
+  // contoh: "Tahanan Kontak (224)" -> "Tahanan Kontak"
+  const paren=s.indexOf("(");
+  if(paren>0) s=s.slice(0,paren).trim();
+  s=s.replace(/[,\-–—:;|]+$/,"").trim();
+  return s;
+}
+function ahiLevel(v){
+  const s=norm(v);
+  if(/^4(\s|-)/.test(s)||s.includes("4 - poor")||s==="poor") return 4;
+  if(/^5(\s|-)/.test(s)||s.includes("5 - critical")||s==="critical") return 5;
+  return 0;
+}
+function renderTriggerLevel(level, rows, title, cardClass){
+  const map=new Map();
   rows.forEach(r=>{
-    const name=String(r["Parameter Pemicu"]??"").replace(/\s+/g," ").trim();
-    if(name)map.set(name,(map.get(name)||0)+1);
+    const cat=triggerCategory(r["Parameter Pemicu"]);
+    if(cat) map.set(cat,(map.get(cat)||0)+1);
   });
-  const items=[...map.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"id")),total=items.reduce((s,x)=>s+x[1],0);
-  if(!items.length)return `<div class="trigger-card"><div class="trigger-head"><div class="trigger-title">${html(t)}</div><div class="trigger-total">0 parameter</div></div><div class="trigger-empty">Tidak ada Parameter Pemicu pada data terfilter.</div></div>`;
+  const items=[...map.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"id"));
+  const total=items.reduce((sum,x)=>sum+x[1],0);
+  const assetCount=rows.length;
+  if(!items.length){
+    return `<div class="trigger-level-card ${cardClass}">
+      <div class="trigger-level-head"><div class="trigger-level-title">${title}</div><div class="trigger-level-total">${fmt(assetCount)} aset</div></div>
+      <div class="trigger-mini-body"><div class="trigger-empty">Tidak ada pemicu</div></div>
+    </div>`;
+  }
+  const palette=level===4
+    ? ["#e53935","#f07800","#d14d72","#c62828","#8c6b43","#ef6c00","#ad1457","#7b61a8","#64748b","#5b8def"]
+    : ["#111","#263238","#455a64","#37474f","#5d4037","#6d4c41","#546e7a","#795548","#212121","#607d8b"];
   let start=0;
-  const stops=items.map((it,i)=>{let end=start+it[1]/total*100,s=`${TRIGGER_COLORS[i%TRIGGER_COLORS.length]} ${start.toFixed(2)}% ${end.toFixed(2)}%`;start=end;return s}).join(",");
-  return `<div class="trigger-card">
-    <div class="trigger-head"><div class="trigger-title">${html(t)}</div><div class="trigger-total">${fmt(total)} parameter</div></div>
-    <div class="trigger-body">
-      <div class="trigger-donut" style="background:conic-gradient(${stops})"><div class="trigger-center"><b>${fmt(total)}</b><span>PARAMETER</span></div></div>
-      <div class="trigger-legend">${items.map((it,i)=>`<div class="trigger-item"><i class="trigger-dot" style="background:${TRIGGER_COLORS[i%TRIGGER_COLORS.length]}"></i><span class="trigger-label" title="${html(it[0])}">${html(it[0])}</span><span class="trigger-value">${fmt(it[1])}</span></div>`).join("")}</div>
+  const stops=items.map((it,i)=>{
+    const end=start+(it[1]/total*100);
+    const stop=`${palette[i%palette.length]} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+    start=end; return stop;
+  }).join(",");
+  return `<div class="trigger-level-card ${cardClass}">
+    <div class="trigger-level-head"><div class="trigger-level-title">${title}</div><div class="trigger-level-total">${fmt(assetCount)} aset</div></div>
+    <div class="trigger-mini-body">
+      <div class="trigger-donut" style="background:conic-gradient(${stops})">
+        <div class="trigger-center"><b>${fmt(total)}</b><span>PEMICU</span></div>
+      </div>
+      <div class="trigger-legend">
+        ${items.map((it,i)=>`<div class="trigger-item">
+          <i class="trigger-dot" style="background:${palette[i%palette.length]}"></i>
+          <span class="trigger-label" title="${html(it[0])}">${html(it[0])}</span>
+          <span class="trigger-value">${fmt(it[1])}</span>
+        </div>`).join("")}
+      </div>
     </div>
   </div>`;
- }).join("");
+}
+function renderOneTriggerAsset(type){
+  const assetRows=filtered.filter(r=>canonical(r["Jenis Aset"])===type);
+  const poor=assetRows.filter(r=>ahiLevel(r["AHI"])===4);
+  const critical=assetRows.filter(r=>ahiLevel(r["AHI"])===5);
+  return `<div class="trigger-asset-card">
+    <div class="trigger-asset-head">
+      <div class="trigger-asset-title">${html(type)}</div>
+      <div class="trigger-asset-total">${fmt(assetRows.length)} aset</div>
+    </div>
+    <div class="trigger-levels">
+      ${renderTriggerLevel(4,poor,"4 - Poor","poor-card")}
+      ${renderTriggerLevel(5,critical,"5 - Critical","critical-card")}
+    </div>
+  </div>`;
+}
+function renderTriggers(){
+  const box=document.getElementById("triggerCharts");
+  if(!box)return;
+  box.innerHTML=TYPES.map(renderOneTriggerAsset).join("");
 }
 
 const cols=["Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Penempatan","Phasa","Techidentno","Jenis Aset","Merk","Serial ID","Status Asset","Tipe Aset","Tegangan","Tahun Buat","Usia Aset","Kategori Umur","AHI","Parameter Pemicu"];
@@ -263,14 +346,48 @@ const cols=["Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Penempatan
 function renderTable(){
  let q=norm(document.getElementById("search").value);
  let arr=filtered.filter(r=>!q||cols.some(c=>norm(r[c]).includes(q)));
- document.getElementById("count").textContent=`Menampilkan ${Math.min(50,arr.length).toLocaleString("id-ID")} dari ${arr.length.toLocaleString("id-ID")} data`;
+ const totalPages=Math.max(1,Math.ceil(arr.length/PAGE_SIZE));
+ currentPage=Math.min(Math.max(1,currentPage),totalPages);
+ const start=(currentPage-1)*PAGE_SIZE;
+ const pageRows=arr.slice(start,start+PAGE_SIZE);
+ const shown=pageRows.length;
+ document.getElementById("count").textContent=`Menampilkan ${shown.toLocaleString("id-ID")} data • halaman ${currentPage} dari ${totalPages} • total ${arr.length.toLocaleString("id-ID")} data`;
  document.getElementById("thead").innerHTML="<tr>"+cols.map(c=>`<th>${c}</th>`).join("")+"</tr>";
- document.getElementById("tbody").innerHTML=arr.slice(0,50).map(r=>"<tr>"+cols.map(c=>`<td>${c==="Usia Aset"?(valAge(r)??"—"):html(r[c])}</td>`).join("")+"</tr>").join("")||'<tr><td colspan="19">Tidak ada data.</td></tr>';
+ document.getElementById("tbody").innerHTML=pageRows.map(r=>"<tr>"+cols.map(c=>`<td>${c==="Usia Aset"?(valAge(r)??"—"):html(r[c])}</td>`).join("")+"</tr>").join("")||'<tr><td colspan="19">Tidak ada data.</td></tr>';
+ renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+ const box=document.getElementById("pagination");
+ if(!box)return;
+ if(totalPages<=1){box.innerHTML="";return;}
+ const parts=[];
+ parts.push(`<button class="page-btn" ${currentPage===1?"disabled":""} onclick="goPage(${currentPage-1})">‹</button>`);
+ const pages=[];
+ const add=n=>{if(!pages.includes(n))pages.push(n)};
+ add(1); add(2); add(3);
+ for(let n=currentPage-2;n<=currentPage+2;n++) if(n>=1&&n<=totalPages)add(n);
+ add(totalPages-2); add(totalPages-1); add(totalPages);
+ pages.sort((a,b)=>a-b);
+ let prev=0;
+ pages.forEach(n=>{
+   if(prev&&n>prev+1) parts.push('<span class="page-info">…</span>');
+   parts.push(`<button class="page-btn ${n===currentPage?"active":""}" onclick="goPage(${n})">${n}</button>`);
+   prev=n;
+ });
+ parts.push(`<button class="page-btn" ${currentPage===totalPages?"disabled":""} onclick="goPage(${currentPage+1})">›</button>`);
+ box.innerHTML=parts.join("");
+}
+
+function goPage(page){
+ currentPage=page;
+ renderTable();
+ document.querySelector(".detail")?.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function render(){renderKpi();renderCharts();renderAges();renderTriggers();renderTable()}
 
-document.getElementById("search").addEventListener("input",renderTable);
+document.getElementById("search").addEventListener("input",()=>{currentPage=1;renderTable()});
 
 document.getElementById("exportBtn").onclick=()=>{
  const q=norm(document.getElementById("search").value),arr=filtered.filter(r=>!q||cols.some(c=>norm(r[c]).includes(q)));
