@@ -1,238 +1,486 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AHI Evaluasi — DASHBOARD AHI UIT JBB</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.app{display:flex;min-height:100vh}
-.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:14px 10px;z-index:20}.logo{height:50px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #edf1f6;margin-bottom:10px;padding-bottom:10px;overflow:hidden}.logo img:first-child{width:65px;height:31px;object-fit:contain}.logo img:last-child{width:104px;height:30px;object-fit:contain}
-.nav a{display:block;padding:11px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:3px 0}.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}.side-date{position:absolute;bottom:70px;left:10px;right:10px;border:1px solid #e3eaf2;background:#f8fafc;border-radius:8px;padding:10px}.side-date small{display:block;color:#65758a}.side-date b{display:block;margin-top:3px}
-main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:12px}.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}.brand p{margin:5px 0 0;color:#60748c}.actions{display:flex;gap:8px;align-items:center}.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}.date b{display:block;font-size:11px;margin-top:2px}.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}
-.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:12px 0;display:grid;grid-template-columns:1.05fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto auto;gap:8px}.filter label{font-size:9px;font-weight:700;color:#53677e;display:block;margin-bottom:4px}.filter select{width:100%;height:30px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:10px}.kpi{background:#fff;border:1px solid #dce6f0;border-radius:9px;padding:11px 13px}.kpi small{font-weight:700;color:#53677e}.kpi .num{font-size:23px;font-weight:800;margin:5px 0}.kpi .pct{font-weight:700}.vg{color:#20a46b}.good{color:#f2b400}.fair{color:#f07800}.poor{color:#e53935}.critical{color:#111}
-.panel{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:13px;min-width:0}.panel-title{font-size:15px;font-weight:800;margin-bottom:4px}.panel-sub{font-size:10px;color:#8b99aa;margin-bottom:10px}.trend-panel{margin-bottom:10px}.asset-trends{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-chart{border:1px solid #e1e8f0;border-radius:8px;padding:10px;min-width:0;background:#fff}.asset-chart h4{margin:0 0 4px;font-size:12px}.asset-chart .mini{height:220px;position:relative}.asset-chart svg{width:100%;height:100%;display:block;overflow:hidden}.asset-empty{height:220px;display:flex;align-items:center;justify-content:center;color:#8a98a8;font-size:11px}.asset-chart .mini-labels{display:grid;grid-template-columns:repeat(12,1fr);font-size:8px;color:#6d7e92;text-align:center;margin-top:2px}.trend-head{display:flex;justify-content:space-between;align-items:center}
-.chart-wrap{position:relative;height:390px;padding:12px 10px 30px 48px}.gridlines{position:absolute;left:48px;right:12px;top:18px;bottom:40px;display:flex;flex-direction:column;justify-content:space-between}.gridline{border-top:1px dashed #dfe6ee;position:relative}.gridline span{position:absolute;left:-43px;top:-7px;font-size:9px;color:#7d8b9c}svg#trendSvg{position:absolute;left:48px;right:12px;top:18px;width:calc(100% - 60px);height:calc(100% - 58px);overflow:visible}.xlabels{position:absolute;left:48px;right:12px;bottom:8px;display:grid;grid-template-columns:repeat(12,1fr);font-size:9px;color:#6d7e92;text-align:center}.dot-hit{cursor:pointer}
-.tooltip{position:fixed;display:none;z-index:100;background:#142b4a;color:#fff;border-radius:8px;padding:9px 11px;box-shadow:0 8px 25px rgba(0,0,0,.18);font-size:10px;pointer-events:none;max-width:300px}.tooltip b{font-size:11px}.tip-row{display:flex;justify-content:space-between;gap:15px;margin-top:4px}.tip-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}.legend{display:flex;gap:18px;justify-content:center;margin-top:5px;font-size:10px;color:#5f7187}.legend span{display:flex;align-items:center;gap:5px}.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
-.detail{margin-top:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.detail-head h3{margin:0;font-size:14px}.detail-head small{display:block;color:#5d7188;margin-top:5px}.search{width:300px;height:34px;border:1px solid #d4dfeb;border-radius:8px;padding:0 12px}.table-wrap{border:1px solid #dce5ee;border-radius:7px;overflow:auto;max-height:450px;position:relative}.table{border-collapse:separate;border-spacing:0;min-width:2600px;width:max-content;font-size:10px}.table th,.table td{padding:9px 10px;border-right:1px solid #e6edf4;border-bottom:1px solid #e6edf4;white-space:nowrap;background:#fff}.table th{background:#f7f9fc;font-weight:800;color:#29415e;position:sticky;top:0;z-index:5}.table th:nth-child(-n+7){z-index:10}.table td:nth-child(-n+7),.table th:nth-child(-n+7){position:sticky}.table th:nth-child(1),.table td:nth-child(1){left:0}.table th:nth-child(2),.table td:nth-child(2){left:100px}.table th:nth-child(3),.table td:nth-child(3){left:220px}.table th:nth-child(4),.table td:nth-child(4){left:315px}.table th:nth-child(5),.table td:nth-child(5){left:450px}.table th:nth-child(6),.table td:nth-child(6){left:590px}.table th:nth-child(7),.table td:nth-child(7){left:680px;box-shadow:4px 0 5px -4px #9aa8b8}.table td:nth-child(-n+7){z-index:3}.table th:nth-child(-n+7){z-index:9}.badge{padding:4px 7px;border-radius:4px;font-weight:700;display:inline-block}.c1{background:#20a46b;color:#fff}.c2{background:#f2b400;color:#17233b}.c3{background:#f07800;color:#fff}.c4{background:#e53935;color:#fff}.c5{background:#111;color:#fff}
-@media(max-width:1250px){.filters{grid-template-columns:repeat(4,1fr)}.kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.sidebar{width:175px}main{margin-left:175px;width:calc(100% - 175px)}.kpis{grid-template-columns:repeat(2,1fr)}}
-</style></head>
-<body><div class="app"><aside class="sidebar"><div class="logo"><img src="assets/pln-logo.webp" alt="PLN"><img src="assets/danantara.png" alt="Danantara"></div>
-<nav class="nav"><a href="index.html">Dashboard</a><a href="index.html">AHI Power Inspect</a><a class="active">AHI Evaluasi</a><a>Data Aset</a><a>Laporan</a></nav>
-<div class="side-date"><small>Data Terakhir (Upload CSV)</small><b id="sideDate">—</b></div></aside>
-<main><header class="header"><div class="brand"><h1>DASHBOARD AHI UIT JBB</h1><p>Asset Health Index – Evaluasi Aset</p></div><div class="actions"><div class="date">Data Terakhir (Upload CSV)<b id="lastDate">—</b></div><button class="btn" id="exportBtn">⇩ Export CSV</button></div></header>
-<section class="filters" id="filters"></section><section class="kpis" id="kpis"></section>
-<section class="panel trend-panel"><div class="trend-head"><div><div class="panel-title">TREND DISTRIBUSI AHI</div><div class="panel-sub">Januari–Desember 2026 • 5 garis sesuai kategori AHI • Hover titik untuk rincian per jenis aset</div></div></div>
-<div class="chart-wrap"><div class="gridlines" id="gridlines"></div><svg id="trendSvg" viewBox="0 0 1200 320" preserveAspectRatio="none"></svg><div class="xlabels" id="xlabels"></div></div><div class="legend" id="trendLegend"></div></section>
-<section class="panel detail"><div class="detail-head"><div><h3>Detail Aset Periode <span id="periodTitle">Januari 2026</span></h3><small id="count">Menampilkan 0 data</small></div><input class="search" id="search" placeholder="Cari aset / merk / GI / Bay / parameter..."></div>
-<div class="table-wrap"><table class="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div></section></main></div><div class="tooltip" id="tooltip"></div>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}
+.app{display:flex;min-height:100vh}
+.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:10px 8px;z-index:20}
+.logo{height:57px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #edf1f6;margin-bottom:7px;padding:4px 1px 10px;overflow:hidden}
+.logo img:first-child{width:70px;height:35px;object-fit:contain}
+.logo img:last-child{width:105px;height:34px;object-fit:contain}
+.nav a{display:block;padding:11px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:3px 0}
+.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}
+.nav a:hover{background:#f2f7fc}
+.side-date{position:absolute;bottom:18px;left:8px;right:8px;border:1px solid #dfe7ef;background:#f8fafc;border-radius:8px;padding:10px}
+.side-date small{display:block;color:#65758a}
+.side-date b{display:block;margin-top:3px}
+main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:10px}
+.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}
+.brand p{margin:5px 0 0;color:#60748c}
+.actions{display:flex;gap:8px;align-items:center}
+.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}
+.date b{display:block;font-size:11px;margin-top:2px}
+.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}
+.btn.primary{background:#0877d1;color:#fff}
+.btn:disabled{opacity:.55;cursor:wait}
+
+.status{display:none;background:#fff;border:1px solid #dce6f0;border-radius:9px;padding:10px 12px;margin:10px 0;font-weight:700}
+.status.error{display:block;color:#b42318;background:#fff8f7;border-color:#f1b8b2}
+.status.ok{display:block;color:#137a4a;background:#f4fbf7;border-color:#b7e2cc}
+.status.info{display:block;color:#315a80;background:#f7fbff}
+
+.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:10px 0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.filter label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}
+.filter select{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}
+.filter-actions{grid-column:1/-1;display:flex;gap:8px;align-items:center;padding-top:2px}
+.filter-actions .check{display:flex;align-items:center;gap:6px;font-size:11px;color:#53677e;margin-right:auto}
+.filter-actions input{accent-color:#0877d1}
+
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:10px 0}
+.kpi{background:#fff;border:1px solid #dce6f0;border-radius:9px;padding:11px 13px}
+.kpi small{font-size:10px;color:#526b84;font-weight:700}
+.kpi .num{font-size:22px;font-weight:800;margin-top:4px;color:#163653}
+.kpi .pct{font-size:10px;font-weight:800;margin-top:2px}
+.vg{color:#20a46b}.good{color:#d59e00}.fair{color:#f07800}.poor{color:#e53935}.critical{color:#111}
+
+.panel{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:12px;margin-top:10px;min-width:0}
+.panel-title{font-size:15px;font-weight:800;color:#173452}
+.panel-sub{font-size:10px;color:#7b8ca0;margin-top:3px}
+.trend-panel{overflow:hidden}
+.chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.asset-chart{border:1px solid #e0e7ef;border-radius:9px;padding:8px;min-width:0;overflow:hidden;background:#fff}
+.asset-chart h3{margin:0 0 5px;font-size:12px;color:#1266b7}
+.asset-chart canvas{width:100%;height:210px;display:block}
+.legend{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;font-size:10px;margin-top:7px;color:#405a73}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.empty-chart{height:210px;display:flex;align-items:center;justify-content:center;color:#91a0b1;font-size:11px}
+
+.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.detail-head h3{margin:0;font-size:15px}
+.detail-head small{color:#6e8195}
+.search{width:350px;height:34px;border:1px solid #d2ddea;border-radius:7px;padding:0 10px}
+.table-wrap{overflow:auto;max-height:520px;margin-top:8px;border:1px solid #e4eaf1;border-radius:7px}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:1550px;font-size:11px}
+th,td{padding:7px 8px;border-bottom:1px solid #e5ebf1;white-space:nowrap;text-align:left;background:#fff}
+th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-index:5}
+.badge{padding:3px 6px;border-radius:4px;font-weight:800;display:inline-block}
+.c1{background:#20a46b;color:#fff}.c2{background:#f2b400;color:#17233b}.c3{background:#f07800;color:#fff}.c4{background:#e53935;color:#fff}.c5{background:#111;color:#fff}
+
+.loading{opacity:.6;pointer-events:none}
+@media(max-width:1250px){
+ .filters{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .chart-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:850px){
+ .sidebar{width:175px}.logo img:first-child{width:58px}.logo img:last-child{width:92px}
+ main{margin-left:175px;width:calc(100% - 175px);padding:10px}
+ .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .chart-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .actions{display:none}.search{width:240px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">
+    <img src="assets/pln-logo.webp" alt="PLN">
+    <img src="assets/danantara.png" alt="Danantara">
+  </div>
+  <nav class="nav">
+    <a href="index.html">Dashboard</a>
+    <a href="index.html">AHI Power Inspect</a>
+    <a class="active" href="ahi-evaluasi.html">AHI Evaluasi</a>
+    <a href="#">Data Aset</a>
+    <a href="#">Laporan</a>
+  </nav>
+  <div class="side-date"><small>Data Terakhir (Upload CSV)</small><b id="sideDate">Memuat...</b></div>
+</aside>
+
+<main>
+<header class="header">
+  <div class="brand"><h1>DASHBOARD AHI UIT JBB</h1><p>Asset Health Index – Evaluasi Aset</p></div>
+  <div class="actions">
+    <div class="date">Data Terakhir (Upload CSV)<b id="lastDate">Memuat...</b></div>
+    <button class="btn" id="exportBtn">⇩ Export CSV</button>
+  </div>
+</header>
+
+<div id="status" class="status"></div>
+<section class="filters" id="filters"></section>
+<section class="kpis" id="kpis"></section>
+
+<section class="panel trend-panel">
+  <div class="panel-title">TREND DISTRIBUSI AHI PER JENIS ASET</div>
+  <div class="panel-sub">Januari–Desember 2026 • Setiap jenis aset memiliki grafik sendiri • Bulan tanpa data dibiarkan putus</div>
+  <div class="legend" id="legend"></div>
+  <div class="chart-grid" id="chartGrid"></div>
+</section>
+
+<section class="panel detail">
+  <div class="detail-head">
+    <div><h3>Detail Aset Periode <span id="periodTitle">Januari 2026</span></h3><small id="count">Memuat data...</small></div>
+    <input class="search" id="search" placeholder="Cari aset / merk / GI / Bay / parameter...">
+  </div>
+  <div class="table-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+</section>
+</main>
+</div>
+
 <script>
-const DATA_URL="";
+const BASE_RAW="https://raw.githubusercontent.com/hargiuijbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/";
 const MONTHS=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const MONTH_FILES={
+  Juni:"AHI_EVAL_JUNI.csv",Juli:"AHI_EVAL_JULI.csv",Agustus:"AHI_EVAL_AGUSTUS.csv",
+  September:"AHI_EVAL_SEPTEMBER.csv",Oktober:"AHI_EVAL_OKTOBER.csv",November:"AHI_EVAL_NOVEMBER.csv",Desember:"AHI_EVAL_DESEMBER.csv"
+};
 const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor","PMT INC","CT INC","PT INC"];
+const TYPE_SHORT={"Power Transformer":"TRAFO","Current Transformer":"CT","Potential Transformer":"CVT/PT","Circuit Breaker":"PMT","Disconnecting Switch":"PMS","Lightning Arrester":"LA","Neutral Grounding Resistance":"NGR","Reactor":"REAKTOR","Capacitor":"KAPASITOR","PMT INC":"PMT INC","CT INC":"CT INC","PT INC":"PT INC"};
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
-const SPLIT=TYPES.slice(0,6),ALLV=TYPES.slice(6,9);let raw=[],filtered=[],period="Januari",search="";
 const HIST={
 "Januari":{"TRAFO":[42,99,254,71,7],"CT":[33,168,52,3083,6315],"CVT/PT":[132,9,2,3893,0],"PMT":[138,479,334,1095,758],"PMS":[24,117,21,7615,0],"LA":[7,157,126,2139,385],"NGR":[10,0,14,344,6],"REAKTOR":[0,0,0,11,0],"KAPASITOR":[0,0,0,6,5]},
 "Februari":{"TRAFO":[43,105,252,67,6],"CT":[33,299,59,3115,10999],"CVT/PT":[125,18,2,3906,0],"PMT":[130,898,326,1141,1442],"PMS":[19,175,21,7665,0],"LA":[4,235,123,2174,702],"NGR":[10,0,14,345,8],"REAKTOR":[0,0,0,11,0],"KAPASITOR":[0,0,0,17,10]},
 "Maret":{"TRAFO":[43,106,253,63,6],"CT":[30,164,56,3283,6128],"CVT/PT":[123,9,2,3908,0],"PMT":[112,474,327,1169,711],"PMS":[19,87,21,7671,0],"LA":[1,157,123,2178,376],"NGR":[9,0,14,346,6],"REAKTOR":[0,0,0,11,0],"KAPASITOR":[0,0,0,17,5]},
 "April":{"TRAFO":[38,107,251,67,6],"CT":[27,148,46,2984,4891],"CVT/PT":[67,9,2,3107,0],"PMT":[85,613,454,864,1435],"PMS":[5,91,22,7687,243],"LA":[13,176,123,2163,366],"NGR":[10,0,14,348,8],"REAKTOR":[0,0,0,23,0],"KAPASITOR":[0,0,0,17,5]},
-"Mei":{"TRAFO":[35,106,255,67,6],"CT":[26,145,36,3025,4844],"CVT/PT":[63,9,2,3111,0],"PMT":[73,562,994,899,917],"PMS":[4,91,22,7686,243],"LA":[13,168,123,2179,358],"NGR":[10,0,12,352,7],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,0,0,25,4],"PMT INC":[1,42,266,2,53],"CT INC":[0,0,0,62,327],"PT INC":[0,0,0,850,0]}};
-const HISTMAP={"TRAFO":"Power Transformer","CT":"Current Transformer","CVT/PT":"Potential Transformer","PMT":"Circuit Breaker","PMS":"Disconnecting Switch","LA":"Lightning Arrester","NGR":"Neutral Grounding Resistance","REAKTOR":"Reactor","KAPASITOR":"Capacitor","PMT INC":"PMT INC","CT INC":"CT INC","PT INC":"PT INC"};
-const MONTH_FILES={Juni:"AHI_EVAL_JUNI.csv",Juli:"AHI_EVAL_JULI.csv",Agustus:"AHI_EVAL_AGUSTUS.csv",September:"AHI_EVAL_SEPTEMBER.csv",Oktober:"AHI_EVAL_OKTOBER.csv",November:"AHI_EVAL_NOVEMBER.csv",Desember:"AHI_EVAL_DESEMBER.csv"};
-const MONTH_DATA={};
-const norm=s=>String(s??"").normalize("NFKC").replace(/^\\uFEFF/,"").replace(/\\u00a0/g," ").trim().replace(/\\s+/g," ").toLowerCase();
-const canonical=v=>TYPES.find(x=>norm(x)===norm(v))||"";const fmt=n=>Number(n||0).toLocaleString("id-ID");const pct=(n,d)=>d?((n/d)*100).toFixed(1).replace(".",",")+"%":"0,0%";
-function parseCSV(t){t=t.replace(/^\\uFEFF/,"");let first=t.split(/\\r?\\n/).find(x=>x.trim())||"",delim=((first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length)?";":",";let rows=[],row=[],cell="",q=false;for(let i=0;i<t.length;i++){let c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===delim&&!q){row.push(cell);cell=""}else if((c=="\\n"||c=="\\r")&&!q){if(c=="\\r"&&t[i+1]=="\\n")i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=""}else cell+=c}if(cell||row.length){row.push(cell);if(row.some(x=>x.trim()))rows.push(row)}if(!rows.length)return[];let h=rows.shift().map(x=>x.trim());return rows.map(r=>Object.fromEntries(h.map((x,i)=>[x,String(r[i]??"").trim()])))}
-function uniq(k){return [...new Set(raw.map(r=>r[k]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)))}
-function includeVoltage(r,g){
- const t=canonical(r["Jenis Aset"]);
- if(!g || g==="semua") return true;
- if(ALLV.includes(t)) return true;
- if(!SPLIT.includes(t)) return true;
- const v=norm(r["Teg Operasi"]||r["Tegangan"]).replace(/\s/g,"");
- const kv=parseFloat(v.replace(/[^0-9.]/g,""));
- return g==="transmisi" ? (Number.isFinite(kv)&&kv>=70) : (v===""||v==="-"||(Number.isFinite(kv)&&kv<=20));
+"Mei":{"TRAFO":[35,106,255,67,6],"CT":[26,145,36,3025,4844],"CVT/PT":[63,9,2,3111,0],"PMT":[73,562,994,899,917],"PMS":[4,91,22,7686,243],"LA":[13,168,123,2179,358],"NGR":[10,0,12,352,7],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,0,0,25,4],"PMT INC":[1,42,266,2,53],"CT INC":[0,0,0,62,327],"PT INC":[0,0,0,850,0]},
+"Juni":{"TRAFO":[26,109,224,108,1],"CT":[124,125,12,7630,185],"CVT/PT":[68,53,0,3043,0],"PMT":[96,395,685,2025,244],"PMS":[6,26,104,1760,6137],"LA":[53,106,20,2593,45],"NGR":[6,1,53,318,3],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,0,0,25,4],"PMT INC":[9,7,90,273,3],"CT INC":[10,13,0,1554,10],"PT INC":[14,8,0,816,11]},
+"Juli":{"TRAFO":[35,112,204,118,0],"CT":[93,58,0,7840,94],"CVT/PT":[63,22,0,3073,6],"PMT":[81,510,907,1902,46],"PMS":[24,24,82,1642,6265],"LA":[41,105,26,2647,0],"NGR":[2,0,57,320,2],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,1,0,28,0],"PMT INC":[12,7,98,260,3],"CT INC":[12,3,0,1453,10],"PT INC":[7,3,0,755,11]}
+};
+const LIVE={};
+let raw=[],filtered=[],period="Agustus",search="",trendFilter=true;
+
+function norm(v){return String(v??"").normalize("NFKC").replace(/^\uFEFF/,"").replace(/\u00a0/g," ").trim().replace(/\s+/g," ").toLowerCase()}
+function fmt(n){return Number(n||0).toLocaleString("id-ID")}
+function esc(v){return String(v??"—").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function typeOf(r){
+  const s=norm(r["Jenis Aset"]||r["Jenis Asset"]);
+  if(s.includes("power"))return "Power Transformer";
+  if(s.includes("current"))return "Current Transformer";
+  if(s.includes("potential")||s.includes("cvt"))return "Potential Transformer";
+  if(s.includes("circuit"))return "Circuit Breaker";
+  if(s.includes("disconnect"))return "Disconnecting Switch";
+  if(s.includes("lightning"))return "Lightning Arrester";
+  if(s.includes("neutral"))return "Neutral Grounding Resistance";
+  if(s.includes("reaktor"))return "Reactor";
+  if(s.includes("capacitor")||s.includes("kapasitor"))return "Capacitor";
+  if(s.includes("pmt inc"))return "PMT INC";
+  if(s.includes("ct inc"))return "CT INC";
+  if(s.includes("pt inc"))return "PT INC";
+  return r["Jenis Aset"]||r["Jenis Asset"]||"";
 }
-function hierarchyBase(row,f,exclude){
- if(!includeVoltage(row,f.g))return false;
- if(exclude!=="ui"&&f.ui&&row["Unit Induk"]!==f.ui)return false;
- if(exclude!=="upt"&&f.upt&&row["Unit Pelaksana"]!==f.upt)return false;
- if(exclude!=="ultg"&&f.ultg&&row["Ultg"]!==f.ultg)return false;
- if(exclude!=="gi"&&f.gi&&row["Gardu Induk"]!==f.gi)return false;
- if(exclude!=="bay"&&f.bay&&row["Bay"]!==f.bay)return false;
- return true;
+function ahiNumber(v){const m=String(v??"").match(/(?:^|\D)([1-5])(?:\D|$)/);return m?Number(m[1]):0}
+function monthKey(month,kind){
+  const m=month.toUpperCase();
+  if(kind==="ahi")return [`AHI FINAL ${m}`,`${m} AHI FINAL`,`AHI ${m}`,`${m} AHI`];
+  if(kind==="param")return [`Parameter Pemicu ${m}`,`${m} Parameter Pemicu`];
+  if(kind==="p01")return [`BA TINJUT ${m}`,`${m} BA TINJUT`];
+  return [];
 }
-function setOptions(sel,values,selected){
- const keep=selected||"";
- sel.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
- if(values.includes(keep))sel.value=keep; else sel.value="";
+function getMonthValue(r,month,kind){
+  const keys=Object.keys(r);
+  for(const c of monthKey(month,kind)){const k=keys.find(x=>norm(x)===norm(c));if(k&&String(r[k]).trim()!=="")return r[k]}
+  const m=norm(month);
+  const k=keys.find(x=>norm(x).includes(m)&&(
+    kind==="ahi"?/(ahi final|ahi|health|kategori)/.test(norm(x)):
+    kind==="param"?/(parameter|pemicu)/.test(norm(x)):
+    kind==="p01"?/(ba tinjut|p0|p1)/.test(norm(x)):false
+  ));
+  return k?r[k]:"";
+}
+function parseCSV(t){
+  t=t.replace(/^\uFEFF/,"");
+  let first=t.split(/\r?\n/).find(x=>x.trim())||"";
+  let delim=((first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length)?";":",";
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(c==='"'){
+      if(q&&t[i+1]==='"'){cell+='"';i++} else q=!q;
+    }else if(c===delim&&!q){row.push(cell);cell=""}
+    else if((c==="\n"||c==="\r")&&!q){
+      if(c==="\r"&&t[i+1]==="\n")i++;
+      row.push(cell);cell="";
+      if(row.some(v=>String(v).trim()!==""))rows.push(row);
+      row=[];
+    }else cell+=c;
+  }
+  if(cell!==""||row.length){row.push(cell);if(row.some(v=>String(v).trim()!==""))rows.push(row)}
+  if(!rows.length)return [];
+  const h=rows.shift().map(x=>String(x).trim());
+  return rows.map(r=>Object.fromEntries(h.map((x,i)=>[x,String(r[i]??"").trim()])));
+}
+async function fetchText(url){
+  const r=await fetch(url,{cache:"no-store"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  return await r.text();
+}
+async function fetchMonth(month){
+  const file=MONTH_FILES[month];if(!file)return null;
+  const urls=[
+    BASE_RAW+file+"?v="+Date.now(),
+    "data/evaluasi/"+file+"?v="+Date.now(),
+    "./data/evaluasi/"+file+"?v="+Date.now()
+  ];
+  for(const u of urls){
+    try{
+      const text=await fetchText(u);
+      const rows=parseCSV(text);
+      if(rows.length)return {rows,file};
+    }catch(e){console.warn("Gagal",month,u,e)}
+  }
+  return null;
+}
+function mockCounts(month,type){
+  const short=TYPE_SHORT[type];
+  return HIST[month]?.[short]??null;
+}
+function liveRows(month){return LIVE[month]?.rows||null}
+function baseRowsForFilters(month){
+  return liveRows(month)||raw;
+}
+function voltageOK(r,v){
+  if(!v)return true;
+  const t=typeOf(r);
+  if(["Reactor","Capacitor","PMT INC","CT INC","PT INC"].includes(t))return true;
+  const n=norm(r["Teg Operasi"]||r["Tegangan"]).replace(/\s/g,"");
+  const high=n.includes("500")||n.includes("150")||n.includes("70");
+  return v==="transmisi"?high:!high;
+}
+function getFilters(){
+  const s=[...document.querySelectorAll("#filters select")];
+  return {teg:s[0]?.value||"",unit:s[1]?.value||"",upt:s[2]?.value||"",ultg:s[3]?.value||"",gi:s[4]?.value||"",bay:s[5]?.value||"",phasa:s[6]?.value||"",type:s[7]?.value||"",ahi:s[8]?.value||"",period:s[9]?.value||"Agustus"};
+}
+function matches(r,f,exclude=""){
+  if(!voltageOK(r,f.teg))return false;
+  const map=[["unit","Unit Induk"],["upt","Unit Pelaksana"],["ultg","Ultg"],["gi","Gardu Induk"],["bay","Bay"],["phasa","Phasa"]];
+  for(const [id,col] of map)if(id!==exclude&&f[id]&&String(r[col]??"")!==f[id])return false;
+  if(exclude!=="type"&&f.type&&typeOf(r)!==f.type)return false;
+  if(exclude!=="ahi"&&f.ahi&&ahiNumber(getMonthValue(r,f.period,"ahi"))!==Number(f.ahi.charAt(0)))return false;
+  return true;
+}
+function uniqRows(rows,col){return [...new Set(rows.map(r=>String(r[col]??"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id"))}
+function setSelect(sel,vals,keep){
+  sel.innerHTML='<option value="">Semua</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if(vals.includes(keep))sel.value=keep;else sel.value="";
 }
 function refreshCascading(){
- const sels=[...document.querySelectorAll("#filters select")],f=selectedFilters();
- if(!sels.length)return;
- // Unit Induk -> UPT -> ULTG -> GI -> Bay
- const uiVals=uniq("Unit Induk",raw.filter(r=>hierarchyBase(r,f,"ui")));
- setOptions(sels[1],uiVals,f.ui);
- f.ui=sels[1].value;
- const uptVals=uniq("Unit Pelaksana",raw.filter(r=>hierarchyBase(r,f,"upt")));
- setOptions(sels[2],uptVals,f.upt);
- f.upt=sels[2].value;
- const ultgVals=uniq("Ultg",raw.filter(r=>hierarchyBase(r,f,"ultg")));
- setOptions(sels[3],ultgVals,f.ultg);
- f.ultg=sels[3].value;
- const giVals=uniq("Gardu Induk",raw.filter(r=>hierarchyBase(r,f,"gi")));
- setOptions(sels[4],giVals,f.gi);
- f.gi=sels[4].value;
- const bayVals=uniq("Bay",raw.filter(r=>hierarchyBase(r,f,"bay")));
- setOptions(sels[5],bayVals,f.bay);
- f.bay=sels[5].value;
+  const s=[...document.querySelectorAll("#filters select")];if(!s.length)return;
+  let f=getFilters();
+  const all=baseRowsForFilters(f.period);
+  const steps=[["Unit Induk","unit"],["Unit Pelaksana","upt"],["Ultg","ultg"],["Gardu Induk","gi"],["Bay","bay"]];
+  for(const [col,id] of steps){
+    const rows=all.filter(r=>matches(r,f,id));
+    setSelect(s[["unit","upt","ultg","gi","bay"].indexOf(id)+1],uniqRows(rows,col),f[id]);
+    f[id]=s[["unit","upt","ultg","gi","bay"].indexOf(id)+1].value;
+  }
+  setSelect(s[6],uniqRows(all.filter(r=>matches(r,f,"phasa")),"Phasa"),f.phasa);
+  setSelect(s[7],TYPES.filter(t=>all.some(r=>matches(r,f,"type")&&typeOf(r)===t)),f.type);
+  setSelect(s[8],AHI.map(x=>x[0]).filter(a=>all.some(r=>matches(r,f,"ahi")&&ahiNumber(getMonthValue(r,f.period,"ahi"))===Number(a.charAt(0)))),f.ahi);
 }
-function populate(){
- const defs=[
- ["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (70 kV ke atas)","Incoming (20 kV ke bawah / -)"]],
- ["Unit Induk",[]],["UPT",[]],["ULTG",[]],["GI",[]],["Bay",[]],
- ["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])],["Periode",MONTHS]
- ];
- const f=document.getElementById("filters");f.innerHTML="";
- defs.forEach((d,i)=>{
-   let div=document.createElement("div");div.className="filter";
-   let l=document.createElement("label");l.textContent=d[0];
-   let sel=document.createElement("select");sel.dataset.i=i;
-   if(i===0)sel.innerHTML=d[1].map((v,j)=>`<option value="${v}">${d[2][j]}</option>`).join("");
-   else if(i===9)sel.innerHTML=d[1].map(v=>`<option value="${v}">${v} 2026</option>`).join("");
-   else sel.innerHTML='<option value="">Semua</option>'+d[1].map(v=>`<option value="${v}">${v}</option>`).join("");
-   if(i===0)sel.value="";
-   if(i===9)sel.value="Januari";
-   sel.addEventListener("change",()=>{
-     if(i===9){period=sel.value;render();return;}
-     if(i<=5) refreshCascading();
-   });
-   div.append(l,sel);f.append(div);
- });
- let b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);
- let r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{
-   f.querySelectorAll("select").forEach((x,i)=>x.value=i===0?"transmisi":i===9?"Januari":"");
-   period="Januari";refreshCascading();apply();
- };f.append(r);
- refreshCascading();
+function buildFilters(){
+  const box=document.getElementById("filters");
+  box.innerHTML="";
+  const defs=["Kelompok Tegangan","Unit Induk","UPT","ULTG","GI","Bay","Phasa","Jenis Aset","Kategori AHI","Periode"];
+  defs.forEach((name,i)=>{
+    const d=document.createElement("div");d.className="filter";
+    const l=document.createElement("label");l.textContent=name;
+    const s=document.createElement("select");d.append(l,s);box.append(d);
+    if(i===0){s.innerHTML='<option value="">Semua</option><option value="transmisi">Transmisi (70 kV ke atas)</option><option value="incoming">Incoming (20 kV ke bawah / -)</option>'}
+    if(i===9){s.innerHTML=MONTHS.map(m=>`<option value="${m}">${m} 2026</option>`).join("");s.value=period}
+    if(i===7){s.innerHTML='<option value="">Semua</option>'+TYPES.map(t=>`<option>${t}</option>`).join("")}
+    if(i===8){s.innerHTML='<option value="">Semua</option>'+AHI.map(a=>`<option>${a[0]}</option>`).join("")}
+    s.addEventListener("change",()=>{
+      if(i===9){period=s.value;refreshCascading();apply();return}
+      if(i<=8)refreshCascading();
+    });
+  });
+  const actions=document.createElement("div");actions.className="filter-actions";
+  actions.innerHTML='<label class="check"><input type="checkbox" id="trendFilter" checked> Terapkan filter ke grafik trending</label><button class="btn primary" id="applyBtn">Terapkan</button><button class="btn" id="resetBtn">Reset</button>';
+  box.append(actions);
+  document.getElementById("trendFilter").onchange=e=>{trendFilter=e.target.checked;renderCharts()};
+  document.getElementById("applyBtn").onclick=apply;
+  document.getElementById("resetBtn").onclick=()=>{
+    const s=[...box.querySelectorAll("select")];
+    s.forEach((x,i)=>x.value=i===9?"Agustus":"");
+    period="Agustus";refreshCascading();apply();
+  };
+  refreshCascading();
 }
-function getFilters(){return selectedFilters()}
-function apply(){
- const f=getFilters(); period=f.period||"Januari";
- filtered=raw.filter(r=>includeVoltage(r,f.g)
-   &&(!f.ui||r["Unit Induk"]===f.ui)
-   &&(!f.upt||r["Unit Pelaksana"]===f.upt)
-   &&(!f.ultg||r["Ultg"]===f.ultg)
-   &&(!f.gi||r["Gardu Induk"]===f.gi)
-   &&(!f.bay||r["Bay"]===f.bay)
-   &&(!f.ph||r["Phasa"]===f.ph)
-   &&(!f.type||canonical(r["Jenis Aset"])===f.type)
-   &&(!f.ahi||norm(monthAhi(r,period))===norm(f.ahi)));
- render();
+function filteredRows(){
+  const f=getFilters();period=f.period;
+  const rows=baseRowsForFilters(period);
+  return rows.filter(r=>matches(r,f));
 }
-function monthAhi(row,month){
- const m=norm(month);
- const keys=Object.keys(row);
- const candidates=[
-   `${month} AHI FINAL`,`${month} AHI`,`AHI ${month}`,`AHI FINAL ${month}`,
-   `${month}_AHI`,`${month}-AHI`,`${month} Final AHI`,`${month} Kategori AHI`
- ];
- for(const c of candidates){const k=keys.find(x=>norm(x)===norm(c));if(k&&row[k])return row[k]}
- const k=keys.find(x=>norm(x).includes(m)&&/(ahi|health|kategori)/.test(norm(x)));
- return k?row[k]:"";
+function countForMonth(month,type,categoryIndex){
+  const f=getFilters();
+  if(LIVE[month]){
+    let rows=LIVE[month].rows;
+    rows=rows.filter(r=>{
+      const ff={...f,period:month};
+      return matches(r,ff);
+    }).filter(r=>typeOf(r)===type);
+    if(f.ahi) return rows.filter(r=>ahiNumber(getMonthValue(r,month,"ahi"))===Number(f.ahi.charAt(0))).length;
+    return rows.filter(r=>ahiNumber(getMonthValue(r,month,"ahi"))===categoryIndex+1).length;
+  }
+  const mock=mockCounts(month,type);
+  if(!mock)return null;
+  if(f.type&&f.type!==type)return 0;
+  return f.ahi ? (Number(f.ahi.charAt(0))===categoryIndex+1?mock[categoryIndex]:0) : mock[categoryIndex];
 }
-function histCounts(m){let o={};for(const [s,v] of Object.entries(HIST[m]||{})){let t=HISTMAP[s];if(t)o[t]=v.slice().reverse()}return o}
-function trendRows(month){
- const ds=MONTH_DATA[month]; if(!ds) return null;
- const f=getFilters();
- return ds.rows.filter(r=>includeVoltage(r,f.g)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&(!f.ultg||r["Ultg"]===f.ultg)&&(!f.gi||r["Gardu Induk"]===f.gi)&&(!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&(!f.type||canonical(r["Jenis Aset"])===f.type)&&(!f.ahi||norm(monthAhi(r,month))===norm(f.ahi)));
+function seriesForType(type,idx){
+  return MONTHS.map(m=>{
+    const hasData=!!LIVE[m] || !!HIST[m];
+    if(!hasData)return null;
+    if(LIVE[m]){
+      const f=getFilters();
+      const rows=LIVE[m].rows.filter(r=>matches(r,{...f,period:m})).filter(r=>typeOf(r)===type);
+      if(!rows.length)return null;
+      const hasAnyAhi=rows.some(r=>ahiNumber(getMonthValue(r,m,"ahi"))>0);
+      if(!hasAnyAhi)return null;
+    }
+    return countForMonth(m,type,idx);
+  });
 }
-function currentCounts(month){
- let o={}; const rows=trendRows(month)||[];
- for(const t of TYPES){const a=rows.filter(r=>canonical(r["Jenis Aset"])===t);o[t]=AHI.map(([n])=>a.filter(r=>norm(monthAhi(r,month))===norm(n)).length)}
- return o;
+function drawChart(canvas,type){
+  const rect=canvas.getBoundingClientRect(),w=Math.max(260,rect.width),h=210,dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+  const c=canvas.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.clearRect(0,0,w,h);
+  const pad={l:38,r:8,t:12,b:27},W=w-pad.l-pad.r,H=h-pad.t-pad.b;
+  const series=AHI.map((_,i)=>seriesForType(type,i));
+  const vals=series.flat().filter(v=>v!=null);
+  if(!vals.length){canvas.parentElement.innerHTML='<h3>'+esc(type)+'</h3><div class="empty-chart">Belum ada data</div>';return}
+  const max=Math.max(1,...vals),step=Math.max(1,Math.ceil(max/4/100)*100);
+  const nice=max<=100?Math.ceil(max/4)*4:Math.max(100,step*4);
+  c.font="9px Arial";c.textBaseline="middle";
+  c.strokeStyle="#dbe5ef";c.fillStyle="#71839b";c.lineWidth=1;
+  for(let j=0;j<=4;j++){
+    const y=pad.t+H*j/4;c.beginPath();c.setLineDash([2,3]);c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke();c.setLineDash([]);
+    c.fillText(fmt(Math.round(nice*(1-j/4))),2,y);
+  }
+  c.textBaseline="alphabetic";c.fillStyle="#61778f";
+  MONTHS.forEach((m,i)=>{const x=pad.l+i*W/11;c.fillText(m.slice(0,3).toUpperCase(),x-9,h-7)});
+  series.forEach((arr,k)=>{
+    c.strokeStyle=AHI[k][1];c.lineWidth=2.2;c.lineJoin="round";c.lineCap="round";
+    let active=false;
+    arr.forEach((v,i)=>{
+      if(v==null){active=false;return}
+      const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);
+      if(!active)c.beginPath(),c.moveTo(x,y),active=true;else c.lineTo(x,y);
+      if(i===arr.length-1||arr[i+1]==null){c.stroke();active=false}
+    });
+    c.fillStyle=AHI[k][1];
+    arr.forEach((v,i)=>{
+      if(v==null)return;
+      const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);
+      c.beginPath();c.arc(x,y,3.2,0,Math.PI*2);c.fill();
+    });
+  });
 }
-function trendData(){return MONTHS.map(m=>{const by=HIST[m]?histCounts(m):MONTH_DATA[m]?currentCounts(m):null;if(!by)return {month:m,totals:AHI.map(()=>null),by:null};return {month:m,totals:AHI.map((_,i)=>Object.values(by).reduce((sum,v)=>sum+(v?.[i]||0),0)),by}})}
-function renderKpi(){let d=HIST[period]?histCounts(period):currentCounts(period),tot=AHI.map((_,i)=>Object.values(d).reduce((s,v)=>s+(v?.[i]||0),0)),total=HIST[period]?tot.reduce((a,b)=>a+b,0):(filtered.length),names=["TOTAL ASET",...AHI.map(x=>x[0])],nums=[total,...tot],cls=["","vg","good","fair","poor","critical"];document.getElementById("kpis").innerHTML=names.map((n,i)=>`<div class="kpi"><small>${n}</small><div class="num">${fmt(nums[i])}</div><div class="pct ${cls[i]}">${i===0?"100%":pct(nums[i],total)}</div></div>`).join("")}
-function renderTrend(){
- const host=document.getElementById("trendSvg");
- const wrap=host.parentElement;
- const trendPanel=wrap.parentElement;
- let grid=trendPanel.querySelector(".asset-trends");
- if(!grid){
-   grid=document.createElement("div");grid.className="asset-trends";
-   wrap.replaceWith(grid);
- }
- const data=trendData();
- const labels=MONTHS.map(m=>m.slice(0,3));
- grid.innerHTML=TYPES.map(type=>{
-   const has=data.some(d=>d.by&&d.by[type]);
-   return `<div class="asset-chart"><h4>${esc(type)}</h4>${has?`<div class="mini"><svg data-type="${esc(type)}" viewBox="0 0 600 200" preserveAspectRatio="none"></svg></div><div class="mini-labels">${labels.map(x=>`<span>${x}</span>`).join("")}</div>`:`<div class="asset-empty">Belum ada data</div>`}</div>`;
- }).join("");
- const W=600,H=200,px=8,py=12;
- grid.querySelectorAll("svg[data-type]").forEach(svg=>{
-   const type=svg.dataset.type;
-   const vals=data.flatMap(d=>d.by&&d.by[type]?d.by[type].filter(v=>v!=null):[]);
-   const max=Math.max(1,...vals), nice=Math.max(10,Math.ceil(max/5/10)*10);
-   // Gridlines stay inside the SVG viewport; no overflow beyond the chart card.
-   [0,1,2,3,4,5].forEach(i=>{
-     const y=H-py-(i/5)*(H-py*2);
-     const line=document.createElementNS("http://www.w3.org/2000/svg","line");line.setAttribute("x1",px);line.setAttribute("x2",W-px);line.setAttribute("y1",y);line.setAttribute("y2",y);line.setAttribute("stroke","#dfe6ee");line.setAttribute("stroke-dasharray","3 4");svg.appendChild(line);
-   });
-   const step=(W-px*2)/(MONTHS.length-1);
-   AHI.forEach(([name,color],idx)=>{
-     let seg=[];
-     const flush=()=>{if(seg.length>=2){const p=document.createElementNS("http://www.w3.org/2000/svg","polyline");p.setAttribute("points",seg.join(" "));p.setAttribute("fill","none");p.setAttribute("stroke",color);p.setAttribute("stroke-width","2.5");p.setAttribute("vector-effect","non-scaling-stroke");svg.appendChild(p)}seg=[]};
-     data.forEach((d,i)=>{
-       const v=d.by&&d.by[type]?d.by[type][idx]:null;
-       if(v==null){flush();return}
-       const x=px+i*step, y=H-py-(Math.min(v,nice)/nice*(H-py*2));
-       seg.push(`${x},${y}`);
-       const c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r","3.6");c.setAttribute("fill",color);c.setAttribute("stroke","#fff");c.setAttribute("stroke-width","1.5");c.classList.add("dot-hit");
-       c.addEventListener("mouseenter",e=>showTip(e,{month:d.month,by:{[type]:d.by[type]},totals:d.totals},idx,name,color));c.addEventListener("mousemove",moveTip);c.addEventListener("mouseleave",hideTip);svg.appendChild(c);
-     });
-     flush();
-   });
- });
- document.getElementById("trendLegend").innerHTML=AHI.map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join("");
+function renderCharts(){
+  const grid=document.getElementById("chartGrid");grid.innerHTML="";
+  const f=getFilters();
+  const types=f.type?[f.type]:TYPES;
+  types.forEach(t=>{
+    const card=document.createElement("div");card.className="asset-chart";
+    card.innerHTML=`<h3>${esc(t)}</h3><canvas></canvas>`;
+    grid.append(card);drawChart(card.querySelector("canvas"),t);
+  });
 }
-function showTip(e,d,idx,name,color){let rows=Object.entries(d.by).filter(([_,v])=>v&&v[idx]>0).sort((a,b)=>b[1][idx]-a[1][idx]),tip=document.getElementById("tooltip");tip.innerHTML=`<b>${d.month} 2026</b><div style="margin-top:4px"><span class="tip-dot" style="background:${color}"></span>${name}: <b>${fmt(d.totals[idx])}</b></div>`+(rows.length?rows.map(([t,v])=>`<div class="tip-row"><span>${t}</span><b>${fmt(v[idx])}</b></div>`).join(""):"<div style='margin-top:5px;color:#b9c7d8'>Tidak ada data</div>");tip.style.display="block";moveTip(e)}
-function moveTip(e){let t=document.getElementById("tooltip");t.style.left=(e.clientX+14)+"px";t.style.top=(e.clientY+14)+"px"}function hideTip(){document.getElementById("tooltip").style.display="none"}
-function monthValue(row,month,kind){let keys=Object.keys(row),m=norm(month),hits=keys.filter(k=>norm(k).includes(m)),key=hits.find(k=>{let n=norm(k);return(kind==="ahi"&&/(ahi|health|kategori)/.test(n))||(kind==="risk"&&/(risiko|risk)/.test(n))||(kind==="param"&&/(parameter|pemicu)/.test(n))||(kind==="p01"&&/(p0|p1)/.test(n))||(kind==="rencana"&&n.includes("rencana"))||(kind==="target"&&/(target|penyelesaian|tanggal)/.test(n))||(kind==="statususia"&&/(status usia|kategori umur|usia)/.test(n))});return key?row[key]:""}
+function renderKpis(){
+  const rows=filteredRows();
+  const cats=[0,0,0,0,0];
+  rows.forEach(r=>{const n=ahiNumber(getMonthValue(r,period,"ahi"));if(n)cats[n-1]++});
+  const total=rows.length;
+  const vals=[total,...cats],names=["TOTAL ASET",...AHI.map(a=>a[0])];
+  const cls=["","vg","good","fair","poor","critical"];
+  document.getElementById("kpis").innerHTML=names.map((n,i)=>`<div class="kpi"><small>${n}</small><div class="num">${fmt(vals[i])}</div><div class="pct ${cls[i]}">${i===0?"100%":(total?((vals[i]/total)*100).toFixed(1):"0.0")+"%"}</div></div>`).join("");
+}
 const detailCols=["Jenis Aset","Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Phasa","Teg Operasi","Merek","Tipe","USIA","STATUS USIA","TINGKAT RESIKO","AHI FINAL","Parameter Pemicu","P0/P1","Rencana","Target Tanggal Penyelesaian"];
-function field(r,c){if(c==="Jenis Aset")return canonical(r["Jenis Aset"])||r["Jenis Aset"]||"—";if(c==="Unit Induk")return r["Unit Induk"]||"—";if(c==="Unit Pelaksana")return r["Unit Pelaksana"]||"—";if(c==="Ultg")return r["Ultg"]||"—";if(c==="Gardu Induk")return r["Gardu Induk"]||"—";if(c==="Bay")return r["Bay"]||"—";if(c==="Phasa")return r["Phasa"]||"—";if(c==="Teg Operasi")return r["Teg Operasi"]||r["Tegangan"]||"—";if(c==="Merek")return r["Merk"]||"—";if(c==="Tipe")return r["Tipe Aset"]||"—";if(c==="USIA"){let y=String(r["Tahun Buat"]||"").match(/\\d{4}/);return y?Math.max(0,new Date().getFullYear()-Number(y[0])):"—"}if(c==="STATUS USIA")return r["STATUS USIA"]||r["Kategori Umur"]||"—";if(c==="TINGKAT RESIKO")return r["TINGKAT RESIKO"]||r["Tingkat Risiko"]||r["Tingkat Resiko"]||"—";if(c==="AHI FINAL")return monthAhi(r,period)||r["AHI"]||"—";if(c==="Parameter Pemicu")return monthValue(r,period,"param")||r["Parameter Pemicu"]||"—";if(c==="P0/P1")return monthValue(r,period,"p01")||r["P0/P1"]||"—";if(c==="Rencana")return monthValue(r,period,"rencana")||r["Rencana"]||"—";if(c==="Target Tanggal Penyelesaian")return monthValue(r,period,"target")||r["Target Tanggal Penyelesaian"]||"—";return"—"}
-function esc(v){return String(v??"—").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}function badge(v){let k=String(v).trim().charAt(0),cl={1:"c1",2:"c2",3:"c3",4:"c4",5:"c5"}[k];return cl?`<span class="badge ${cl}">${esc(v)}</span>`:esc(v)}
-function renderTable(){let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q)));document.getElementById("periodTitle").textContent=period+" 2026";document.getElementById("count").textContent=`Menampilkan ${Math.min(50,arr.length).toLocaleString("id-ID")} dari ${arr.length.toLocaleString("id-ID")} data`;document.getElementById("thead").innerHTML="<tr>"+detailCols.map(c=>`<th>${c}</th>`).join("")+"</tr>";document.getElementById("tbody").innerHTML=arr.slice(0,50).map(r=>"<tr>"+detailCols.map(c=>`<td>${c==="AHI FINAL"?badge(field(r,c)):esc(field(r,c))}</td>`).join("")+"</tr>").join("")}
-function render(){renderKpi();renderTrend();renderTable()}
-document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});document.getElementById("exportBtn").onclick=()=>{let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q))),out=detailCols.join(";")+"\\n"+arr.map(r=>detailCols.map(c=>`"${String(field(r,c)).replaceAll('"','""')}"`).join(";")).join("\\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\\ufeff"+out],{type:"text/csv"}));a.download=`AHI_Evaluasi_${period}_2026.csv`;a.click()};
-async function fetchMonth(month){
- const file=MONTH_FILES[month]; if(!file)return null;
- const urls=[
-   "https://cdn.jsdelivr.net/gh/hargiuitjbb16/dashboardahiuitjbb@main/data/evaluasi/"+file+"?v="+Date.now(),
-   "https://raw.githubusercontent.com/hargiuitjbb16/dashboardahiuitjbb/main/data/evaluasi/"+file+"?v="+Date.now(),
-   "https://raw.githubusercontent.com/hargiuitjbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/"+file+"?v="+Date.now(),
-   "data/evaluasi/"+file+"?v="+Date.now(),
-   "./data/evaluasi/"+file+"?v="+Date.now()
- ];
- for(const url of urls){
-   try{
-     const r=await fetch(url,{cache:"no-store"});
-     if(!r.ok) continue;
-     const text=await r.text();
-     const rows=parseCSV(text);
-     if(rows.length) return {rows,file};
-   }catch(e){console.warn("Gagal memuat",url,e);}
- }
- return null;
+function field(r,c){
+  if(c==="Jenis Aset")return typeOf(r)||"—";
+  if(c==="Unit Induk")return r["Unit Induk"]||"—";
+  if(c==="Unit Pelaksana")return r["Unit Pelaksana"]||"—";
+  if(c==="Ultg")return r["Ultg"]||"—";
+  if(c==="Gardu Induk")return r["Gardu Induk"]||"—";
+  if(c==="Bay")return r["Bay"]||"—";
+  if(c==="Phasa")return r["Phasa"]||"—";
+  if(c==="Teg Operasi")return r["Teg Operasi"]||r["Tegangan"]||"—";
+  if(c==="Merek")return r["Merek"]||r["Merk"]||"—";
+  if(c==="Tipe")return r["Tipe"]||r["Tipe Aset"]||"—";
+  if(c==="USIA")return r["USIA"]||"—";
+  if(c==="STATUS USIA")return r["STATUS USIA"]||"—";
+  if(c==="TINGKAT RESIKO")return r["TINGKAT RESIKO"]||"—";
+  if(c==="AHI FINAL")return getMonthValue(r,period,"ahi")||"—";
+  if(c==="Parameter Pemicu")return getMonthValue(r,period,"param")||"—";
+  if(c==="P0/P1")return r["P0/P1"]||"—";
+  if(c==="Rencana")return r["Rencana"]||"—";
+  if(c==="Target Tanggal Penyelesaian")return r["Target Tanggal Penyelesaian"]||"—";
+  return "—";
 }
+function renderTable(){
+  const q=norm(search);
+  let rows=filteredRows().filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q)));
+  document.getElementById("periodTitle").textContent=period+" 2026";
+  document.getElementById("count").textContent=`Menampilkan ${Math.min(50,rows.length).toLocaleString("id-ID")} dari ${rows.length.toLocaleString("id-ID")} data`;
+  document.getElementById("thead").innerHTML="<tr>"+detailCols.map(c=>`<th>${c}</th>`).join("")+"</tr>";
+  document.getElementById("tbody").innerHTML=rows.slice(0,50).map(r=>{
+    return "<tr>"+detailCols.map(c=>{
+      const v=field(r,c),n=ahiNumber(v);
+      return `<td>${c==="AHI FINAL"&&n?`<span class="badge c${n}">${esc(v)}</span>`:esc(v)}</td>`;
+    }).join("")+"</tr>";
+  }).join("");
+}
+function render(){
+  renderKpis();renderCharts();renderTable();
+}
+function apply(){
+  filtered=filteredRows();
+  render();
+}
+document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const rows=filteredRows();const out=detailCols.join(";")+"\n"+rows.map(r=>detailCols.map(c=>`"${String(field(r,c)).replaceAll('"','""')}"`).join(";")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+out],{type:"text/csv"}));a.download=`AHI_Evaluasi_${period}_2026.csv`;a.click();
+});
 async function load(){
- try{
-  // Load the latest/current month first so the dashboard never stays blank while history is loading.
-  const first=await fetchMonth("Agustus");
-  if(!first) throw Error("AHI_EVAL_AGUSTUS.csv tidak dapat dibaca");
-  MONTH_DATA.Agustus=first; period="Agustus"; raw=first.rows; populate();
-  const ss=[...document.querySelectorAll("#filters select")]; if(ss[0])ss[0].value=""; if(ss[9])ss[9].value=period; refreshCascading(); apply();
-  document.getElementById("lastDate").textContent="CSV AGUSTUS berhasil dimuat";document.getElementById("sideDate").textContent="24 Agustus 2026";
-  // Load June/July in the background. Future months are loaded automatically when their CSV exists.
-  Promise.all(["Juni","Juli","September","Oktober","November","Desember"].map(async m=>{const d=await fetchMonth(m);if(d){MONTH_DATA[m]=d;renderTrend()}}));
- }catch(e){console.error("AHI Evaluasi:",e);document.getElementById("lastDate").textContent="CSV belum terbaca";document.getElementById("sideDate").textContent="CSV belum terbaca";document.getElementById("filters").innerHTML='<div style="grid-column:1/-1;padding:10px;color:#b42318;font-weight:700">CSV AGUSTUS belum dapat dimuat. Pastikan AHI_EVAL_AGUSTUS.csv sudah ada di data/evaluasi/.</div>';document.getElementById("count").textContent=e.message}}
+  const status=document.getElementById("status");
+  status.className="status info";status.textContent="Memuat data Agustus...";
+  try{
+    // Load the current month first. The exact GitHub raw path is the primary source.
+    const aug=await fetchMonth("Agustus");
+    if(!aug)throw new Error("AHI_EVAL_AGUSTUS.csv tidak dapat diambil dari GitHub.");
+    LIVE.Agustus=aug;raw=aug.rows;
+    period="Agustus";
+    document.getElementById("lastDate").textContent="24 Agustus 2026";
+    document.getElementById("sideDate").textContent="24 Agustus 2026";
+    buildFilters();
+    apply();
+    status.className="status ok";status.textContent=`CSV AGUSTUS berhasil dimuat • ${fmt(raw.length)} baris`;
+    // Historical/current months load in the background. Missing future files are simply ignored.
+    for(const m of ["Juni","Juli","September","Oktober","November","Desember"]){
+      fetchMonth(m).then(d=>{if(d){LIVE[m]=d;renderCharts()}}).catch(()=>{});
+    }
+  }catch(e){
+    console.error(e);
+    status.className="status error";
+    status.textContent="Gagal memuat CSV Agustus. Cek koneksi atau pastikan file AHI_EVAL_AGUSTUS.csv ada di data/evaluasi.";
+    document.getElementById("lastDate").textContent="CSV belum terbaca";
+    document.getElementById("sideDate").textContent="CSV belum terbaca";
+    // Still show the permanent Jan–Jul mock trend so the page is never blank.
+    raw=[];
+    buildFilters();apply();
+  }
+}
+window.addEventListener("resize",()=>{clearTimeout(window.__rt);window.__rt=setTimeout(renderCharts,120)});
 load();
-</script></body></html>
+</script>
+</body>
+</html>
