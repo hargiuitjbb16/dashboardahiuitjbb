@@ -1,349 +1,42 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AHI Evaluasi — Dashboard AHI UIT JBB</title>
+<!doctype html><html><head><meta charset="utf-8"><title>AHI Evaluasi</title>
 <style>
-*{box-sizing:border-box}
-:root{--blue:#0877df;--navy:#10233f;--bg:#f5f8fc;--border:#dbe5f0;--text:#17324f}
-body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,Segoe UI,Arial,sans-serif}
-.app{display:flex;min-height:100vh}
-.sidebar{width:205px;background:#fff;border-right:1px solid #dce5ef;position:fixed;left:0;top:0;bottom:0;padding:8px 0;z-index:10}
-.logo{height:54px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #eef2f7;margin-bottom:7px}
-.logo img{max-width:171px;max-height:42px;object-fit:contain}
-.logo-fallback{font-size:20px;font-weight:900;color:#0877df}
-.nav a{display:block;margin:3px 4px;padding:11px 10px;border-radius:9px;color:#16324f;text-decoration:none;font-weight:500}
-.nav a.active{background:#e6f0ff;color:#066dd2;font-weight:700}
-.side-bottom{position:absolute;left:3px;right:3px;bottom:12px;border:1px solid var(--border);border-radius:8px;padding:10px;background:#f8fbff}
-.side-bottom small{display:block;color:#61748a}.side-bottom b{display:block;margin-top:2px}
-main{margin-left:205px;width:calc(100% - 205px);padding:8px 12px 24px}
-.header{height:62px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-h1{font-size:27px;margin:0;font-weight:850}.subtitle{margin-top:3px;color:#6a7f96}
-.status{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;font-size:11px}
-.status b{font-size:12px}
-.card{background:#fff;border:1px solid var(--border);border-radius:9px;box-shadow:0 1px 2px #16324f08}
-.filters{margin-top:10px;padding:11px;display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:8px}
-.field label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;color:#536b83;margin-bottom:4px}
-select,input{width:100%;height:34px;border:1px solid #cbd9e8;border-radius:7px;background:#fff;padding:0 9px;color:#17324f;outline:none}
-select:focus,input:focus{border-color:#6baef3}
-.actions{display:flex;align-items:end;gap:6px}
-button{height:34px;border-radius:7px;border:1px solid #0877df;background:#0877df;color:#fff;padding:0 15px;font-weight:750;cursor:pointer}
-button.secondary{background:#fff;color:#0877df}
-.trend-toggle{grid-column:1/-1;display:flex;align-items:center;gap:7px;color:#486178;font-size:11px}.trend-toggle input{width:auto;height:auto}
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-top:9px}
-.kpi{padding:12px 13px;min-height:86px}.kpi small{font-weight:700;color:#526a82}.kpi .num{font-size:25px;font-weight:850;margin-top:6px}.kpi .pct{font-size:11px;margin-top:2px;font-weight:700}
-.vg{color:#12a36b}.good{color:#efae00}.fair{color:#f07b00}.poor{color:#e83434}.critical{color:#111827}
-.panel{margin-top:9px;padding:12px}
-.panel-title{font-size:16px;font-weight:850;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
-.legend{display:flex;gap:15px;font-size:11px}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:currentColor}
-.chart-wrap{height:350px;position:relative;overflow:hidden;min-width:0}.chart-wrap svg{width:100%;height:100%;overflow:hidden}
-svg#trend{width:100%;height:100%;display:block}
-.gridline{stroke:#d9e4ef;stroke-dasharray:2 3}.axistext{font-size:10px;fill:#71859a}.monthtext{font-size:10px;fill:#526b83}
-.series{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}.dot{stroke:#fff;stroke-width:2;cursor:pointer}
-.tooltip{position:fixed;display:none;z-index:50;background:#17324f;color:#fff;padding:8px 10px;border-radius:7px;box-shadow:0 5px 20px #0003;font-size:11px;pointer-events:none;max-width:280px}
-.detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.detail-head h3{margin:0;font-size:16px}.count{font-size:11px;color:#6a7f96}
-.search{width:300px}
-.table-wrap{overflow:auto;max-height:420px;border:1px solid #e0e8f1;border-radius:6px}
-table{width:100%;border-collapse:collapse;min-width:1600px;font-size:11px}
-th{position:sticky;top:0;background:#f0f5fa;color:#27445f;text-align:left;padding:8px 7px;border-bottom:1px solid #d7e2ed;white-space:nowrap}
-td{padding:7px;border-bottom:1px solid #edf1f5;white-space:nowrap}
-tr:hover{background:#f7fbff}
-.badge{font-weight:800}.empty{padding:28px;text-align:center;color:#7890a6}
-@media(max-width:1000px){.sidebar{width:170px}.logo{padding:0 8px}.nav a{font-size:12px}.app main{margin-left:170px;width:calc(100% - 170px)}.filters{grid-template-columns:repeat(3,1fr)}.kpis{grid-template-columns:repeat(3,1fr)}}
-</style>
-</head>
-<body>
-<div class="app">
-<aside class="sidebar">
-  <div class="logo">
-    <img src="assets/pln-logo.webp" alt="PLN" onerror="this.style.display='none';document.getElementById('lf').style.display='block'">
-    <span id="lf" class="logo-fallback" style="display:none">PLN | Danantara</span>
-  </div>
-  <nav class="nav">
-    <a href="index.html">Dashboard</a>
-    <a href="index.html">AHI Power Inspect</a>
-    <a class="active" href="ahi-evaluasi.html">AHI Evaluasi</a>
-    <a href="#">Data Aset</a>
-    <a href="#">Laporan</a>
-  </nav>
-  <div class="side-bottom"><small>Data Terakhir (Upload CSV)</small><b id="sideDate">-</b></div>
-</aside>
-
-<main>
-<header class="header">
-  <div><h1>AHI Evaluasi</h1><div class="subtitle">Asset Health Index — Evaluasi Bulanan</div></div>
-  <div class="status" id="status">Menyiapkan data...</div>
-</header>
-
-<section class="card filters">
-  <div class="field"><label>Kelompok Tegangan</label><select id="group"></select></div>
-  <div class="field"><label>Unit Induk</label><select id="ui"></select></div>
-  <div class="field"><label>UPT</label><select id="upt"></select></div>
-  <div class="field"><label>ULTG</label><select id="ultg"></select></div>
-  <div class="field"><label>GI</label><select id="gi"></select></div>
-  <div class="field"><label>Bay</label><select id="bay"></select></div>
-  <div class="field"><label>Phasa</label><select id="phasa"></select></div>
-  <div class="field"><label>Jenis Aset</label><select id="type"></select></div>
-  <div class="field"><label>Kategori AHI</label><select id="ahi"></select></div>
-  <div class="field"><label>Periode</label><select id="period"></select></div>
-  <div class="actions"><button id="apply">Terapkan</button><button class="secondary" id="reset">Reset</button></div>
-  <label class="trend-toggle"><input id="trendFilter" type="checkbox" checked> Terapkan filter ke grafik trending</label>
-</section>
-
-<section class="kpis" id="kpis"></section>
-
-<section class="card panel">
- <div class="panel-title">
-   <span>Trend Distribusi AHI</span>
-   <div class="legend">
-    <span style="color:#16a36c">1 - Very Good</span>
-    <span style="color:#e6ad00">2 - Good</span>
-    <span style="color:#f07b00">3 - Fair</span>
-    <span style="color:#e83434">4 - Poor</span>
-    <span style="color:#111827">5 - Critical</span>
-   </div>
- </div>
- <div class="chart-wrap"><svg id="trend" viewBox="0 0 1200 330" preserveAspectRatio="xMidYMid meet"></svg></div>
-</section>
-
-<section class="card panel">
- <div class="detail-head">
-   <div><h3>Detail Aset</h3><div class="count" id="detailCount"></div></div>
-   <input class="search" id="search" placeholder="Cari aset / merk / GI / Bay / parameter...">
- </div>
- <div class="table-wrap"><table><thead><tr>
- <th>Jenis Aset</th><th>Unit Induk</th><th>Unit Pelaksana</th><th>ULTG</th><th>Gardu Induk</th><th>Bay</th><th>Phasa</th><th>Teg Operasi</th><th>Merek</th><th>Tipe</th><th>USIA</th><th>STATUS USIA</th><th>TINGKAT RESIKO</th><th>AHI FINAL</th><th>Parameter Pemicu</th><th>P0/P1</th><th>Rencana</th><th>Target Tanggal Penyelesaian</th>
- </tr></thead><tbody id="tbody"></tbody></table></div>
-</section>
-</main>
-</div>
-<div class="tooltip" id="tip"></div>
-
+*{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#12385f;font:13px Arial}.side{position:fixed;width:185px;height:100vh;background:#fff;border-right:1px solid #dce5ef}.logo{height:62px;border-bottom:1px solid #ddd;display:flex;align-items:center;padding:8px}.logo img{width:50%;height:42px;object-fit:contain}nav a{display:block;margin:3px 5px;padding:11px;border-radius:8px;color:#173a61;text-decoration:none}nav a.active{background:#e5efff;color:#0871d1;font-weight:bold}.last{position:absolute;bottom:15px;left:6px;right:6px;padding:10px;border:1px solid #dce5ef;border-radius:9px}main{margin-left:185px;padding:12px 16px}header{display:flex;justify-content:space-between;border-bottom:1px solid #dce5ef;padding-bottom:9px}h1{margin:0;font-size:24px}.sub{color:#71839b;margin-top:4px}.status,.panel,.kpi{background:white;border:1px solid #d9e4ef;border-radius:10px}.status{padding:9px 12px;font-weight:bold}.panel{padding:12px;margin-top:10px}.filters{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}label{font-size:10px;font-weight:bold;color:#59708a;text-transform:uppercase}select,input{width:100%;height:34px;margin-top:4px;border:1px solid #cbd9e8;border-radius:7px;background:#fff;padding:0 9px}.btn{height:34px;margin-top:4px;border:0;border-radius:7px;background:#1178da;color:white;font-weight:bold;padding:0 15px}.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}.kpi{padding:11px}.kpi b{display:block;font-size:22px;margin-top:5px}.charts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.chart{border:1px solid #e0e7ef;border-radius:9px;padding:8px;min-width:0}.chart h3{font-size:12px;color:#1165bd;margin:0 0 4px}canvas{width:100%;height:210px;display:block}.legend{float:right;font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 8px}.table{overflow:auto;max-height:400px}table{border-collapse:collapse;width:100%;min-width:1000px;font-size:11px}th,td{padding:7px;border-bottom:1px solid #e3eaf1;white-space:nowrap;text-align:left}th{background:#edf4fa;position:sticky;top:0}
+@media(max-width:1100px){.charts{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:repeat(3,1fr)}}@media(max-width:750px){.side{width:150px}main{margin-left:150px}.charts{grid-template-columns:1fr}}
+</style></head><body>
+<aside class="side"><div class="logo"><img src="assets/pln-logo.webp"><img src="assets/danantara.png"></div><nav><a href="index.html">Dashboard</a><a href="index.html">AHI Power Inspect</a><a class="active" href="ahi-evaluasi.html">AHI Evaluasi</a><a href="#">Data Aset</a><a href="#">Laporan</a></nav><div class="last">Data Terakhir<br><b id="last">Memuat...</b></div></aside>
+<main><header><div><h1>AHI Evaluasi</h1><div class="sub">Asset Health Index — Evaluasi Bulanan</div></div><div class="status" id="status">Memuat data...</div></header>
+<section class="panel"><div class="filters">
+<label>Kelompok Tegangan<select id="teg"><option>Semua</option></select></label><label>Unit Induk<select id="unit"><option>Semua</option></select></label><label>UPT<select id="upt"><option>Semua</option></select></label><label>ULTG<select id="ultg"><option>Semua</option></select></label><label>GI<select id="gi"><option>Semua</option></select></label><label>Bay<select id="bay"><option>Semua</option></select></label><label>Phasa<select id="phasa"><option>Semua</option></select></label><label>Jenis Aset<select id="jenis"><option>Semua</option></select></label><label>Kategori AHI<select id="kategori"><option>Semua</option></select></label><label>Periode<select id="periode"></select></label><button class="btn" onclick="render()">Terapkan</button>
+</div></section><section id="kpis" class="kpis"></section>
+<section class="panel"><b>Trend Distribusi AHI per Jenis Aset</b><span class="legend"><i class="dot" style="background:#16a56a"></i>1 Very Good <i class="dot" style="background:#e8aa00"></i>2 Good <i class="dot" style="background:#f57c00"></i>3 Fair <i class="dot" style="background:#ef3434"></i>4 Poor <i class="dot" style="background:#162033"></i>5 Critical</span><div style="clear:both"></div><div id="charts" class="charts"></div></section>
+<section class="panel"><b>Detail Aset</b><input id="search" placeholder="Cari aset / merk / GI / Bay..." oninput="table()" style="float:right;width:300px"><div style="clear:both"></div><div class="table"><table><thead><tr id="th"></tr></thead><tbody id="tb"></tbody></table></div></section></main>
 <script>
-const MONTHS=["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
-const MONTH_FILES={JUNI:"AHI_EVAL_JUNI.csv",JULI:"AHI_EVAL_JULI.csv",AGUSTUS:"AHI_EVAL_AGUSTUS.csv"};
-const COLORS=["#16a36c","#e6ad00","#f07b00","#e83434","#111827"];
-const CATS=["1 - VERY GOOD","2 - GOOD","3 - FAIR","4 - POOR","5 - CRITICAL"];
-const LABELS=["1 - Very Good","2 - Good","3 - Fair","4 - Poor","5 - Critical"];
-let monthly={}; let currentRows=[]; let allRows=[];
-const $=id=>document.getElementById(id);
-const norm=v=>String(v??"").trim().replace(/\s+/g," ").toUpperCase();
-const canon=v=>norm(v).replace(/[^A-Z0-9]/g,"");
-function pick(r, names){for(const n of names){if(Object.prototype.hasOwnProperty.call(r,n)) return r[n]} return ""}
-function cleanHeader(s){return String(s).replace(/^\uFEFF/,"").trim()}
-function parseCSV(text){
-  const rows=[];let row=[],cell="",q=false;
-  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
-    if(c=='"'&&q&&n=='"'){cell+='"';i++;continue}
-    if(c=='"'){q=!q;continue}
-    if(c==','&&!q){row.push(cell);cell="";continue}
-    if((c=='\n'||c=='\r')&&!q){if(c=='\r'&&n=='\n')i++;row.push(cell);cell="";if(row.some(x=>x.trim()!=""))rows.push(row);row=[];continue}
-    cell+=c;
-  }
-  if(cell.length||row.length){row.push(cell);rows.push(row)}
-  if(!rows.length)return [];
-  const headers=rows[0].map(cleanHeader);
-  return rows.slice(1).map(a=>{const o={};headers.forEach((h,i)=>o[h]=(a[i]??"").trim());return o})
-}
-function num(v){const x=parseFloat(String(v??"").replace(/[^\d.-]/g,""));return Number.isFinite(x)?x:null}
-function voltage(r){return num(pick(r,["Teg Operasi","Teg Operasi (kV)","Tegangan"]))}
-function groupOf(r){const v=voltage(r); return v!==null&&v>=70?"TRANSMISI (≥ 70 KV)":"INCOMING (≤ 20 KV)"}
-function assetType(r){return pick(r,["Jenis Aset","Jenis Asset","Jenis Peralatan"])}
-function monthAhiValue(r,month){
-  const m=norm(month);
-  const keys=Object.keys(r);
-  const exact=keys.find(x=>{
-    const n=norm(x);
-    return n===("AHI FINAL "+m) && String(r[x]).trim();
-  });
-  if(exact)return r[exact];
-  const k=keys.find(x=>{
-    const n=norm(x);
-    return n.includes(m) && /AHI|HEALTH|KATEGORI/.test(n) && String(r[x]).trim();
-  });
-  if(k)return r[k];
-  for(const name of ["AHI FINAL","AHI","Kategori AHI","AHI PI"]){
-    const kk=keys.find(x=>norm(x)===norm(name) && String(r[x]).trim());
-    if(kk)return r[kk];
-  }
-  const fk=keys.find(x=>/AHI\s*FINAL/i.test(x)&&String(r[x]).trim());
-  return fk?r[fk]:"";
-}
-function ahiOf(r,month){
-  const v=monthAhiValue(r,month||"AGUSTUS");
-  const n=norm(v).replace(/\s+/g," ");
-  if(/\b1\s*[-–—]\s*VERY\s*GOOD\b|\bVERY\s*GOOD\b/.test(n))return CATS[0];
-  if(/\b2\s*[-–—]\s*GOOD\b|\bGOOD\b/.test(n))return CATS[1];
-  if(/\b3\s*[-–—]\s*FAIR\b|\bFAIR\b/.test(n))return CATS[2];
-  if(/\b4\s*[-–—]\s*POOR\b|\bPOOR\b/.test(n))return CATS[3];
-  if(/\b5\s*[-–—]\s*CRITICAL\b|\bCRITICAL\b/.test(n))return CATS[4];
-  const m=num(v);
-  if(m!==null){if(m===1)return CATS[0];if(m===2)return CATS[1];if(m===3)return CATS[2];if(m===4)return CATS[3];if(m===5)return CATS[4];}
-  return "";
-}
-function ahiFinalDisplay(r){
- const v=monthAhiValue(r,currentMonth());
- if(v)return v;
- const a=ahiOf(r,currentMonth());
- return a||"—";
-}
-function matches(r,f){
- if(f.group&&groupOf(r)!==f.group)return false;
- if(f.ui&&norm(pick(r,["Unit Induk"]))!==norm(f.ui))return false;
- if(f.upt&&norm(pick(r,["Unit Pelaksana","UPT"]))!==norm(f.upt))return false;
- if(f.ultg&&norm(pick(r,["Ultg","ULTG"]))!==norm(f.ultg))return false;
- if(f.gi&&norm(pick(r,["Gardu Induk","GI"]))!==norm(f.gi))return false;
- if(f.bay&&norm(pick(r,["Bay"]))!==norm(f.bay))return false;
- if(f.phasa&&norm(pick(r,["Phasa","Fasa"]))!==norm(f.phasa))return false;
- if(f.type&&canon(assetType(r))!==canon(f.type))return false;
- if(f.ahi&&norm(ahiOf(r,currentMonth()))!==norm(f.ahi))return false;
- return true;
-}
-function vals(rows,key){return [...new Set(rows.map(r=>String(pick(r,key)).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'))}
-function fill(id,arr,keep=true){
- const el=$(id), old=el.value; el.innerHTML='<option value="">Semua</option>'+arr.map(x=>`<option>${escapeHtml(x)}</option>`).join("");
- if(keep&&arr.includes(old))el.value=old;
-}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function filters(){return {group:$("group").value,ui:$("ui").value,upt:$("upt").value,ultg:$("ultg").value,gi:$("gi").value,bay:$("bay").value,phasa:$("phasa").value,type:$("type").value,ahi:$("ahi").value}}
-function cascade(){
-  const f=filters();
-  const same=(r,key,val)=>!val || norm(pick(r,key))===norm(val);
-  const base=allRows.filter(r=>!f.group||groupOf(r)===f.group);
-  const uiRows=base;
-  fill("ui",vals(uiRows,["Unit Induk"]));
-  const uptRows=base.filter(r=>same(r,["Unit Induk"],f.ui));
-  fill("upt",vals(uptRows,["Unit Pelaksana","UPT"]));
-  const ultgRows=uptRows.filter(r=>same(r,["Unit Pelaksana","UPT"],f.upt));
-  fill("ultg",vals(ultgRows,["Ultg","ULTG"]));
-  const giRows=ultgRows.filter(r=>same(r,["Ultg","ULTG"],f.ultg));
-  fill("gi",vals(giRows,["Gardu Induk","GI"]));
-  const bayRows=giRows.filter(r=>same(r,["Gardu Induk","GI"],f.gi));
-  fill("bay",vals(bayRows,["Bay"]));
-  const phRows=bayRows.filter(r=>same(r,["Bay"],f.bay));
-  fill("phasa",vals(phRows,["Phasa","Fasa"]));
-  fill("type",vals(phRows,["Jenis Aset","Jenis Asset","Jenis Peralatan"]));
-  fill("ahi",CATS);
-}
-function countCats(rows,month){
- const c=[0,0,0,0,0];
- rows.forEach(r=>{const i=CATS.indexOf(ahiOf(r,month));if(i>=0)c[i]++});
- return c;
-}
-function renderKPI(rows){const c=countCats(rows,currentMonth()),total=rows.length;$("kpis").innerHTML=`<div class="card kpi"><small>Total Aset</small><div class="num">${fmt(total)}</div><div class="pct">${total?100:0}%</div></div>`+c.map((n,i)=>`<div class="card kpi"><small>${LABELS[i]}</small><div class="num ${["vg","good","fair","poor","critical"][i]}">${fmt(n)}</div><div class="pct">${total?(n/total*100).toFixed(1):0}%</div></div>`).join("")}
-function fmt(n){return Number(n||0).toLocaleString("id-ID")}
-function currentMonth(){return $("period").value}
-const MOCK_TREND={
- "JANUARI":[7476,18257,803,1029,386],
- "FEBRUARI":[13167,18441,797,1730,364],
- "MARET":[7232,18646,796,997,337],
- "APRIL":[6954,17260,912,1144,245],
- "MEI":[6759,18282,1710,1123,225],
- "JUNI":[6643,20169,1188,843,412],
- "JULI":[6437,20062,1374,845,370]
-};
-const MOCK_DETAIL={
- "JANUARI":[[7,6315,0,0,0,385,6,0,5],[71,3083,3893,1095,7615,2139,344,11,6],[254,52,2,334,21,126,14,0,0],[99,168,9,479,117,157,0,0,0],[42,33,132,138,24,7,10,0,0]],
- "FEBRUARI":[[6,10999,0,0,0,702,8,0,10],[67,3115,3906,1141,7665,2174,345,11,17],[252,59,2,326,21,123,14,0,0],[105,299,18,898,175,235,0,0,0],[43,33,125,130,19,4,10,0,0]],
- "MARET":[[6,6128,0,0,0,376,6,0,5],[63,3283,3908,1169,7671,2178,346,11,17],[253,56,2,327,21,123,14,0,0],[106,164,9,474,87,157,0,0,0],[43,30,123,112,19,1,9,0,0]],
- "APRIL":[[6,4891,0,0,0,366,8,0,5],[67,2984,3107,864,7687,2163,348,23,17],[251,46,2,454,22,123,14,0,0],[107,148,9,613,91,176,0,0,0],[38,27,67,85,5,13,10,0,0]],
- "MEI":[[6,4844,0,0,0,358,7,0,4],[67,3025,3111,899,7686,2179,352,24,25],[255,36,2,994,22,123,12,0,0],[106,145,9,562,91,168,0,0,0],[35,26,63,73,4,13,10,0,0]]
-};
-const MOCK_ASSETS=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor"];
-function trendRowsFor(m,f){
- const rs=monthly[m]; if(!rs)return null;
- return $("trendFilter").checked?rs.filter(r=>matches(r,f)):rs;
-}
-function renderTrend(){
- const f=filters(),months=MONTHS;
- const data=CATS.map((cat,i)=>({cat,color:COLORS[i],vals:months.map(m=>{
-   if(MOCK_TREND[m])return MOCK_TREND[m][i];
-   const rs=trendRowsFor(m,f);return rs===null?null:countCats(rs,m)[i];
- })}));
- const nums=data.flatMap(s=>s.vals.filter(v=>v!==null));
- const max=Math.max(1,...nums),top=Math.max(1000,Math.ceil(max/2500)*2500);
- const svg=$("trend"),W=1200,H=330,L=58,R=18,T=18,B=42;svg.innerHTML="";
- for(let i=0;i<=5;i++){const y=T+(H-T-B)*i/5;svg.appendChild(el("line",{x1:L,x2:W-R,y1:y,y2:y,class:"gridline"}));svg.appendChild(textEl(L-8,y+4,fmt(Math.round(top*(5-i)/5)),"axistext","end"))}
- const step=(W-L-R)/(months.length-1);
- months.forEach((m,j)=>svg.appendChild(textEl(L+j*step,H-14,m.slice(0,3),"monthtext","middle")));
- data.forEach(s=>{
-   let seg=[];
-   const flush=()=>{if(seg.length>=2)svg.appendChild(el("polyline",{points:seg.map(p=>p[0]+","+p[1]).join(" "),class:"series",stroke:s.color}));seg=[]};
-   s.vals.forEach((v,j)=>{
-     if(v===null){flush();return}
-     const x=L+j*step,y=T+(H-T-B)*(1-v/top);seg.push([x,y]);
-     const c=el("circle",{cx:x,cy:y,r:4.5,class:"dot",fill:s.color});
-     c.addEventListener("mouseenter",e=>{
-       const m=months[j];let detail="";
-       if(MOCK_DETAIL[m])detail=MOCK_ASSETS.map((a,ai)=>`${a}: ${fmt(MOCK_DETAIL[m][i][ai])}`).filter(x=>!x.endsWith(": 0")).slice(0,8).join("<br>");
-       else{const rs=trendRowsFor(m,f)||[],by={};rs.filter(r=>ahiOf(r,m)===s.cat).forEach(r=>{const t=assetType(r)||"Aset";by[t]=(by[t]||0)+1});detail=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>`${escapeHtml(x[0])}: ${fmt(x[1])}`).join("<br>")}
-       $("tip").innerHTML=`<b>${m}</b><br><span style="color:${s.color}">● ${s.cat}</span>: <b>${fmt(v)}</b><br><br>${detail||"Tidak ada rincian"}`;
-       $("tip").style.display="block";$("tip").style.left=Math.min(window.innerWidth-300,e.clientX+12)+"px";$("tip").style.top=Math.min(window.innerHeight-150,e.clientY+12)+"px";
-     });
-     c.addEventListener("mouseleave",()=>{$("tip").style.display="none"});svg.appendChild(c);
-   });flush();
- });
-}
-function el(tag,attrs){const x=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>x.setAttribute(k,v));return x}
-function textEl(x,y,t,cls,anchor){const e=el("text",{x,y,class:cls,"text-anchor":anchor});e.textContent=t;return e}
-function showTip(e,_,m,cat,v,color,rows){
- const by={};(rows||[]).forEach(r=>{const t=assetType(r)||"Aset";by[t]=(by[t]||0)+1});
- const top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>`${escapeHtml(x[0])}: ${fmt(x[1])}`).join("<br>");
- const isMock=Object.prototype.hasOwnProperty.call(MOCK_TREND,m);
- $("tip").innerHTML=`<b>${m}</b>${isMock?" <small>(data mockup)</small>":""}<br><span style="color:${color}">● ${cat}</span>: <b>${fmt(v)}</b>${isMock?"":"<br><br>"+(top||"Tidak ada rincian")}`;
- $("tip").style.display="block";$("tip").style.left=(e.clientX+12)+"px";$("tip").style.top=(e.clientY+12)+"px";
-}
-function renderTable(rows){
- const q=norm($("search").value);const rs=q?rows.filter(r=>Object.values(r).some(v=>norm(v).includes(q))):rows;
- $("detailCount").textContent=`Menampilkan ${fmt(rs.length)} dari ${fmt(rows.length)} aset • ${currentMonth()}`;
- $("tbody").innerHTML=rs.length?rs.map(r=>`<tr>
- <td>${escapeHtml(assetType(r))}</td><td>${escapeHtml(pick(r,["Unit Induk"]))}</td><td>${escapeHtml(pick(r,["Unit Pelaksana"]))}</td>
- <td>${escapeHtml(pick(r,["Ultg","ULTG"]))}</td><td>${escapeHtml(pick(r,["Gardu Induk","GI"]))}</td><td>${escapeHtml(pick(r,["Bay"]))}</td>
- <td>${escapeHtml(pick(r,["Phasa","Fasa"]))}</td><td>${escapeHtml(pick(r,["Teg Operasi","Teg Operasi (kV)","Tegangan"]))}</td>
- <td>${escapeHtml(pick(r,["Merek","Merk"]))}</td><td>${escapeHtml(pick(r,["Tipe","Type"]))}</td><td>${escapeHtml(pick(r,["USIA","Usia"]))}</td>
- <td>${escapeHtml(pick(r,["STATUS USIA","Status Usia"]))}</td><td>${escapeHtml(pick(r,["TINGKAT RESIKO","Tingkat Resiko"]))}</td><td class="badge">${escapeHtml(ahiFinalDisplay(r))}</td>
- <td>${escapeHtml(pick(r,["Parameter Pemicu"]))}</td><td>${escapeHtml(pick(r,["P0/P1"]))}</td><td>${escapeHtml(pick(r,["Rencana"]))}</td><td>${escapeHtml(pick(r,["Target Tanggal Penyelesaian"]))}</td>
- </tr>`).join(""):`<tr><td colspan="18" class="empty">Tidak ada data untuk filter/periode ini.</td></tr>`;
-}
-function render(){
- const m=currentMonth(),f=filters();currentRows=(monthly[m]||[]).filter(r=>matches(r,f));
- renderKPI(currentRows);renderTrend();renderTable(currentRows);
-}
-function setCascadesAndRender(){
- cascade();
- render();
-}
-async function load(){
- try{
-  $("group").innerHTML='<option value="">Semua</option><option value="TRANSMISI (≥ 70 KV)">Transmisi (70 kV ke atas)</option><option value="INCOMING (≤ 20 KV)">Incoming (20 kV ke bawah termasuk -)</option>';
-  $("period").innerHTML=MONTHS.map(m=>`<option>${m}</option>`).join("");$("period").value="AGUSTUS";
-  await Promise.all(Object.entries(MONTH_FILES).map(async([m,file])=>{
-    try{const r=await fetch("data/evaluasi/"+file,{cache:"no-store"});if(!r.ok)throw new Error(r.status);monthly[m]=parseCSV(await r.text())}
-    catch(e){monthly[m]=null;console.warn("CSV tidak tersedia",m,e)}
-  }));
-  allRows=Object.values(monthly).flat().filter(Boolean);
-  $("sideDate").textContent="24 Agustus 2026";
-  const loaded=["JUNI","JULI","AGUSTUS"].filter(m=>monthly[m]).join(", ");
-  $("status").innerHTML=loaded?`<b>Data ${loaded} berhasil dimuat</b>`:"<b>CSV belum terbaca</b>";
-  cascade();render();
- }catch(e){console.error(e);$("status").textContent="Gagal menyiapkan data";}
-}
-const chain=["group","ui","upt","ultg","gi","bay","phasa","type","ahi"];
-chain.forEach((id,idx)=>{
- $(id).addEventListener("change",()=>{
-   for(let j=idx+1;j<chain.length;j++)$(chain[j]).value="";
-   cascade();render();
- });
-});
-$("period").addEventListener("change",()=>{cascade();render()});
-$("trendFilter").addEventListener("change",render);
-$("apply").addEventListener("click",render);
-$("reset").addEventListener("click",()=>{
- chain.forEach(id=>$(id).value="");$("period").value="AGUSTUS";cascade();render();
-});
-$("search").addEventListener("input",()=>renderTable(currentRows));
-load();
-</script>
-</body>
-</html>
+const M=['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
+const T=['TRAFO','CT','CVT/PT','PMT','PMS','LA','NGR','REAKTOR','KAPASITOR','PMT INC','CT INC','PT INC'];
+const L={TRAFO:'Power Transformer',CT:'Current Transformer','CVT/PT':'Potential Transformer',PMT:'Circuit Breaker',PMS:'Disconnecting Switch',LA:'Lightning Arrester',NGR:'Neutral Grounding Resistor',REAKTOR:'Reaktor',KAPASITOR:'Kapasitor','PMT INC':'PMT INC','CT INC':'CT INC','PT INC':'PT INC'};
+const C=['#16a56a','#e8aa00','#f57c00','#ef3434','#162033'];let csv=[],heads=[];
+const MOCK={
+JANUARI:{TRAFO:[42,99,254,71,7],CT:[33,168,52,3083,6315],'CVT/PT':[132,9,2,3893,0],PMT:[138,479,334,1095,758],PMS:[24,117,21,7615,0],LA:[7,157,126,2139,385],NGR:[10,0,14,344,6],REAKTOR:[0,0,0,11,0],KAPASITOR:[0,0,0,6,5]},
+FEBRUARI:{TRAFO:[43,105,252,67,6],CT:[33,299,59,3115,10999],'CVT/PT':[125,18,2,3906,0],PMT:[130,898,326,1141,1442],PMS:[19,175,21,7665,0],LA:[4,235,123,2174,702],NGR:[10,0,14,345,8],REAKTOR:[0,0,0,11,0],KAPASITOR:[0,0,0,17,10]},
+MARET:{TRAFO:[43,106,253,63,6],CT:[30,164,56,3283,6128],'CVT/PT':[123,9,2,3908,0],PMT:[112,474,327,1169,711],PMS:[19,87,21,7671,0],LA:[1,157,123,2178,376],NGR:[9,0,14,346,6],REAKTOR:[0,0,0,11,0],KAPASITOR:[0,0,0,17,5]},
+APRIL:{TRAFO:[38,107,251,67,6],CT:[27,148,46,2984,4891],'CVT/PT':[67,9,2,3107,0],PMT:[85,613,454,864,1435],PMS:[5,91,22,7687,243],LA:[13,176,123,2163,366],NGR:[10,0,14,348,8],REAKTOR:[0,0,0,23,0],KAPASITOR:[0,0,0,17,5]},
+MEI:{TRAFO:[35,106,255,67,6],CT:[26,145,36,3025,4844],'CVT/PT':[63,9,2,3111,0],PMT:[73,562,994,899,917],PMS:[4,91,22,7686,243],LA:[13,168,123,2179,358],NGR:[10,0,12,352,7],REAKTOR:[0,0,0,24,0],KAPASITOR:[0,0,0,25,4],'PMT INC':[1,42,266,2,53],'CT INC':[0,0,0,62,327],'PT INC':[0,0,0,850,0]},
+JUNI:{TRAFO:[26,109,224,108,1],CT:[124,125,12,7630,185],'CVT/PT':[68,53,0,3043,0],PMT:[96,395,685,2025,244],PMS:[6,26,104,1760,6137],LA:[53,106,20,2593,45],NGR:[6,1,53,318,3],REAKTOR:[0,0,0,24,0],KAPASITOR:[0,0,0,25,4],'PMT INC':[9,7,90,273,3],'CT INC':[10,13,0,1554,10],'PT INC':[14,8,0,816,11]},
+JULI:{TRAFO:[35,112,204,118,0],CT:[93,58,0,7840,94],'CVT/PT':[63,22,0,3073,6],PMT:[81,510,907,1902,46],PMS:[24,24,82,1642,6265],LA:[41,105,26,2647,0],NGR:[2,0,57,320,2],REAKTOR:[0,0,0,24,0],KAPASITOR:[0,1,0,28,0],'PMT INC':[12,7,98,260,3],'CT INC':[12,3,0,1453,10],'PT INC':[7,3,0,755,11]}};
+function col(o,p){let k=Object.keys(o).find(h=>p.some(x=>h.toUpperCase().includes(x)));return k?o[k]:''}
+function type(o){let s=String(col(o,['JENIS ASET','JENIS ASSET'])).toUpperCase();if(s.includes('POWER'))return'TRAFO';if(s.includes('CURRENT'))return'CT';if(s.includes('POTENTIAL')||s.includes('CVT'))return'CVT/PT';if(s.includes('CIRCUIT'))return'PMT';if(s.includes('DISCONNECT'))return'PMS';if(s.includes('LIGHTNING'))return'LA';if(s.includes('NEUTRAL'))return'NGR';if(s.includes('REAKTOR'))return'REAKTOR';if(s.includes('CAPACITOR'))return'KAPASITOR';return s}
+function ahi(o){let v=String(col(o,['AHI FINAL','AHI AGUSTUS']));let m=v.match(/[1-5]/);return m?+m[0]:0}
+function parse(t){let a=[],r=[],c='',q=false;for(let i=0;i<t.length;i++){let x=t[i];if(x=='"')q=!q;else if(x==','&&!q){r.push(c);c=''}else if((x=='
+'||x=='')&&!q){if(x==''&&t[i+1]=='
+')i++;r.push(c);c='';if(r.some(v=>v))a.push(r);r=[]}else c+=x}return a}
+function opt(id,a){let e=document.getElementById(id),old=e.value;e.innerHTML='<option>Semua</option>'+[...new Set(a.filter(Boolean))].sort().map(x=>'<option>'+x+'</option>').join('');if([...e.options].some(x=>x.value==old))e.value=old}
+function cascade(){let r=csv;[['unit','UNIT INDUK'],['upt','UNIT PELAKSANA'],['ultg','ULTG'],['gi','GARDU INDUK'],['bay','BAY']].forEach(([id,c])=>{let v=document.getElementById(id).value;if(v!='Semua')r=r.filter(x=>col(x,[c])==v);opt(id=='unit'?'unit':id,r.map(x=>col(x,[c])));})}
+function filtered(){let r=csv;[['unit','UNIT INDUK'],['upt','UNIT PELAKSANA'],['ultg','ULTG'],['gi','GARDU INDUK'],['bay','BAY'],['phasa','PHASA']].forEach(([id,c])=>{let v=document.getElementById(id).value;if(v!='Semua')r=r.filter(x=>col(x,[c])==v)});if(jenis.value!='Semua')r=r.filter(x=>type(x)==jenis.value);return r}
+function series(t,k){let a=M.map(m=>MOCK[m]?.[t]?.[k]??null);if(csv.length){let r=filtered().filter(x=>type(x)==t),c=[0,0,0,0,0];r.forEach(x=>{let v=ahi(x);if(v)c[v-1]++});a[7]=c[k]}return a}
+function draw(cv,t){let w=cv.clientWidth,h=210,d=devicePixelRatio||1;cv.width=w*d;cv.height=h*d;let c=cv.getContext('2d');c.scale(d,d);let p={l:40,r:8,t:12,b:25},W=w-p.l-p.r,H=h-p.t-p.b,all=[];for(let k=0;k<5;k++)all.push(...series(t,k).filter(v=>v!=null));let mx=Math.max(...all,1),u=10**Math.floor(Math.log10(mx));mx=Math.ceil(mx/u)*u;let dx=W/11;c.font='10px Arial';c.strokeStyle='#dbe5ef';c.fillStyle='#71839b';for(let j=0;j<5;j++){let y=p.t+H*j/4;c.beginPath();c.setLineDash([2,3]);c.moveTo(p.l,y);c.lineTo(w-p.r,y);c.stroke();c.setLineDash([]);c.fillText(Math.round(mx*(1-j/4)).toLocaleString('id-ID'),2,y+3)}for(let i=0;i<12;i++)c.fillText(M[i].slice(0,3),p.l+i*dx-8,h-6);for(let k=0;k<5;k++){let a=series(t,k);c.strokeStyle=C[k];c.lineWidth=2;c.beginPath();let on=false;a.forEach((v,i)=>{if(v==null){on=false;return}let x=p.l+i*dx,y=p.t+H*(1-v/mx);on?c.lineTo(x,y):c.moveTo(x,y);on=true});c.stroke();}}
+function charts(){let ts=jenis.value!='Semua'?[jenis.value]:T;chartsDiv.innerHTML='';ts.forEach(t=>{let d=document.createElement('div');d.className='chart';d.innerHTML='<h3>'+L[t]+' ('+t+')</h3><canvas></canvas>';chartsDiv.appendChild(d);draw(d.querySelector('canvas'),t)})}
+function kpis(){let r=filtered(),c=[0,0,0,0,0];r.forEach(x=>{let a=ahi(x);if(a)c[a-1]++});kpisDiv.innerHTML='<div class="kpi"><small>Total Aset</small><b>'+r.length.toLocaleString('id-ID')+'</b></div>'+c.map((v,i)=>'<div class="kpi"><small>'+(i+1)+' - '+['Very Good','Good','Fair','Poor','Critical'][i]+'</small><b style="color:'+C[i]+'">'+v.toLocaleString('id-ID')+'</b></div>').join('')}
+function table(){let r=filtered(),q=search.value.toUpperCase();if(q)r=r.filter(x=>Object.values(x).some(v=>String(v).toUpperCase().includes(q)));let cs=['JENIS ASET','UNIT INDUK','UNIT PELAKSANA','ULTG','GARDU INDUK','BAY','PHASA','TEG OPERASI','MEREK','TIPE','USIA','STATUS USIA','TINGKAT RESIKO','AHI FINAL','PARAMETER PEMICU','P0/P1','RENCANA'];th.innerHTML=cs.map(x=>'<th>'+x+'</th>').join('');tb.innerHTML=r.slice(0,200).map(x=>'<tr>'+cs.map(c=>'<td>'+(c=='JENIS ASET'?(L[type(x)]||type(x)):c=='AHI FINAL'?(ahi(x)||''):col(x,[c]))+'</td>').join('')+'</tr>').join('')}
+function render(){kpis();charts();table()}
+async function load(){try{let z=await fetch('data/evaluasi/AHI_EVAL_AGUSTUS.csv?'+Date.now());if(z.ok){let a=parse(await z.text());heads=a.shift()||[];csv=a.map(r=>Object.fromEntries(heads.map((h,i)=>[h,r[i]||''])));status.textContent='Agustus CSV berhasil dimuat';last.textContent='Agustus 2026'}}catch(e){}opt('jenis',T);opt('kategori',['1','2','3','4','5']);periode.innerHTML=M.map(x=>'<option>'+x+'</option>').join('');periode.value='AGUSTUS';opt('unit',csv.map(x=>col(x,['UNIT INDUK'])));cascade();opt('phasa',csv.map(x=>col(x,['PHASA'])));render()}load();window.onresize=charts;
+</script></body></html>
