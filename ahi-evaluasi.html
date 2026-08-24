@@ -73,6 +73,7 @@ th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-inde
 .c1{background:#20a46b;color:#fff}.c2{background:#f2b400;color:#17233b}.c3{background:#f07800;color:#fff}.c4{background:#e53935;color:#fff}.c5{background:#111;color:#fff}
 
 .loading{opacity:.6;pointer-events:none}
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0 2px}.pagination button{min-width:32px;height:30px;border:1px solid #d2ddea;background:#fff;border-radius:6px;color:#24415f;cursor:pointer}.pagination button.active{background:#0877d1;color:#fff;border-color:#0877d1;font-weight:800}.pagination button:disabled{opacity:.45;cursor:not-allowed}.page-info{font-size:10px;color:#64788f;margin:0 8px}
 @media(max-width:1250px){
  .filters{grid-template-columns:repeat(4,minmax(0,1fr))}
  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -141,27 +142,22 @@ const MONTH_FILES={
   Juni:"AHI_EVAL_JUNI.csv",Juli:"AHI_EVAL_JULI.csv",Agustus:"AHI_EVAL_AGUSTUS.csv",
   September:"AHI_EVAL_SEPTEMBER.csv",Oktober:"AHI_EVAL_OKTOBER.csv",November:"AHI_EVAL_NOVEMBER.csv",Desember:"AHI_EVAL_DESEMBER.csv"
 };
-const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor","PMT INC","CT INC","PT INC"];
-const TYPE_SHORT={"Power Transformer":"TRAFO","Current Transformer":"CT","Potential Transformer":"CVT/PT","Circuit Breaker":"PMT","Disconnecting Switch":"PMS","Lightning Arrester":"LA","Neutral Grounding Resistance":"NGR","Reactor":"REAKTOR","Capacitor":"KAPASITOR","PMT INC":"PMT INC","CT INC":"CT INC","PT INC":"PT INC"};
+const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor","Circuit Breaker Incoming","Current Transformer Incoming","Potential Transformer Incoming"];
+const TYPE_SHORT={"Power Transformer":"Power Transformer","Current Transformer":"Current Transformer","Potential Transformer":"Potential Transformer","Circuit Breaker":"Circuit Breaker","Disconnecting Switch":"Disconnecting Switch","Lightning Arrester":"Lightning Arrester","Neutral Grounding Resistance":"Neutral Grounding Resistance","Reactor":"Reactor","Capacitor":"Capacitor","Circuit Breaker Incoming":"Circuit Breaker Incoming","Current Transformer Incoming":"Current Transformer Incoming","Potential Transformer Incoming":"Potential Transformer Incoming"};
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
-const HIST={
-"Januari":{"TRAFO":[42,99,254,71,7],"CT":[33,168,52,3083,6315],"CVT/PT":[132,9,2,3893,0],"PMT":[138,479,334,1095,758],"PMS":[24,117,21,7615,0],"LA":[7,157,126,2139,385],"NGR":[10,0,14,344,6],"REAKTOR":[0,0,0,11,0],"KAPASITOR":[0,0,0,6,5]},
-"Februari":{"TRAFO":[43,105,252,67,6],"CT":[33,299,59,3115,10999],"CVT/PT":[125,18,2,3906,0],"PMT":[130,898,326,1141,1442],"PMS":[19,175,21,7665,0],"LA":[4,235,123,2174,702],"NGR":[10,0,14,345,8],"REAKTOR":[0,0,0,11,0],"KAPASITOR":[0,0,0,17,10]},
-"Maret":{"TRAFO":[43,106,253,63,6],"CT":[30,164,56,3283,6128],"CVT/PT":[123,9,2,3908,0],"PMT":[112,474,327,1169,711],"PMS":[19,87,21,7671,0],"LA":[1,157,123,2178,376],"NGR":[9,0,14,346,6],"REAKTOR":[0,0,0,11,0],"KAPASITOR":[0,0,0,17,5]},
-"April":{"TRAFO":[38,107,251,67,6],"CT":[27,148,46,2984,4891],"CVT/PT":[67,9,2,3107,0],"PMT":[85,613,454,864,1435],"PMS":[5,91,22,7687,243],"LA":[13,176,123,2163,366],"NGR":[10,0,14,348,8],"REAKTOR":[0,0,0,23,0],"KAPASITOR":[0,0,0,17,5]},
-"Mei":{"TRAFO":[35,106,255,67,6],"CT":[26,145,36,3025,4844],"CVT/PT":[63,9,2,3111,0],"PMT":[73,562,994,899,917],"PMS":[4,91,22,7686,243],"LA":[13,168,123,2179,358],"NGR":[10,0,12,352,7],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,0,0,25,4],"PMT INC":[1,42,266,2,53],"CT INC":[0,0,0,62,327],"PT INC":[0,0,0,850,0]},
-"Juni":{"TRAFO":[26,109,224,108,1],"CT":[124,125,12,7630,185],"CVT/PT":[68,53,0,3043,0],"PMT":[96,395,685,2025,244],"PMS":[6,26,104,1760,6137],"LA":[53,106,20,2593,45],"NGR":[6,1,53,318,3],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,0,0,25,4],"PMT INC":[9,7,90,273,3],"CT INC":[10,13,0,1554,10],"PT INC":[14,8,0,816,11]},
-"Juli":{"TRAFO":[35,112,204,118,0],"CT":[93,58,0,7840,94],"CVT/PT":[63,22,0,3073,6],"PMT":[81,510,907,1902,46],"PMS":[24,24,82,1642,6265],"LA":[41,105,26,2647,0],"NGR":[2,0,57,320,2],"REAKTOR":[0,0,0,24,0],"KAPASITOR":[0,1,0,28,0],"PMT INC":[12,7,98,260,3],"CT INC":[12,3,0,1453,10],"PT INC":[7,3,0,755,11]}
-};
+const HIST={"Januari":{"Power Transformer":[108,556,755,473,133],"Current Transformer":[353,580,204,15429,14836],"Potential Transformer":[526,76,651,11874,2950],"Circuit Breaker":[354,1470,3768,4959,1796],"Disconnecting Switch":[359,298,181,10614,10991],"Lightning Arrester":[359,689,684,13550,846],"Neutral Grounding Resistance":[15,15,38,1251,96],"Reactor":[1,5,10,64,5],"Capacitor":[7,0,1,179,5]},"Februari":{"Power Transformer":[96,436,809,551,138],"Current Transformer":[268,540,175,20860,15894],"Potential Transformer":[501,80,628,13602,1763],"Circuit Breaker":[292,1823,3712,6203,3041],"Disconnecting Switch":[398,370,183,12905,10861],"Lightning Arrester":[340,769,674,13710,1056],"Neutral Grounding Resistance":[18,9,32,1309,88],"Reactor":[1,5,10,63,6],"Capacitor":[10,0,1,187,10]},"Maret":{"Power Transformer":[106,422,821,543,138],"Current Transformer":[338,404,213,18952,10714],"Potential Transformer":[518,76,632,13175,1396],"Circuit Breaker":[316,1448,3605,5150,1467],"Disconnecting Switch":[435,302,184,10961,10568],"Lightning Arrester":[221,677,684,13856,661],"Neutral Grounding Resistance":[16,8,32,1285,90],"Reactor":[1,5,10,65,5],"Capacitor":[9,0,1,188,5]},"April":{"Power Transformer":[88,422,595,788,143],"Current Transformer":[312,418,228,18660,8670],"Potential Transformer":[404,83,658,12296,1367],"Circuit Breaker":[252,1628,2867,5643,2226],"Disconnecting Switch":[404,294,195,11182,10725],"Lightning Arrester":[210,714,693,13460,1132],"Neutral Grounding Resistance":[17,8,31,1293,89],"Reactor":[1,7,3,85,5],"Capacitor":[7,0,1,181,5]},"Mei":{"Power Transformer":[92,402,739,519,303],"Current Transformer":[177,1484,132,20332,6309],"Potential Transformer":[515,688,602,12898,196],"Circuit Breaker":[206,1397,3199,5966,1874],"Disconnecting Switch":[81,307,217,17270,5049],"Lightning Arrester":[210,705,175,14498,684],"Neutral Grounding Resistance":[24,8,66,1248,93],"Reactor":[4,6,2,87,9],"Capacitor":[6,7,0,185,4],"Circuit Breaker Incoming":[2,65,318,762,322],"Current Transformer Incoming":[8,135,0,2619,1430],"Potential Transformer Incoming":[17,105,0,2890,224]}};
 const LIVE={};
-let raw=[],filtered=[],period="Agustus",search="",trendFilter=true;
+let raw=[],filtered=[],period="Agustus",search="",trendFilter=true,currentPage=1;const PAGE_SIZE=50;
 
 function norm(v){return String(v??"").normalize("NFKC").replace(/^\uFEFF/,"").replace(/\u00a0/g," ").trim().replace(/\s+/g," ").toLowerCase()}
 function fmt(n){return Number(n||0).toLocaleString("id-ID")}
 function esc(v){return String(v??"—").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function typeOf(r){
   const s=norm(r["Jenis Aset"]||r["Jenis Asset"]);
-  if(s.includes("power"))return "Power Transformer";
+  if(s.includes("circuit")&&s.includes("incoming"))return "Circuit Breaker Incoming";
+  if(s.includes("current")&&s.includes("incoming"))return "Current Transformer Incoming";
+  if(s.includes("potential")&&s.includes("incoming"))return "Potential Transformer Incoming";
+  if(s.includes("power")||s.includes("transformer daya"))return "Power Transformer";
   if(s.includes("current"))return "Current Transformer";
   if(s.includes("potential")||s.includes("cvt"))return "Potential Transformer";
   if(s.includes("circuit"))return "Circuit Breaker";
@@ -185,13 +181,20 @@ function monthKey(month,kind){
 }
 function getMonthValue(r,month,kind){
   const keys=Object.keys(r);
-  for(const c of monthKey(month,kind)){const k=keys.find(x=>norm(x)===norm(c));if(k&&String(r[k]).trim()!=="")return r[k]}
-  const m=norm(month);
-  const k=keys.find(x=>norm(x).includes(m)&&(
-    kind==="ahi"?/(ahi final|ahi|health|kategori)/.test(norm(x)):
-    kind==="param"?/(parameter|pemicu)/.test(norm(x)):
-    kind==="p01"?/(ba tinjut|p0|p1)/.test(norm(x)):false
-  ));
+  const target=norm(month);
+  const candidates=monthKey(month,kind).map(norm);
+  for(const c of candidates){
+    const k=keys.find(x=>norm(x)===c);
+    if(k&&String(r[k]).trim()!=="")return r[k];
+  }
+  const k=keys.find(x=>{
+    const n=norm(x);
+    if(!n.includes(target))return false;
+    if(kind==="ahi")return n.includes("ahi final")||n.includes("ahi");
+    if(kind==="param")return n.includes("parameter")||n.includes("pemicu");
+    if(kind==="p01")return n.includes("ba tinjut")||n.includes("p0")||n.includes("p1");
+    return false;
+  });
   return k?r[k]:"";
 }
 function parseCSV(t){
@@ -224,9 +227,9 @@ async function fetchText(url){
 async function fetchMonth(month){
   const file=MONTH_FILES[month];if(!file)return null;
   const urls=[
-    BASE_RAW+file+"?v="+Date.now(),
-    "data/evaluasi/"+file+"?v="+Date.now(),
-    "./data/evaluasi/"+file+"?v="+Date.now()
+    BASE_RAW+file,
+    "data/evaluasi/"+file,
+    "./data/evaluasi/"+file
   ];
   for(const u of urls){
     try{
@@ -418,7 +421,7 @@ function field(r,c){
   if(c==="USIA")return r["USIA"]||"—";
   if(c==="STATUS USIA")return r["STATUS USIA"]||"—";
   if(c==="TINGKAT RESIKO")return r["TINGKAT RESIKO"]||"—";
-  if(c==="AHI FINAL")return getMonthValue(r,period,"ahi")||"—";
+  if(c==="AHI FINAL"){const v=getMonthValue(r,period,"ahi");return v||r["AHI FINAL"]||r["AHI FINAL "+period.toUpperCase()]||"—";}
   if(c==="Parameter Pemicu")return getMonthValue(r,period,"param")||"—";
   if(c==="P0/P1")return r["P0/P1"]||"—";
   if(c==="Rencana")return r["Rencana"]||"—";
@@ -428,24 +431,47 @@ function field(r,c){
 function renderTable(){
   const q=norm(search);
   let rows=filteredRows().filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q)));
+  const total=rows.length;
+  const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  currentPage=Math.min(currentPage,pages);
+  const start=(currentPage-1)*PAGE_SIZE;
+  const shown=rows.slice(start,start+PAGE_SIZE);
   document.getElementById("periodTitle").textContent=period+" 2026";
-  document.getElementById("count").textContent=`Menampilkan ${Math.min(50,rows.length).toLocaleString("id-ID")} dari ${rows.length.toLocaleString("id-ID")} data`;
+  document.getElementById("count").textContent=`Menampilkan ${total?start+1:0}–${Math.min(start+PAGE_SIZE,total)} dari ${total.toLocaleString("id-ID")} data`;
   document.getElementById("thead").innerHTML="<tr>"+detailCols.map(c=>`<th>${c}</th>`).join("")+"</tr>";
-  document.getElementById("tbody").innerHTML=rows.slice(0,50).map(r=>{
+  document.getElementById("tbody").innerHTML=shown.map(r=>{
     return "<tr>"+detailCols.map(c=>{
       const v=field(r,c),n=ahiNumber(v);
       return `<td>${c==="AHI FINAL"&&n?`<span class="badge c${n}">${esc(v)}</span>`:esc(v)}</td>`;
     }).join("")+"</tr>";
   }).join("");
+  let nav=document.getElementById("pagination");
+  if(!nav){
+    nav=document.createElement("div");nav.id="pagination";nav.className="pagination";
+    document.querySelector(".table-wrap").after(nav);
+  }
+  if(pages<=1){nav.innerHTML="";return}
+  const buttons=[];
+  buttons.push(`<button ${currentPage===1?"disabled":""} data-page="${currentPage-1}">‹</button>`);
+  const from=Math.max(1,currentPage-2),to=Math.min(pages,currentPage+2);
+  if(from>1)buttons.push(`<button data-page="1">1</button>${from>2?'<span class="page-info">…</span>':''}`);
+  for(let i=from;i<=to;i++)buttons.push(`<button class="${i===currentPage?"active":""}" data-page="${i}">${i}</button>`);
+  if(to<pages)buttons.push(`${to<pages-1?'<span class="page-info">…</span>':''}<button data-page="${pages}">${pages}</button>`);
+  buttons.push(`<button ${currentPage===pages?"disabled":""} data-page="${currentPage+1}">›</button>`);
+  nav.innerHTML=buttons.join("");
+  nav.querySelectorAll("button[data-page]").forEach(btn=>btn.onclick=()=>{
+    const p=Number(btn.dataset.page);if(!p||p<1||p>pages)return;
+    currentPage=p;renderTable();
+    document.querySelector(".detail").scrollIntoView({behavior:"smooth",block:"start"});
+  });
 }
 function render(){
   renderKpis();renderCharts();renderTable();
 }
 function apply(){
-  filtered=filteredRows();
-  render();
+  currentPage=1;filtered=filteredRows();render();
 }
-document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});
+document.getElementById("search").addEventListener("input",e=>{search=e.target.value;currentPage=1;renderTable()});
 document.getElementById("exportBtn").addEventListener("click",()=>{
   const rows=filteredRows();const out=detailCols.join(";")+"\n"+rows.map(r=>detailCols.map(c=>`"${String(field(r,c)).replaceAll('"','""')}"`).join(";")).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+out],{type:"text/csv"}));a.download=`AHI_Evaluasi_${period}_2026.csv`;a.click();
@@ -465,9 +491,9 @@ async function load(){
     apply();
     status.className="status ok";status.textContent=`CSV AGUSTUS berhasil dimuat • ${fmt(raw.length)} baris`;
     // Historical/current months load in the background. Missing future files are simply ignored.
-    for(const m of ["Juni","Juli","September","Oktober","November","Desember"]){
-      fetchMonth(m).then(d=>{if(d){LIVE[m]=d;renderCharts()}}).catch(()=>{});
-    }
+    Promise.all(["Juni","Juli"].map(async m=>{
+      try{const d=await fetchMonth(m);if(d)LIVE[m]=d;}catch(e){}
+    })).then(()=>renderCharts());
   }catch(e){
     console.error(e);
     status.className="status error";
@@ -484,3 +510,13 @@ load();
 </script>
 </body>
 </html>
+
+<script>
+window.MOCKUP_DATA_REVISED = {
+  'JANUARI': [['Power Transformer',42,99,254,71,7],['Current Transformer',33,168,52,3083,6315],['Potential Transformer',132,9,2,3893,0],['Circuit Breaker',138,479,334,1095,758],['Disconnecting Switch',24,117,21,7615,0],['Lightning Arrester',7,157,126,2139,385],['Neutral Grounding Resistance',10,0,14,344,6],['Reactor',0,0,0,11,0],['Capacitor',0,0,0,6,5]],
+  'FEBRUARI': [['Power Transformer',43,105,252,67,6],['Current Transformer',33,299,59,3115,10999],['Potential Transformer',125,18,2,3906,0],['Circuit Breaker',130,898,326,1141,1442],['Disconnecting Switch',19,175,21,7665,0],['Lightning Arrester',4,235,123,2174,702],['Neutral Grounding Resistance',10,0,14,345,8],['Reactor',0,0,0,11,0],['Capacitor',0,0,0,17,10]],
+  'MARET': [['Power Transformer',43,106,253,63,6],['Current Transformer',30,164,56,3283,6128],['Potential Transformer',123,9,2,3908,0],['Circuit Breaker',112,474,327,1169,711],['Disconnecting Switch',19,87,21,7671,0],['Lightning Arrester',1,157,123,2178,376],['Neutral Grounding Resistance',9,0,14,346,6],['Reactor',0,0,0,11,0],['Capacitor',0,0,0,17,5]],
+  'APRIL': [['Power Transformer',38,107,251,67,6],['Current Transformer',27,148,46,2984,4891],['Potential Transformer',67,9,2,3107,0],['Circuit Breaker',85,613,454,864,1435],['Disconnecting Switch',5,91,22,7687,243],['Lightning Arrester',13,176,123,2163,366],['Neutral Grounding Resistance',10,0,14,348,8],['Reactor',0,0,0,23,0],['Capacitor',0,0,0,17,5]],
+  'MEI': [['Power Transformer',35,106,255,67,6],['Current Transformer',26,145,36,3025,4844],['Potential Transformer',63,9,2,3111,0],['Circuit Breaker',73,562,994,899,917],['Disconnecting Switch',4,91,22,7686,243],['Lightning Arrester',13,168,123,2179,358],['Neutral Grounding Resistance',10,0,12,352,7],['Reactor',0,0,0,24,0],['Capacitor',0,0,0,25,4]]
+};
+</script>
