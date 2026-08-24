@@ -23,7 +23,16 @@ APRIL:{TRAFO:[38,107,251,67,6],CT:[27,148,46,2984,4891],'CVT/PT':[67,9,2,3107,0]
 MEI:{TRAFO:[35,106,255,67,6],CT:[26,145,36,3025,4844],'CVT/PT':[63,9,2,3111,0],PMT:[73,562,994,899,917],PMS:[4,91,22,7686,243],LA:[13,168,123,2179,358],NGR:[10,0,12,352,7],REAKTOR:[0,0,0,24,0],KAPASITOR:[0,0,0,25,4],'PMT INC':[1,42,266,2,53],'CT INC':[0,0,0,62,327],'PT INC':[0,0,0,850,0]},
 JUNI:{TRAFO:[26,109,224,108,1],CT:[124,125,12,7630,185],'CVT/PT':[68,53,0,3043,0],PMT:[96,395,685,2025,244],PMS:[6,26,104,1760,6137],LA:[53,106,20,2593,45],NGR:[6,1,53,318,3],REAKTOR:[0,0,0,24,0],KAPASITOR:[0,0,0,25,4],'PMT INC':[9,7,90,273,3],'CT INC':[10,13,0,1554,10],'PT INC':[14,8,0,816,11]},
 JULI:{TRAFO:[35,112,204,118,0],CT:[93,58,0,7840,94],'CVT/PT':[63,22,0,3073,6],PMT:[81,510,907,1902,46],PMS:[24,24,82,1642,6265],LA:[41,105,26,2647,0],NGR:[2,0,57,320,2],REAKTOR:[0,0,0,24,0],KAPASITOR:[0,1,0,28,0],'PMT INC':[12,7,98,260,3],'CT INC':[12,3,0,1453,10],'PT INC':[7,3,0,755,11]}};
-function col(o,p){let k=Object.keys(o).find(h=>p.some(x=>h.toUpperCase().includes(x)));return k?o[k]:''}
+function col(o,p){
+  let k=Object.keys(o).find(h=>p.some(x=>String(h).trim().toUpperCase().includes(x.toUpperCase())));
+  return k?o[k]:'';
+}
+function finalFor(o,month){
+  const m={JANUARI:'JANUARI',FEBRUARI:'FEBRUARI',MARET:'MARET',APRIL:'APRIL',MEI:'MEI',JUNI:'JUNI',JULI:'JULI',AGUSTUS:'AGUSTUS',SEPTEMBER:'SEPTEMBER',OKTOBER:'OKTOBER',NOVEMBER:'NOVEMBER',DESEMBER:'DESEMBER'}[month];
+  if(!m)return '';
+  const k=Object.keys(o).find(h=>String(h).trim().toUpperCase()==='AHI FINAL '+m);
+  return k?o[k]:'';
+}
 function type(o){let s=String(col(o,['JENIS ASET','JENIS ASSET'])).toUpperCase();if(s.includes('POWER'))return'TRAFO';if(s.includes('CURRENT'))return'CT';if(s.includes('POTENTIAL')||s.includes('CVT'))return'CVT/PT';if(s.includes('CIRCUIT'))return'PMT';if(s.includes('DISCONNECT'))return'PMS';if(s.includes('LIGHTNING'))return'LA';if(s.includes('NEUTRAL'))return'NGR';if(s.includes('REAKTOR'))return'REAKTOR';if(s.includes('CAPACITOR'))return'KAPASITOR';return s}
 function ahi(o){let per=(document.getElementById('periode')?.value||'AGUSTUS').toUpperCase();let keys=[`AHI FINAL ${per}`,`AHI PI ${per}`,`AHI FINAL`];let v='';for(const k of keys){if(Object.prototype.hasOwnProperty.call(o,k)){v=String(o[k]);break}}let m=v.match(/(?:^|\s)([1-5])\s*(?:-|$)/);return m?Number(m[1]):0}
 function parse(t){let a=[],r=[],c='',q=false;for(let i=0;i<t.length;i++){let x=t[i];if(x=='"')q=!q;else if(x==','&&!q){r.push(c);c=''}else if((x=='
@@ -34,11 +43,66 @@ function parse(t){let a=[],r=[],c='',q=false;for(let i=0;i<t.length;i++){let x=t
 function opt(id,a){let e=document.getElementById(id),old=e.value;e.innerHTML='<option>Semua</option>'+[...new Set(a.filter(Boolean))].sort().map(x=>'<option>'+x+'</option>').join('');if([...e.options].some(x=>x.value==old))e.value=old}
 function cascade(){const chain=[['unit','UNIT INDUK'],['upt','UNIT PELAKSANA'],['ultg','ULTG'],['gi','GARDU INDUK'],['bay','BAY']];let r=csv;for(const [id,c] of chain){const v=document.getElementById(id).value;if(v!='Semua')r=r.filter(x=>String(col(x,[c])).trim()==String(v).trim());opt(id,r.map(x=>col(x,[c])))} }
 function filtered(){let r=csv;[['teg','KELOMPOK TEGANGAN'],['unit','UNIT INDUK'],['upt','UNIT PELAKSANA'],['ultg','ULTG'],['gi','GARDU INDUK'],['bay','BAY'],['phasa','PHASA']].forEach(([id,c])=>{let v=document.getElementById(id).value;if(v!='Semua')r=r.filter(x=>String(col(x,[c])).trim()==String(v).trim())});if(jenis.value!='Semua')r=r.filter(x=>type(x)==jenis.value);if(kategori.value!='Semua')r=r.filter(x=>ahi(x)==Number(kategori.value));return r}
-function series(t,k){let a=M.map(m=>MOCK[m]?.[t]?.[k]??null);if(csv.length){let r=filtered().filter(x=>type(x)==t),c=[0,0,0,0,0];r.forEach(x=>{let v=ahi(x);if(v)c[v-1]++});a[7]=c[k]}return a}
+function series(t,k){
+  return M.map(month=>{
+    if(MOCK[month]?.[t]) return MOCK[month][t][k];
+    const ds=window.MONTH_CSV?.[month];
+    if(!ds) return null;
+    let r=ds.rows;
+    // Apply the same hierarchy filters to the month's own dataset.
+    const pairs=[['unit','UNIT INDUK'],['upt','UNIT PELAKSANA'],['ultg','ULTG'],['gi','GARDU INDUK'],['bay','BAY'],['phasa','PHASA']];
+    for(const [id,c] of pairs){
+      const v=document.getElementById(id)?.value;
+      if(v && v!=='Semua') r=r.filter(x=>col(x,[c])===v);
+    }
+    if(jenis.value!=='Semua') r=r.filter(x=>type(x)===jenis.value);
+    const c=[0,0,0,0,0];
+    r.forEach(x=>{const v=finalFor(x,month);const m=String(v).match(/(?:^|[^0-9])([1-5])(?:\s*-|\s|$)/);if(m)c[+m[1]-1]++;});
+    return c[k];
+  });
+}
 function draw(cv,t){let w=cv.clientWidth,h=210,d=devicePixelRatio||1;cv.width=w*d;cv.height=h*d;let c=cv.getContext('2d');c.scale(d,d);let p={l:40,r:8,t:12,b:25},W=w-p.l-p.r,H=h-p.t-p.b,all=[];for(let k=0;k<5;k++)all.push(...series(t,k).filter(v=>v!=null));let mx=Math.max(...all,1),u=10**Math.floor(Math.log10(mx));mx=Math.ceil(mx/u)*u;let dx=W/11;c.font='10px Arial';c.strokeStyle='#dbe5ef';c.fillStyle='#71839b';for(let j=0;j<5;j++){let y=p.t+H*j/4;c.beginPath();c.setLineDash([2,3]);c.moveTo(p.l,y);c.lineTo(w-p.r,y);c.stroke();c.setLineDash([]);c.fillText(Math.round(mx*(1-j/4)).toLocaleString('id-ID'),2,y+3)}for(let i=0;i<12;i++)c.fillText(M[i].slice(0,3),p.l+i*dx-8,h-6);for(let k=0;k<5;k++){let a=series(t,k);c.strokeStyle=C[k];c.lineWidth=2;c.beginPath();let on=false;a.forEach((v,i)=>{if(v==null){on=false;return}let x=p.l+i*dx,y=p.t+H*(1-v/mx);on?c.lineTo(x,y):c.moveTo(x,y);on=true});c.stroke();}}
 function charts(){let ts=jenis.value!='Semua'?[jenis.value]:T;chartsDiv.innerHTML='';ts.forEach(t=>{let d=document.createElement('div');d.className='chart';d.innerHTML='<h3>'+L[t]+' ('+t+')</h3><canvas></canvas>';chartsDiv.appendChild(d);draw(d.querySelector('canvas'),t)})}
 function kpis(){let r=filtered(),c=[0,0,0,0,0];r.forEach(x=>{let a=ahi(x);if(a)c[a-1]++});kpisDiv.innerHTML='<div class="kpi"><small>Total Aset</small><b>'+r.length.toLocaleString('id-ID')+'</b></div>'+c.map((v,i)=>'<div class="kpi"><small>'+(i+1)+' - '+['Very Good','Good','Fair','Poor','Critical'][i]+'</small><b style="color:'+C[i]+'">'+v.toLocaleString('id-ID')+'</b></div>').join('')}
 function table(){let r=filtered(),q=search.value.toUpperCase();if(q)r=r.filter(x=>Object.values(x).some(v=>String(v).toUpperCase().includes(q)));let cs=['JENIS ASET','UNIT INDUK','UNIT PELAKSANA','ULTG','GARDU INDUK','BAY','PHASA','TEG OPERASI','MEREK','TIPE','USIA','STATUS USIA','TINGKAT RESIKO','AHI FINAL','PARAMETER PEMICU','P0/P1','RENCANA'];th.innerHTML=cs.map(x=>'<th>'+x+'</th>').join('');tb.innerHTML=r.slice(0,200).map(x=>'<tr>'+cs.map(c=>'<td>'+(c=='JENIS ASET'?(L[type(x)]||type(x)):c=='AHI FINAL'?(ahi(x)||''):col(x,[c]))+'</td>').join('')+'</tr>').join('')}
 function render(){kpis();charts();table()}
-async function load(){try{let z=await fetch('data/evaluasi/AHI_EVAL_AGUSTUS.csv?'+Date.now());if(z.ok){let a=parse(await z.text());heads=a.shift()||[];csv=a.map(r=>Object.fromEntries(heads.map((h,i)=>[h,r[i]||''])));status.textContent='Agustus CSV berhasil dimuat';last.textContent='Agustus 2026'}}catch(e){}opt('jenis',T);opt('kategori',['1','2','3','4','5']);periode.innerHTML=M.map(x=>'<option>'+x+'</option>').join('');periode.value='AGUSTUS';opt('teg',csv.map(x=>col(x,['KELOMPOK TEGANGAN'])));opt('unit',csv.map(x=>col(x,['UNIT INDUK'])));opt('phasa',csv.map(x=>col(x,['PHASA'])));cascade();['unit','upt','ultg','gi','bay'].forEach(id=>document.getElementById(id).addEventListener('change',cascade));document.getElementById('periode').addEventListener('change',render);render()}load();window.onresize=charts;
+async function fetchCSV(paths){
+  for(const path of paths){
+    try{
+      const z=await fetch(path+'?v='+Date.now(),{cache:'no-store'});
+      if(z.ok){
+        const text=await z.text();
+        if(text.trim().length>20) return {text,path};
+      }
+    }catch(e){}
+  }
+  return null;
+}
+async function load(){
+  // Juni-Agustus and future months are read independently from data/evaluasi/.
+  // This lets the dashboard keep each month's CSV and extend automatically.
+  const monthFiles={JUNI:'AHI_EVAL_JUNI.csv',JULI:'AHI_EVAL_JULI.csv',AGUSTUS:'AHI_EVAL_AGUSTUS.csv',
+    SEPTEMBER:'AHI_EVAL_SEPTEMBER.csv',OKTOBER:'AHI_EVAL_OKTOBER.csv',NOVEMBER:'AHI_EVAL_NOVEMBER.csv',DESEMBER:'AHI_EVAL_DESEMBER.csv'};
+  window.MONTH_CSV={};
+  for(const [month,file] of Object.entries(monthFiles)){
+    const r=await fetchCSV(['data/evaluasi/'+file]);
+    if(r){
+      let a=parse(r.text), h=a.shift()||[];
+      window.MONTH_CSV[month]={heads:h,rows:a.map(row=>Object.fromEntries(h.map((x,i)=>[String(x).trim(),row[i]??''])))};
+    }
+  }
+  // Current month dataset is the latest available monthly CSV.
+  const available=Object.keys(window.MONTH_CSV);
+  const latest=available.length?available[available.length-1]:'';
+  if(latest){
+    heads=window.MONTH_CSV[latest].heads;
+    csv=window.MONTH_CSV[latest].rows;
+    status.textContent=latest+' CSV berhasil dimuat';
+    last.textContent='24 Agustus 2026';
+  }else{
+    status.textContent='CSV bulanan belum ditemukan';
+    last.textContent='CSV belum terbaca';
+  }
+  opt('jenis',T);
+opt('jenis',T);opt('kategori',['1','2','3','4','5']);periode.innerHTML=M.map(x=>'<option>'+x+'</option>').join('');periode.value='AGUSTUS';opt('teg',csv.map(x=>col(x,['KELOMPOK TEGANGAN'])));opt('unit',csv.map(x=>col(x,['UNIT INDUK'])));opt('phasa',csv.map(x=>col(x,['PHASA'])));cascade();['unit','upt','ultg','gi','bay'].forEach(id=>document.getElementById(id).addEventListener('change',cascade));document.getElementById('periode').addEventListener('change',render);render()}load();window.onresize=charts;
 </script></body></html>
