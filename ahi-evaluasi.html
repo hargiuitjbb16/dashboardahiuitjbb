@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AHI Evaluasi — Dashboard AHI UIT JBB</title>
+<style>
+*{box-sizing:border-box}
+:root{--blue:#0877df;--navy:#10233f;--bg:#f5f8fc;--border:#dbe5f0;--text:#17324f}
+body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,Segoe UI,Arial,sans-serif}
+.app{display:flex;min-height:100vh}
+.sidebar{width:205px;background:#fff;border-right:1px solid #dce5ef;position:fixed;left:0;top:0;bottom:0;padding:8px 0;z-index:10}
+.logo{height:54px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #eef2f7;margin-bottom:7px}
+.logo img{max-width:171px;max-height:42px;object-fit:contain}
+.logo-fallback{font-size:20px;font-weight:900;color:#0877df}
+.nav a{display:block;margin:3px 4px;padding:11px 10px;border-radius:9px;color:#16324f;text-decoration:none;font-weight:500}
+.nav a.active{background:#e6f0ff;color:#066dd2;font-weight:700}
+.side-bottom{position:absolute;left:3px;right:3px;bottom:12px;border:1px solid var(--border);border-radius:8px;padding:10px;background:#f8fbff}
+.side-bottom small{display:block;color:#61748a}.side-bottom b{display:block;margin-top:2px}
+main{margin-left:205px;width:calc(100% - 205px);padding:8px 12px 24px}
+.header{height:62px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+h1{font-size:27px;margin:0;font-weight:850}.subtitle{margin-top:3px;color:#6a7f96}
+.status{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;font-size:11px}
+.status b{font-size:12px}
+.card{background:#fff;border:1px solid var(--border);border-radius:9px;box-shadow:0 1px 2px #16324f08}
+.filters{margin-top:10px;padding:11px;display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:8px}
+.field label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;color:#536b83;margin-bottom:4px}
+select,input{width:100%;height:34px;border:1px solid #cbd9e8;border-radius:7px;background:#fff;padding:0 9px;color:#17324f;outline:none}
+select:focus,input:focus{border-color:#6baef3}
+.actions{display:flex;align-items:end;gap:6px}
+button{height:34px;border-radius:7px;border:1px solid #0877df;background:#0877df;color:#fff;padding:0 15px;font-weight:750;cursor:pointer}
+button.secondary{background:#fff;color:#0877df}
+.trend-toggle{grid-column:1/-1;display:flex;align-items:center;gap:7px;color:#486178;font-size:11px}.trend-toggle input{width:auto;height:auto}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-top:9px}
+.kpi{padding:12px 13px;min-height:86px}.kpi small{font-weight:700;color:#526a82}.kpi .num{font-size:25px;font-weight:850;margin-top:6px}.kpi .pct{font-size:11px;margin-top:2px;font-weight:700}
+.vg{color:#12a36b}.good{color:#efae00}.fair{color:#f07b00}.poor{color:#e83434}.critical{color:#111827}
+.panel{margin-top:9px;padding:12px}
+.panel-title{font-size:16px;font-weight:850;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.legend{display:flex;gap:15px;font-size:11px}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:currentColor}
+.chart-wrap{height:350px;position:relative;overflow:hidden}
+svg#trend{width:100%;height:100%;display:block}
+.gridline{stroke:#d9e4ef;stroke-dasharray:2 3}.axistext{font-size:10px;fill:#71859a}.monthtext{font-size:10px;fill:#526b83}
+.series{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}.dot{stroke:#fff;stroke-width:2;cursor:pointer}
+.tooltip{position:fixed;display:none;z-index:50;background:#17324f;color:#fff;padding:8px 10px;border-radius:7px;box-shadow:0 5px 20px #0003;font-size:11px;pointer-events:none;max-width:280px}
+.detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.detail-head h3{margin:0;font-size:16px}.count{font-size:11px;color:#6a7f96}
+.search{width:300px}
+.table-wrap{overflow:auto;max-height:420px;border:1px solid #e0e8f1;border-radius:6px}
+table{width:100%;border-collapse:collapse;min-width:1600px;font-size:11px}
+th{position:sticky;top:0;background:#f0f5fa;color:#27445f;text-align:left;padding:8px 7px;border-bottom:1px solid #d7e2ed;white-space:nowrap}
+td{padding:7px;border-bottom:1px solid #edf1f5;white-space:nowrap}
+tr:hover{background:#f7fbff}
+.badge{font-weight:800}.empty{padding:28px;text-align:center;color:#7890a6}
+@media(max-width:1000px){.sidebar{width:170px}.logo{padding:0 8px}.nav a{font-size:12px}.app main{margin-left:170px;width:calc(100% - 170px)}.filters{grid-template-columns:repeat(3,1fr)}.kpis{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">
+    <img src="assets/pln-logo.webp" alt="PLN" onerror="this.style.display='none';document.getElementById('lf').style.display='block'">
+    <span id="lf" class="logo-fallback" style="display:none">PLN | Danantara</span>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Dashboard</a>
+    <a href="index.html">AHI Power Inspect</a>
+    <a class="active" href="ahi-evaluasi.html">AHI Evaluasi</a>
+    <a href="#">Data Aset</a>
+    <a href="#">Laporan</a>
+  </nav>
+  <div class="side-bottom"><small>Data Terakhir (Upload CSV)</small><b id="sideDate">-</b></div>
+</aside>
+
+<main>
+<header class="header">
+  <div><h1>AHI Evaluasi</h1><div class="subtitle">Asset Health Index — Evaluasi Bulanan</div></div>
+  <div class="status" id="status">Menyiapkan data...</div>
+</header>
+
+<section class="card filters">
+  <div class="field"><label>Kelompok Tegangan</label><select id="group"></select></div>
+  <div class="field"><label>Unit Induk</label><select id="ui"></select></div>
+  <div class="field"><label>UPT</label><select id="upt"></select></div>
+  <div class="field"><label>ULTG</label><select id="ultg"></select></div>
+  <div class="field"><label>GI</label><select id="gi"></select></div>
+  <div class="field"><label>Bay</label><select id="bay"></select></div>
+  <div class="field"><label>Phasa</label><select id="phasa"></select></div>
+  <div class="field"><label>Jenis Aset</label><select id="type"></select></div>
+  <div class="field"><label>Kategori AHI</label><select id="ahi"></select></div>
+  <div class="field"><label>Periode</label><select id="period"></select></div>
+  <div class="actions"><button id="apply">Terapkan</button><button class="secondary" id="reset">Reset</button></div>
+  <label class="trend-toggle"><input id="trendFilter" type="checkbox" checked> Terapkan filter ke grafik trending</label>
+</section>
+
+<section class="kpis" id="kpis"></section>
+
+<section class="card panel">
+ <div class="panel-title">
+   <span>Trend Distribusi AHI</span>
+   <div class="legend">
+    <span style="color:#16a36c">1 - Very Good</span>
+    <span style="color:#e6ad00">2 - Good</span>
+    <span style="color:#f07b00">3 - Fair</span>
+    <span style="color:#e83434">4 - Poor</span>
+    <span style="color:#111827">5 - Critical</span>
+   </div>
+ </div>
+ <div class="chart-wrap"><svg id="trend" viewBox="0 0 1200 330" preserveAspectRatio="none"></svg></div>
+</section>
+
+<section class="card panel">
+ <div class="detail-head">
+   <div><h3>Detail Aset</h3><div class="count" id="detailCount"></div></div>
+   <input class="search" id="search" placeholder="Cari aset / merk / GI / Bay / parameter...">
+ </div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>Jenis Aset</th><th>Unit Induk</th><th>Unit Pelaksana</th><th>ULTG</th><th>Gardu Induk</th><th>Bay</th><th>Phasa</th><th>Teg Operasi</th><th>Merek</th><th>Tipe</th><th>USIA</th><th>STATUS USIA</th><th>TINGKAT RESIKO</th><th>AHI FINAL</th><th>Parameter Pemicu</th><th>P0/P1</th><th>Rencana</th><th>Target Tanggal Penyelesaian</th>
+ </tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+</main>
+</div>
+<div class="tooltip" id="tip"></div>
+
+<script>
+const MONTHS=["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
+const MONTH_FILES={JUNI:"AHI_EVAL_JUNI.csv",JULI:"AHI_EVAL_JULI.csv",AGUSTUS:"AHI_EVAL_AGUSTUS.csv"};
+const COLORS=["#16a36c","#e6ad00","#f07b00","#e83434","#111827"];
+const CATS=["1 - VERY GOOD","2 - GOOD","3 - FAIR","4 - POOR","5 - CRITICAL"];
+const LABELS=["1 - Very Good","2 - Good","3 - Fair","4 - Poor","5 - Critical"];
+let monthly={}; let currentRows=[]; let allRows=[];
+const $=id=>document.getElementById(id);
+const norm=v=>String(v??"").trim().replace(/\s+/g," ").toUpperCase();
+const canon=v=>norm(v).replace(/[^A-Z0-9]/g,"");
+function pick(r, names){for(const n of names){if(Object.prototype.hasOwnProperty.call(r,n)) return r[n]} return ""}
+function cleanHeader(s){return String(s).replace(/^\uFEFF/,"").trim()}
+function parseCSV(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c=='"'&&q&&n=='"'){cell+='"';i++;continue}
+    if(c=='"'){q=!q;continue}
+    if(c==','&&!q){row.push(cell);cell="";continue}
+    if((c=='\n'||c=='\r')&&!q){if(c=='\r'&&n=='\n')i++;row.push(cell);cell="";if(row.some(x=>x.trim()!=""))rows.push(row);row=[];continue}
+    cell+=c;
+  }
+  if(cell.length||row.length){row.push(cell);rows.push(row)}
+  if(!rows.length)return [];
+  const headers=rows[0].map(cleanHeader);
+  return rows.slice(1).map(a=>{const o={};headers.forEach((h,i)=>o[h]=(a[i]??"").trim());return o})
+}
+function num(v){const x=parseFloat(String(v??"").replace(/[^\d.-]/g,""));return Number.isFinite(x)?x:null}
+function voltage(r){return num(pick(r,["Teg Operasi","Teg Operasi (kV)","Tegangan"]))}
+function groupOf(r){const v=voltage(r); return v!==null&&v>=70?"TRANSMISI (≥ 70 KV)":"INCOMING (≤ 20 KV)"}
+function assetType(r){return pick(r,["Jenis Aset","Jenis Asset","Jenis Peralatan"])}
+function ahiOf(r){
+  const v=pick(r,["AHI FINAL","AHI FINAL AGUSTUS","AHI FINAL JULI","AHI FINAL JUNI"]);
+  const n=norm(v);
+  if(/1\s*-\s*VERY\s*GOOD/.test(n))return CATS[0];
+  if(/2\s*-\s*GOOD/.test(n))return CATS[1];
+  if(/3\s*-\s*FAIR/.test(n))return CATS[2];
+  if(/4\s*-\s*POOR/.test(n))return CATS[3];
+  if(/5\s*-\s*CRITICAL/.test(n))return CATS[4];
+  const m=num(v); if(m!==null){if(m>=90)return CATS[0];if(m>=75)return CATS[1];if(m>=60)return CATS[2];if(m>=40)return CATS[3];return CATS[4]}
+  return "";
+}
+function matches(r,f){
+ if(f.group&&groupOf(r)!==f.group)return false;
+ if(f.ui&&norm(pick(r,["Unit Induk"]))!==norm(f.ui))return false;
+ if(f.upt&&norm(pick(r,["Unit Pelaksana","UPT"]))!==norm(f.upt))return false;
+ if(f.ultg&&norm(pick(r,["Ultg","ULTG"]))!==norm(f.ultg))return false;
+ if(f.gi&&norm(pick(r,["Gardu Induk","GI"]))!==norm(f.gi))return false;
+ if(f.bay&&norm(pick(r,["Bay"]))!==norm(f.bay))return false;
+ if(f.phasa&&norm(pick(r,["Phasa","Fasa"]))!==norm(f.phasa))return false;
+ if(f.type&&canon(assetType(r))!==canon(f.type))return false;
+ if(f.ahi&&norm(ahiOf(r))!==norm(f.ahi))return false;
+ return true;
+}
+function vals(rows,key){return [...new Set(rows.map(r=>String(pick(r,key)).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'))}
+function fill(id,arr,keep=true){
+ const el=$(id), old=el.value; el.innerHTML='<option value="">Semua</option>'+arr.map(x=>`<option>${escapeHtml(x)}</option>`).join("");
+ if(keep&&arr.includes(old))el.value=old;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function filters(){return {group:$("group").value,ui:$("ui").value,upt:$("upt").value,ultg:$("ultg").value,gi:$("gi").value,bay:$("bay").value,phasa:$("phasa").value,type:$("type").value,ahi:$("ahi").value}}
+function cascade(){
+ const f=filters(), base=allRows.filter(r=>!f.group||groupOf(r)===f.group);
+ const uiRows=base.filter(r=>!f.upt||norm(pick(r,["Unit Pelaksana"]))===norm(f.upt));
+ fill("ui",vals(uiRows,["Unit Induk"]));
+ const f2={...f}; const uptRows=base.filter(r=>!f.ui||norm(pick(r,["Unit Induk"]))===norm(f.ui));
+ fill("upt",vals(uptRows,["Unit Pelaksana"]));
+ const f3=allRows.filter(r=>(!f.group||groupOf(r)===f.group)&&(!f.ui||norm(pick(r,["Unit Induk"]))===norm(f.ui)));
+ fill("ultg",vals(f3,["Ultg","ULTG"]));
+ const f4=allRows.filter(r=>(!f.group||groupOf(r)===f.group)&&(!f.ui||norm(pick(r,["Unit Induk"]))===norm(f.ui))&&(!f.upt||norm(pick(r,["Unit Pelaksana"]))===norm(f.upt)));
+ fill("gi",vals(f4,["Gardu Induk","GI"]));
+ const f5=f4.filter(r=>!f.ultg||norm(pick(r,["Ultg","ULTG"]))===norm(f.ultg));
+ fill("bay",vals(f5,["Bay"]));
+ const f6=f5.filter(r=>!f.gi||norm(pick(r,["Gardu Induk","GI"]))===norm(f.gi));
+ fill("phasa",vals(f6,["Phasa","Fasa"]));
+ fill("type",vals(f6,["Jenis Aset","Jenis Asset","Jenis Peralatan"]));
+ fill("ahi",CATS);
+}
+function countCats(rows){const c=[0,0,0,0,0];rows.forEach(r=>{const i=CATS.indexOf(ahiOf(r));if(i>=0)c[i]++});return c}
+function renderKPI(rows){const c=countCats(rows),total=rows.length;$("kpis").innerHTML=`<div class="card kpi"><small>Total Aset</small><div class="num">${fmt(total)}</div><div class="pct">${total?100:0}%</div></div>`+c.map((n,i)=>`<div class="card kpi"><small>${LABELS[i]}</small><div class="num ${["vg","good","fair","poor","critical"][i]}">${fmt(n)}</div><div class="pct">${total?(n/total*100).toFixed(1):0}%</div></div>`).join("")}
+function fmt(n){return Number(n||0).toLocaleString("id-ID")}
+function currentMonth(){return $("period").value}
+function trendRowsFor(m,f){
+ const rs=monthly[m]; if(!rs)return null;
+ return $("trendFilter").checked?rs.filter(r=>matches(r,f)):rs;
+}
+function renderTrend(){
+ const f=filters(); const months=MONTHS;
+ const data=CATS.map((cat,i)=>({cat,color:COLORS[i],vals:months.map(m=>{const rs=trendRowsFor(m,f);return rs===null?null:countCats(rs)[i]})}));
+ const nums=data.flatMap(s=>s.vals.filter(v=>v!==null));const max=Math.max(1,...nums);const top=Math.max(100,Math.ceil(max/5/100)*100);
+ const svg=$("trend"),W=1200,H=330,L=48,R=14,T=16,B=42;svg.innerHTML="";
+ for(let i=0;i<=5;i++){const y=T+(H-T-B)*i/5; const line=el("line",{x1:L,x2:W-R,y1:y,y2:y,class:"gridline"});svg.appendChild(line);svg.appendChild(textEl(L-7,y+3,fmt(Math.round(top*(5-i)/5)),"axistext","end"))}
+ const step=(W-L-R)/(months.length-1);
+ months.forEach((m,j)=>svg.appendChild(textEl(L+j*step,H-15,m.slice(0,3),"monthtext","middle")));
+ data.forEach(s=>{
+   let seg=[];
+   const flush=()=>{if(seg.length>=2){const p=el("polyline",{points:seg.map(p=>p[0]+","+p[1]).join(" "),class:"series",stroke:s.color});svg.appendChild(p)}seg=[]};
+   s.vals.forEach((v,j)=>{
+     if(v===null){flush();return}
+     const x=L+j*step,y=T+(H-T-B)*(1-v/top);seg.push([x,y]);
+     const c=el("circle",{cx:x,cy:y,r:4.5,class:"dot",fill:s.color});
+     c.addEventListener("mouseenter",e=>showTip(e,m=>{},months[j],s.cat,v,s.color,trendRowsFor(months[j],f)));
+     c.addEventListener("mouseleave",()=>{$("tip").style.display="none"});
+     svg.appendChild(c);
+   });flush();
+ });
+}
+function el(tag,attrs){const x=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>x.setAttribute(k,v));return x}
+function textEl(x,y,t,cls,anchor){const e=el("text",{x,y,class:cls,"text-anchor":anchor});e.textContent=t;return e}
+function showTip(e,_,m,cat,v,color,rows){
+ const by={};(rows||[]).forEach(r=>{const t=assetType(r)||"Aset";by[t]=(by[t]||0)+1});
+ const top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>`${escapeHtml(x[0])}: ${fmt(x[1])}`).join("<br>");
+ $("tip").innerHTML=`<b>${m}</b><br><span style="color:${color}">● ${cat}</span>: <b>${fmt(v)}</b><br><br>${top||"Tidak ada rincian"}`;
+ $("tip").style.display="block";$("tip").style.left=(e.clientX+12)+"px";$("tip").style.top=(e.clientY+12)+"px";
+}
+function renderTable(rows){
+ const q=norm($("search").value);const rs=q?rows.filter(r=>Object.values(r).some(v=>norm(v).includes(q))):rows;
+ $("detailCount").textContent=`Menampilkan ${fmt(rs.length)} dari ${fmt(rows.length)} aset • ${currentMonth()}`;
+ $("tbody").innerHTML=rs.length?rs.map(r=>`<tr>
+ <td>${escapeHtml(assetType(r))}</td><td>${escapeHtml(pick(r,["Unit Induk"]))}</td><td>${escapeHtml(pick(r,["Unit Pelaksana"]))}</td>
+ <td>${escapeHtml(pick(r,["Ultg","ULTG"]))}</td><td>${escapeHtml(pick(r,["Gardu Induk","GI"]))}</td><td>${escapeHtml(pick(r,["Bay"]))}</td>
+ <td>${escapeHtml(pick(r,["Phasa","Fasa"]))}</td><td>${escapeHtml(pick(r,["Teg Operasi","Teg Operasi (kV)","Tegangan"]))}</td>
+ <td>${escapeHtml(pick(r,["Merek","Merk"]))}</td><td>${escapeHtml(pick(r,["Tipe","Type"]))}</td><td>${escapeHtml(pick(r,["USIA","Usia"]))}</td>
+ <td>${escapeHtml(pick(r,["STATUS USIA","Status Usia"]))}</td><td>${escapeHtml(pick(r,["TINGKAT RESIKO","Tingkat Resiko"]))}</td><td class="badge">${escapeHtml(pick(r,["AHI FINAL"]))}</td>
+ <td>${escapeHtml(pick(r,["Parameter Pemicu"]))}</td><td>${escapeHtml(pick(r,["P0/P1"]))}</td><td>${escapeHtml(pick(r,["Rencana"]))}</td><td>${escapeHtml(pick(r,["Target Tanggal Penyelesaian"]))}</td>
+ </tr>`).join(""):`<tr><td colspan="18" class="empty">Tidak ada data untuk filter/periode ini.</td></tr>`;
+}
+function render(){
+ const m=currentMonth(),f=filters();currentRows=(monthly[m]||[]).filter(r=>matches(r,f));
+ renderKPI(currentRows);renderTrend();renderTable(currentRows);
+}
+function setCascadesAndRender(){
+ cascade();
+ render();
+}
+async function load(){
+ try{
+   $("group").innerHTML='<option value="">Semua</option><option value="TRANSMISI (≥ 70 KV)">Transmisi (≥ 70 kV)</option><option value="INCOMING (≤ 20 KV)">Incoming (≤ 20 kV)</option>';
+   $("period").innerHTML=MONTHS.map(m=>`<option>${m}</option>`).join("");$("period").value="AGUSTUS";
+   const tasks=Object.entries(MONTH_FILES).map(async([m,file])=>{
+     try{const r=await fetch("data/evaluasi/"+file,{cache:"no-store"});if(!r.ok)throw 0;monthly[m]=parseCSV(await r.text())}catch(e){monthly[m]=null}
+   });
+   await Promise.all(tasks);
+   // January-May trend values are the user's supplied monthly totals.
+   const hist=[
+    [42,99,254,71,7,33,168,52,3083,6315,132,9,2,3893,0,138,479,334,1095,758,24,117,21,7615,0,7,157,126,2139,385,10,0,14,344,6,0,0,0,11,0,0,0,0,6,5],
+    [43,105,252,67,6,33,299,59,3115,10999,125,18,2,3906,0,130,898,326,1141,1442,19,175,21,7665,0,4,235,123,2174,702,10,0,14,345,8,0,0,0,11,0,0,0,0,17,10],
+    [43,106,253,63,6,30,164,56,3283,6128,123,9,2,3908,0,112,474,327,1169,711,19,87,21,7671,0,1,157,123,2178,376,9,0,14,346,6,0,0,0,11,0,0,0,0,17,5],
+    [38,107,251,67,6,27,148,46,2984,4891,67,9,2,3107,0,85,613,454,864,1435,5,91,22,7687,243,13,176,123,2163,366,10,0,14,348,8,0,0,0,23,0,0,0,0,17,5],
+    [35,106,255,67,6,26,145,36,3025,4844,63,9,2,3111,0,73,562,994,899,917,4,91,22,7686,243,13,168,123,2179,358,10,0,12,352,7,0,0,0,24,0,0,0,0,25,4]
+   ];
+   const assets=["TRAFO","CT","CVT/PT","PMT","PMS","LA","NGR","REAKTOR","KAPASITOR"];
+   window.histTrend=hist.map(row=>{const out=[];let k=0;assets.forEach((a,ai)=>{for(let c=0;c<5;c++)out.push(row[k++])});return out});
+   // Build synthetic trend rows only for Jan-May counts so filters can still render a continuous baseline.
+   const typeMap={"TRAFO":"Power Transformer","CT":"Current Transformer","CVT/PT":"Potential Transformer","PMT":"Circuit Breaker","PMS":"Disconnecting Switch","LA":"Lightning Arrester","NGR":"Neutral Grounding Resistance","REAKTOR":"Reactor","KAPASITOR":"Capacitor"};
+   MONTHS.slice(0,5).forEach((m,mi)=>{
+     const rows=[];let k=0;
+     assets.forEach((a,ai)=>{for(let cat=0;cat<5;cat++){for(let n=0;n<hist[mi][k++];n++)rows.push({"Jenis Aset":typeMap[a],"Unit Induk":"ALL","Unit Pelaksana":"ALL","Ultg":"ALL","Gardu Induk":"ALL","Bay":"ALL","Phasa":"ALL","Teg Operasi":"150","AHI FINAL":CATS[cat]})}});
+     monthly[m]=rows;
+   });
+   allRows=Object.values(monthly).flat().filter(Boolean);
+   $("sideDate").textContent="24 Agustus 2026";
+   $("status").innerHTML='<b>Data Agustus berhasil dimuat</b>';
+   ["ui","upt","ultg","gi","bay","phasa","type","ahi"].forEach(id=>fill(id,[]));
+   cascade();render();
+ }catch(e){console.error(e);$("status").textContent="Gagal menyiapkan data";}
+}
+["group","ui","upt","ultg","gi","bay","phasa","type","ahi"].forEach(id=>$(id).addEventListener("change",()=>{cascade();render()}));
+$("period").addEventListener("change",render);
+$("trendFilter").addEventListener("change",render);
+$("apply").addEventListener("click",render);
+$("reset").addEventListener("click",()=>{["group","ui","upt","ultg","gi","bay","phasa","type","ahi"].forEach(id=>$(id).value="");$("period").value="AGUSTUS";cascade();render()});
+$("search").addEventListener("input",()=>renderTable(currentRows));
+load();
+</script>
+</body>
+</html>
