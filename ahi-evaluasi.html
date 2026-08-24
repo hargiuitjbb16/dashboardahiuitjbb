@@ -60,6 +60,7 @@ main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}
 .legend span{display:inline-flex;align-items:center;gap:4px}
 .legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
 .empty-chart{height:210px;display:flex;align-items:center;justify-content:center;color:#91a0b1;font-size:11px}
+.chart-tooltip{position:fixed;display:none;z-index:9999;pointer-events:none;background:#142b4a;color:#fff;border-radius:7px;padding:7px 9px;font-size:10px;line-height:1.45;box-shadow:0 4px 18px rgba(0,0,0,.18);white-space:nowrap}.chart-crosshair{position:fixed;display:none;z-index:9998;pointer-events:none;width:1px;background:#8da1b6;opacity:.65}
 
 .detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .detail-head h3{margin:0;font-size:15px}
@@ -136,7 +137,7 @@ th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-inde
 </div>
 
 <script>
-const BASE_RAW="https://raw.githubusercontent.com/hargiuijbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/";
+const BASE_RAW="https://raw.githubusercontent.com/hargiuitjbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/";
 const MONTHS=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const MONTH_FILES={
   Juni:"AHI_EVAL_JUNI.csv",Juli:"AHI_EVAL_JULI.csv",Agustus:"AHI_EVAL_AGUSTUS.csv",
@@ -145,7 +146,7 @@ const MONTH_FILES={
 const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor","Circuit Breaker Incoming","Current Transformer Incoming","Potential Transformer Incoming"];
 const TYPE_SHORT={"Power Transformer":"Power Transformer","Current Transformer":"Current Transformer","Potential Transformer":"Potential Transformer","Circuit Breaker":"Circuit Breaker","Disconnecting Switch":"Disconnecting Switch","Lightning Arrester":"Lightning Arrester","Neutral Grounding Resistance":"Neutral Grounding Resistance","Reactor":"Reactor","Capacitor":"Capacitor","Circuit Breaker Incoming":"Circuit Breaker Incoming","Current Transformer Incoming":"Current Transformer Incoming","Potential Transformer Incoming":"Potential Transformer Incoming"};
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
-const HIST={"Januari":{"Power Transformer":[108,556,755,473,133],"Current Transformer":[353,580,204,15429,14836],"Potential Transformer":[526,76,651,11874,2950],"Circuit Breaker":[354,1470,3768,4959,1796],"Disconnecting Switch":[359,298,181,10614,10991],"Lightning Arrester":[359,689,684,13550,846],"Neutral Grounding Resistance":[15,15,38,1251,96],"Reactor":[1,5,10,64,5],"Capacitor":[7,0,1,179,5]},"Februari":{"Power Transformer":[96,436,809,551,138],"Current Transformer":[268,540,175,20860,15894],"Potential Transformer":[501,80,628,13602,1763],"Circuit Breaker":[292,1823,3712,6203,3041],"Disconnecting Switch":[398,370,183,12905,10861],"Lightning Arrester":[340,769,674,13710,1056],"Neutral Grounding Resistance":[18,9,32,1309,88],"Reactor":[1,5,10,63,6],"Capacitor":[10,0,1,187,10]},"Maret":{"Power Transformer":[106,422,821,543,138],"Current Transformer":[338,404,213,18952,10714],"Potential Transformer":[518,76,632,13175,1396],"Circuit Breaker":[316,1448,3605,5150,1467],"Disconnecting Switch":[435,302,184,10961,10568],"Lightning Arrester":[221,677,684,13856,661],"Neutral Grounding Resistance":[16,8,32,1285,90],"Reactor":[1,5,10,65,5],"Capacitor":[9,0,1,188,5]},"April":{"Power Transformer":[88,422,595,788,143],"Current Transformer":[312,418,228,18660,8670],"Potential Transformer":[404,83,658,12296,1367],"Circuit Breaker":[252,1628,2867,5643,2226],"Disconnecting Switch":[404,294,195,11182,10725],"Lightning Arrester":[210,714,693,13460,1132],"Neutral Grounding Resistance":[17,8,31,1293,89],"Reactor":[1,7,3,85,5],"Capacitor":[7,0,1,181,5]},"Mei":{"Power Transformer":[92,402,739,519,303],"Current Transformer":[177,1484,132,20332,6309],"Potential Transformer":[515,688,602,12898,196],"Circuit Breaker":[206,1397,3199,5966,1874],"Disconnecting Switch":[81,307,217,17270,5049],"Lightning Arrester":[210,705,175,14498,684],"Neutral Grounding Resistance":[24,8,66,1248,93],"Reactor":[4,6,2,87,9],"Capacitor":[6,7,0,185,4],"Circuit Breaker Incoming":[2,65,318,762,322],"Current Transformer Incoming":[8,135,0,2619,1430],"Potential Transformer Incoming":[17,105,0,2890,224]}};
+const HIST={"Januari": {"Power Transformer": [42, 99, 254, 71, 7], "Current Transformer": [33, 168, 52, 3083, 6315], "Potential Transformer": [132, 9, 2, 3893, 0], "Circuit Breaker": [138, 479, 334, 1095, 758], "Disconnecting Switch": [24, 117, 21, 7615, 0], "Lightning Arrester": [7, 157, 126, 2139, 385], "Neutral Grounding Resistance": [10, 0, 14, 344, 6], "Reactor": [0, 0, 0, 11, 0], "Capacitor": [0, 0, 0, 6, 5]}, "Februari": {"Power Transformer": [43, 105, 252, 67, 6], "Current Transformer": [33, 299, 59, 3115, 10999], "Potential Transformer": [125, 18, 2, 3906, 0], "Circuit Breaker": [130, 898, 326, 1141, 1442], "Disconnecting Switch": [19, 175, 21, 7665, 0], "Lightning Arrester": [4, 235, 123, 2174, 702], "Neutral Grounding Resistance": [10, 0, 14, 345, 8], "Reactor": [0, 0, 0, 11, 0], "Capacitor": [0, 0, 0, 17, 10]}, "Maret": {"Power Transformer": [43, 106, 253, 63, 6], "Current Transformer": [30, 164, 56, 3283, 6128], "Potential Transformer": [123, 9, 2, 3908, 0], "Circuit Breaker": [112, 474, 327, 1169, 711], "Disconnecting Switch": [19, 87, 21, 7671, 0], "Lightning Arrester": [1, 157, 123, 2178, 376], "Neutral Grounding Resistance": [9, 0, 14, 346, 6], "Reactor": [0, 0, 0, 11, 0], "Capacitor": [0, 0, 0, 17, 5]}, "April": {"Power Transformer": [38, 107, 251, 67, 6], "Current Transformer": [27, 148, 46, 2984, 4891], "Potential Transformer": [67, 9, 2, 3107, 0], "Circuit Breaker": [85, 613, 454, 864, 1435], "Disconnecting Switch": [5, 91, 22, 7687, 243], "Lightning Arrester": [13, 176, 123, 2163, 366], "Neutral Grounding Resistance": [10, 0, 14, 348, 8], "Reactor": [0, 0, 0, 23, 0], "Capacitor": [0, 0, 0, 17, 5]}, "Mei": {"Power Transformer": [35, 106, 255, 67, 6], "Current Transformer": [26, 145, 36, 3025, 4844], "Potential Transformer": [63, 9, 2, 3111, 0], "Circuit Breaker": [73, 562, 994, 899, 917], "Disconnecting Switch": [4, 91, 22, 7686, 243], "Lightning Arrester": [13, 168, 123, 2179, 358], "Neutral Grounding Resistance": [10, 0, 12, 352, 7], "Reactor": [0, 0, 0, 24, 0], "Capacitor": [0, 0, 0, 25, 4]}};
 const LIVE={};
 let raw=[],filtered=[],period="Agustus",search="",trendFilter=true,currentPage=1;const PAGE_SIZE=50;
 
@@ -335,7 +336,8 @@ function countForMonth(month,type,categoryIndex){
   const mock=mockCounts(month,type);
   if(!mock)return null;
   if(f.type&&f.type!==type)return 0;
-  return f.ahi ? (Number(f.ahi.charAt(0))===categoryIndex+1?mock[categoryIndex]:0) : mock[categoryIndex];
+  const mockIndex=4-categoryIndex;
+  return f.ahi ? (Number(f.ahi.charAt(0))===categoryIndex+1?mock[mockIndex]:0) : mock[mockIndex];
 }
 function seriesForType(type,idx){
   return MONTHS.map(m=>{
@@ -353,39 +355,38 @@ function seriesForType(type,idx){
 }
 function drawChart(canvas,type){
   const rect=canvas.getBoundingClientRect(),w=Math.max(260,rect.width),h=210,dpr=window.devicePixelRatio||1;
-  canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
-  const c=canvas.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
-  c.clearRect(0,0,w,h);
+  canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);canvas.style.cursor="crosshair";
+  const c=canvas.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
   const pad={l:38,r:8,t:12,b:27},W=w-pad.l-pad.r,H=h-pad.t-pad.b;
   const series=AHI.map((_,i)=>seriesForType(type,i));
   const vals=series.flat().filter(v=>v!=null);
   if(!vals.length){canvas.parentElement.innerHTML='<h3>'+esc(type)+'</h3><div class="empty-chart">Belum ada data</div>';return}
-  const max=Math.max(1,...vals),step=Math.max(1,Math.ceil(max/4/100)*100);
-  const nice=max<=100?Math.ceil(max/4)*4:Math.max(100,step*4);
-  c.font="9px Arial";c.textBaseline="middle";
-  c.strokeStyle="#dbe5ef";c.fillStyle="#71839b";c.lineWidth=1;
-  for(let j=0;j<=4;j++){
-    const y=pad.t+H*j/4;c.beginPath();c.setLineDash([2,3]);c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke();c.setLineDash([]);
-    c.fillText(fmt(Math.round(nice*(1-j/4))),2,y);
-  }
+  const max=Math.max(1,...vals), nice=max<=100?Math.max(4,Math.ceil(max/4)*4):Math.max(100,Math.ceil(max/4/100)*100*4);
+  c.font="9px Arial";c.textBaseline="middle";c.strokeStyle="#dbe5ef";c.fillStyle="#71839b";c.lineWidth=1;
+  for(let j=0;j<=4;j++){const y=pad.t+H*j/4;c.beginPath();c.setLineDash([2,3]);c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke();c.setLineDash([]);c.fillText(fmt(Math.round(nice*(1-j/4))),2,y)}
   c.textBaseline="alphabetic";c.fillStyle="#61778f";
   MONTHS.forEach((m,i)=>{const x=pad.l+i*W/11;c.fillText(m.slice(0,3).toUpperCase(),x-9,h-7)});
   series.forEach((arr,k)=>{
-    c.strokeStyle=AHI[k][1];c.lineWidth=2.2;c.lineJoin="round";c.lineCap="round";
-    let active=false;
-    arr.forEach((v,i)=>{
-      if(v==null){active=false;return}
-      const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);
-      if(!active)c.beginPath(),c.moveTo(x,y),active=true;else c.lineTo(x,y);
-      if(i===arr.length-1||arr[i+1]==null){c.stroke();active=false}
-    });
-    c.fillStyle=AHI[k][1];
-    arr.forEach((v,i)=>{
-      if(v==null)return;
-      const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);
-      c.beginPath();c.arc(x,y,3.2,0,Math.PI*2);c.fill();
-    });
+    c.strokeStyle=AHI[k][1];c.lineWidth=2.2;c.lineJoin="round";c.lineCap="round";let active=false;
+    arr.forEach((v,i)=>{if(v==null){active=false;return}const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);if(!active)c.beginPath(),c.moveTo(x,y),active=true;else c.lineTo(x,y);if(i===arr.length-1||arr[i+1]==null){c.stroke();active=false}});
+    c.fillStyle=AHI[k][1];arr.forEach((v,i)=>{if(v==null)return;const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);c.beginPath();c.arc(x,y,3.2,0,Math.PI*2);c.fill()});
   });
+  let tip=document.getElementById("chartTooltip");
+  if(!tip){tip=document.createElement("div");tip.id="chartTooltip";tip.className="chart-tooltip";document.body.append(tip)}
+  let cross=document.getElementById("chartCrosshair");
+  if(!cross){cross=document.createElement("div");cross.id="chartCrosshair";cross.className="chart-crosshair";document.body.append(cross)}
+  canvas.onmousemove=e=>{
+    const r=canvas.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    if(mx<pad.l||mx>w-pad.r||my<pad.t||my>h-pad.b){tip.style.display="none";cross.style.display="none";return}
+    const idx=Math.max(0,Math.min(11,Math.round((mx-pad.l)/W*11))),month=MONTHS[idx],x=pad.l+idx*W/11;
+    const items=series.map((arr,k)=>arr[idx]==null?null:`<span style="color:${AHI[k][1]}">●</span> ${AHI[k][0]}: <b>${fmt(arr[idx])}</b>`).filter(Boolean);
+    if(!items.length){tip.style.display="none";cross.style.display="none";return}
+    tip.innerHTML=`<b>${esc(type)} — ${month}</b><br>${items.join("<br>")}`;
+    tip.style.display="block";
+    const tw=tip.offsetWidth,th=tip.offsetHeight;tip.style.left=Math.min(window.innerWidth-tw-10,e.clientX+12)+"px";tip.style.top=Math.max(8,Math.min(window.innerHeight-th-8,e.clientY-th-12))+"px";
+    cross.style.display="block";cross.style.left=(e.clientX)+"px";cross.style.top=r.top+pad.t+"px";cross.style.height=H+"px";
+  };
+  canvas.onmouseleave=()=>{tip.style.display="none";cross.style.display="none"};
 }
 function renderCharts(){
   const grid=document.getElementById("chartGrid");grid.innerHTML="";
@@ -511,12 +512,3 @@ load();
 </body>
 </html>
 
-<script>
-window.MOCKUP_DATA_REVISED = {
-  'JANUARI': [['Power Transformer',42,99,254,71,7],['Current Transformer',33,168,52,3083,6315],['Potential Transformer',132,9,2,3893,0],['Circuit Breaker',138,479,334,1095,758],['Disconnecting Switch',24,117,21,7615,0],['Lightning Arrester',7,157,126,2139,385],['Neutral Grounding Resistance',10,0,14,344,6],['Reactor',0,0,0,11,0],['Capacitor',0,0,0,6,5]],
-  'FEBRUARI': [['Power Transformer',43,105,252,67,6],['Current Transformer',33,299,59,3115,10999],['Potential Transformer',125,18,2,3906,0],['Circuit Breaker',130,898,326,1141,1442],['Disconnecting Switch',19,175,21,7665,0],['Lightning Arrester',4,235,123,2174,702],['Neutral Grounding Resistance',10,0,14,345,8],['Reactor',0,0,0,11,0],['Capacitor',0,0,0,17,10]],
-  'MARET': [['Power Transformer',43,106,253,63,6],['Current Transformer',30,164,56,3283,6128],['Potential Transformer',123,9,2,3908,0],['Circuit Breaker',112,474,327,1169,711],['Disconnecting Switch',19,87,21,7671,0],['Lightning Arrester',1,157,123,2178,376],['Neutral Grounding Resistance',9,0,14,346,6],['Reactor',0,0,0,11,0],['Capacitor',0,0,0,17,5]],
-  'APRIL': [['Power Transformer',38,107,251,67,6],['Current Transformer',27,148,46,2984,4891],['Potential Transformer',67,9,2,3107,0],['Circuit Breaker',85,613,454,864,1435],['Disconnecting Switch',5,91,22,7687,243],['Lightning Arrester',13,176,123,2163,366],['Neutral Grounding Resistance',10,0,14,348,8],['Reactor',0,0,0,23,0],['Capacitor',0,0,0,17,5]],
-  'MEI': [['Power Transformer',35,106,255,67,6],['Current Transformer',26,145,36,3025,4844],['Potential Transformer',63,9,2,3111,0],['Circuit Breaker',73,562,994,899,917],['Disconnecting Switch',4,91,22,7686,243],['Lightning Arrester',13,168,123,2179,358],['Neutral Grounding Resistance',10,0,12,352,7],['Reactor',0,0,0,24,0],['Capacitor',0,0,0,25,4]]
-};
-</script>
