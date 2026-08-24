@@ -1,21 +1,39 @@
-DASHBOARD AHI UIT JBB
+DASHBOARD AHI UIT JBB - UPLOAD
 
-STRUKTUR:
-assets/
-data/
-index.html
-ahi-evaluasi.html
-app.js
-style.css
+ROOT REPOSITORY:
+- index.html
+- ahi-evaluasi.html
+- app.js
+- style.css
+- assets/
+- data/
 
-UPLOAD:
-1. Buka repository GitHub.
-2. Upload/replace file sesuai struktur di atas.
-3. Pastikan data/Monitoring-AHI.csv tetap ada.
-4. Commit changes.
-5. Buka GitHub Pages.
-6. Klik AHI Evaluasi dari menu Dashboard.
+FOLDER data WAJIB berisi:
+- Monitoring-AHI.csv       -> AHI Power Inspect
+- AHI-EVALUASI.csv         -> AHI Evaluasi
 
-CATATAN:
-- index.html = Dashboard AHI Power Inspect + menu AHI Evaluasi.
-- ahi-evaluasi.html = halaman AHI Evaluasi.
+Jangan hapus kedua CSV yang sudah ada di repository.
+
+SETELAH UPLOAD:
+1. Commit changes.
+2. Buka GitHub Pages.
+3. Tekan Ctrl + Shift + R.
+4. Dashboard utama:
+   https://hargiuijbb16.github.io/dashboardahiuitjbb/
+5. AHI Evaluasi:
+   https://hargiuijbb16.github.io/dashboardahiuitjbb/ahi-evaluasi.html
+
+FILTER CASCADING:
+Unit Induk -> UPT -> ULTG -> GI -> Bay
+
+AHI:
+1 Very Good = hijau
+2 Good      = kuning
+3 Fair      = oranye
+4 Poor      = merah
+5 Critical  = hitam
+
+TEGANGAN:
+Transmisi = 70 kV ke atas
+Incoming  = 20 kV ke bawah termasuk "-"
+NGR/Reactor/Capacitor mengikuti semua tegangan.
