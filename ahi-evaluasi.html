@@ -24,7 +24,7 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}.header{displa
 <section class="panel detail"><div class="detail-head"><div><h3>Detail Aset Periode <span id="periodTitle">Januari 2026</span></h3><small id="count">Menampilkan 0 data</small></div><input class="search" id="search" placeholder="Cari aset / merk / GI / Bay / parameter..."></div>
 <div class="table-wrap"><table class="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div></section></main></div><div class="tooltip" id="tooltip"></div>
 <script>
-const DATA_URL="https://raw.githubusercontent.com/harguitjbb16/dashboardahiuitjbb/main/data/Monitoring-AHI.csv";
+const DATA_URL="data/AHI-EVALUASI.csv";
 const MONTHS=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor","PMT INC","CT INC","PT INC"];
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
@@ -41,41 +41,134 @@ const canonical=v=>TYPES.find(x=>norm(x)===norm(v))||"";const fmt=n=>Number(n||0
 function parseCSV(t){t=t.replace(/^\\uFEFF/,"");let first=t.split(/\\r?\\n/).find(x=>x.trim())||"",delim=((first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length)?";":",";let rows=[],row=[],cell="",q=false;for(let i=0;i<t.length;i++){let c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===delim&&!q){row.push(cell);cell=""}else if((c=="\\n"||c=="\\r")&&!q){if(c=="\\r"&&t[i+1]=="\\n")i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=""}else cell+=c}if(cell||row.length){row.push(cell);if(row.some(x=>x.trim()))rows.push(row)}if(!rows.length)return[];let h=rows.shift().map(x=>x.trim());return rows.map(r=>Object.fromEntries(h.map((x,i)=>[x,String(r[i]??"").trim()])))}
 function uniq(k){return [...new Set(raw.map(r=>r[k]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)))}
 function includeVoltage(r,g){let t=canonical(r["Jenis Aset"]);if(ALLV.includes(t))return true;if(!SPLIT.includes(t))return false;let v=norm(r["Tegangan"]).replace(/\\s/g,"");return g==="transmisi"?(v==="150kv"||v==="500kv"):(v!=="150kv"&&v!=="500kv")}
-function setCascadeOptions(sel,values,keep=""){
- let old=keep||sel.value;
- sel.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
- sel.value=values.includes(old)?old:"";
+function uniq(k, rows=raw){return [...new Set(rows.map(r=>r[k]).filter(v=>String(v??"").trim()!==""))].sort((a,b)=>String(a).localeCompare(String(b),"id"))}
+function selectedFilters(){
+ const s=[...document.querySelectorAll("#filters select")];
+ return {g:s[0]?.value||"transmisi",ui:s[1]?.value||"",upt:s[2]?.value||"",ultg:s[3]?.value||"",gi:s[4]?.value||"",bay:s[5]?.value||"",ph:s[6]?.value||"",type:s[7]?.value||"",ahi:s[8]?.value||"",period:s[9]?.value||"Januari"};
 }
-function refreshHierarchyFilters(){
- const s=[...document.querySelectorAll("#filters select")]; if(s.length<10)return;
- const ui=s[1],upt=s[2],ultg=s[3],gi=s[4],bay=s[5];
- setCascadeOptions(ui,[...new Set(raw.map(r=>r["Unit Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ui.value);
- const rUpt=raw.filter(r=>!ui.value||r["Unit Induk"]===ui.value);
- setCascadeOptions(upt,[...new Set(rUpt.map(r=>r["Unit Pelaksana"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),upt.value);
- const rUltg=rUpt.filter(r=>!upt.value||r["Unit Pelaksana"]===upt.value);
- setCascadeOptions(ultg,[...new Set(rUltg.map(r=>r["Ultg"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ultg.value);
- const rGi=rUltg.filter(r=>!ultg.value||r["Ultg"]===ultg.value);
- setCascadeOptions(gi,[...new Set(rGi.map(r=>r["Gardu Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),gi.value);
- const rBay=rGi.filter(r=>!gi.value||r["Gardu Induk"]===gi.value);
- setCascadeOptions(bay,[...new Set(rBay.map(r=>r["Bay"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),bay.value);
+function hierarchyBase(row,f,exclude){
+ if(!includeVoltage(row,f.g))return false;
+ if(exclude!=="ui"&&f.ui&&row["Unit Induk"]!==f.ui)return false;
+ if(exclude!=="upt"&&f.upt&&row["Unit Pelaksana"]!==f.upt)return false;
+ if(exclude!=="ultg"&&f.ultg&&row["Ultg"]!==f.ultg)return false;
+ if(exclude!=="gi"&&f.gi&&row["Gardu Induk"]!==f.gi)return false;
+ if(exclude!=="bay"&&f.bay&&row["Bay"]!==f.bay)return false;
+ return true;
+}
+function setOptions(sel,values,selected){
+ const keep=selected||"";
+ sel.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+ if(values.includes(keep))sel.value=keep; else sel.value="";
+}
+function refreshCascading(){
+ const sels=[...document.querySelectorAll("#filters select")],f=selectedFilters();
+ if(!sels.length)return;
+ // Unit Induk -> UPT -> ULTG -> GI -> Bay
+ const uiVals=uniq("Unit Induk",raw.filter(r=>hierarchyBase(r,f,"ui")));
+ setOptions(sels[1],uiVals,f.ui);
+ f.ui=sels[1].value;
+ const uptVals=uniq("Unit Pelaksana",raw.filter(r=>hierarchyBase(r,f,"upt")));
+ setOptions(sels[2],uptVals,f.upt);
+ f.upt=sels[2].value;
+ const ultgVals=uniq("Ultg",raw.filter(r=>hierarchyBase(r,f,"ultg")));
+ setOptions(sels[3],ultgVals,f.ultg);
+ f.ultg=sels[3].value;
+ const giVals=uniq("Gardu Induk",raw.filter(r=>hierarchyBase(r,f,"gi")));
+ setOptions(sels[4],giVals,f.gi);
+ f.gi=sels[4].value;
+ const bayVals=uniq("Bay",raw.filter(r=>hierarchyBase(r,f,"bay")));
+ setOptions(sels[5],bayVals,f.bay);
+ f.bay=sels[5].value;
 }
 function populate(){
- let defs=[["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (70 kV ke atas)","Incoming (20 kV ke bawah / -)"]],["Unit Induk",[]],["UPT",[]],["ULTG",[]],["GI",[]],["Bay",[]],["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])],["Periode",MONTHS]];
- let f=document.getElementById("filters");f.innerHTML="";
- defs.forEach((d,i)=>{let div=document.createElement("div");div.className="filter";let l=document.createElement("label");l.textContent=d[0];let sel=document.createElement("select");sel.dataset.i=i;let vals=d[1];sel.innerHTML=(i===9?vals.map(v=>`<option value="${esc(v)}">${esc(v)} 2026</option>`):'<option value="">Semua</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(""));if(i===0)sel.value="transmisi";if(i===9)sel.value="Januari";div.append(l,sel);f.append(div)});
- let sels=[...f.querySelectorAll("select")];
+ const defs=[
+ ["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (70 kV ke atas)","Incoming (20 kV ke bawah / -)"]],
+ ["Unit Induk",[]],["UPT",[]],["ULTG",[]],["GI",[]],["Bay",[]],
+ ["Phasa",uniq("Phasa")],["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])],["Periode",MONTHS]
+ ];
+ const f=document.getElementById("filters");f.innerHTML="";
+ defs.forEach((d,i)=>{
+   let div=document.createElement("div");div.className="filter";
+   let l=document.createElement("label");l.textContent=d[0];
+   let sel=document.createElement("select");sel.dataset.i=i;
+   if(i===0)sel.innerHTML=d[1].map((v,j)=>`<option value="${v}">${d[2][j]}</option>`).join("");
+   else if(i===9)sel.innerHTML=d[1].map(v=>`<option value="${v}">${v} 2026</option>`).join("");
+   else sel.innerHTML='<option value="">Semua</option>'+d[1].map(v=>`<option value="${v}">${v}</option>`).join("");
+   if(i===0)sel.value="transmisi";
+   if(i===9)sel.value="Januari";
+   sel.addEventListener("change",()=>{
+     if(i===9){period=sel.value;render();return;}
+     if(i<=5) refreshCascading();
+   });
+   div.append(l,sel);f.append(div);
+ });
  let b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);
- let r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{sels.forEach((x,i)=>x.value=i===0?"transmisi":i===9?"Januari":"");period="Januari";refreshHierarchyFilters();apply()};f.append(r);
- [1,2,3,4].forEach(i=>sels[i].addEventListener("change",refreshHierarchyFilters));
- refreshHierarchyFilters();
+ let r=document.createElement("button");r.className="btn";r.textContent="Reset";r.onclick=()=>{
+   f.querySelectorAll("select").forEach((x,i)=>x.value=i===0?"transmisi":i===9?"Januari":"");
+   period="Januari";refreshCascading();apply();
+ };f.append(r);
+ refreshCascading();
 }
-function getFilters(){let s=[...document.querySelectorAll("#filters select")];return{g:s[0].value,ui:s[1].value,upt:s[2].value,ultg:s[3].value,gi:s[4].value,bay:s[5].value,ph:s[6].value,type:s[7].value,ahi:s[8].value,period:s[9].value}}
-function apply(){let f=getFilters();period=f.period||"Januari";filtered=raw.filter(r=>includeVoltage(r,f.g)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&(!f.ultg||r["Ultg"]===f.ultg)&&(!f.gi||r["Gardu Induk"]===f.gi)&&(!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&(!f.type||canonical(r["Jenis Aset"])===f.type)&&(!f.ahi||norm(r["AHI"])===norm(f.ahi)));render()}
-function histCounts(m){let o={};for(const [s,v] of Object.entries(HIST[m]||{})){let t=HISTMAP[s];if(t)o[t]=v.slice()}return o}
-function currentCounts(){let o={};for(const t of TYPES){let a=filtered.filter(r=>canonical(r["Jenis Aset"])===t);o[t]=AHI.map(([n])=>a.filter(r=>norm(r["AHI"])===norm(n)).length)}return o}
-function trendData(){return MONTHS.map(m=>{let by=HIST[m]?histCounts(m):currentCounts();return{month:m,totals:AHI.map((_,i)=>Object.values(by).reduce((s,v)=>s+(v?.[i]||0),0)),by}})}
-function renderKpi(){let d=HIST[period]?histCounts(period):currentCounts(),tot=AHI.map((_,i)=>Object.values(d).reduce((s,v)=>s+(v?.[i]||0),0)),total=tot.reduce((a,b)=>a+b,0),names=["TOTAL ASET",...AHI.map(x=>x[0])],nums=[total,...tot],cls=["","vg","good","fair","poor","critical"];document.getElementById("kpis").innerHTML=names.map((n,i)=>`<div class="kpi"><small>${n}</small><div class="num">${fmt(nums[i])}</div><div class="pct ${cls[i]}">${i===0?"100%":pct(nums[i],total)}</div></div>`).join("")}
-function renderTrend(){let data=trendData(),max=Math.max(1,...data.flatMap(d=>d.totals)),nice=Math.ceil(max/5/100)*100||100;document.getElementById("gridlines").innerHTML=[5,4,3,2,1,0].map((_,i)=>`<div class="gridline"><span>${fmt(Math.round(nice*(5-i)/5))}</span></div>`).join("");document.getElementById("xlabels").innerHTML=MONTHS.map(m=>`<span>${m.slice(0,3)}</span>`).join("");let svg=document.getElementById("trendSvg");svg.innerHTML="";const W=1200,H=320,px=10,py=8,step=(W-px*2)/(MONTHS.length-1);AHI.forEach(([name,color],idx)=>{let pts=data.map((d,i)=>`${px+i*step},${H-py-(d.totals[idx]/nice*H)}`).join(" ");let p=document.createElementNS("http://www.w3.org/2000/svg","polyline");p.setAttribute("points",pts);p.setAttribute("fill","none");p.setAttribute("stroke",color);p.setAttribute("stroke-width","2.6");p.setAttribute("vector-effect","non-scaling-stroke");svg.appendChild(p);data.forEach((d,i)=>{let c=document.createElementNS("http://www.w3.org/2000/svg","circle"),x=px+i*step,y=H-py-(d.totals[idx]/nice*H);c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r","4.5");c.setAttribute("fill",color);c.setAttribute("stroke","#fff");c.setAttribute("stroke-width","2");c.classList.add("dot-hit");c.addEventListener("mouseenter",e=>showTip(e,d,idx,name,color));c.addEventListener("mousemove",moveTip);c.addEventListener("mouseleave",hideTip);svg.appendChild(c)})});document.getElementById("trendLegend").innerHTML=AHI.map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join("")}
+function getFilters(){return selectedFilters()}
+function apply(){
+ const f=getFilters(); period=f.period||"Januari";
+ filtered=raw.filter(r=>includeVoltage(r,f.g)
+   &&(!f.ui||r["Unit Induk"]===f.ui)
+   &&(!f.upt||r["Unit Pelaksana"]===f.upt)
+   &&(!f.ultg||r["Ultg"]===f.ultg)
+   &&(!f.gi||r["Gardu Induk"]===f.gi)
+   &&(!f.bay||r["Bay"]===f.bay)
+   &&(!f.ph||r["Phasa"]===f.ph)
+   &&(!f.type||canonical(r["Jenis Aset"])===f.type)
+   &&(!f.ahi||norm(monthAhi(r,period))===norm(f.ahi)));
+ render();
+}
+function monthAhi(row,month){
+ const m=norm(month);
+ const keys=Object.keys(row);
+ const candidates=[
+   `${month} AHI FINAL`,`${month} AHI`,`AHI ${month}`,`AHI FINAL ${month}`,
+   `${month}_AHI`,`${month}-AHI`,`${month} Final AHI`,`${month} Kategori AHI`
+ ];
+ for(const c of candidates){const k=keys.find(x=>norm(x)===norm(c));if(k&&row[k])return row[k]}
+ const k=keys.find(x=>norm(x).includes(m)&&/(ahi|health|kategori)/.test(norm(x)));
+ return k?row[k]:"";
+}
+function histCounts(m){let o={};for(const [s,v] of Object.entries(HIST[m]||{})){let t=HISTMAP[s];if(t)o[t]=v.slice().reverse()}return o}
+function currentCounts(month){
+ let o={};
+ for(const t of TYPES){
+   const a=filtered.filter(r=>canonical(r["Jenis Aset"])===t&&monthAhi(r,month));
+   o[t]=AHI.map(([n])=>a.filter(r=>norm(monthAhi(r,month))===norm(n)).length);
+ }
+ return o;
+}
+function trendData(){
+ return MONTHS.map(m=>{
+   const by=HIST[m]?histCounts(m):currentCounts(m);
+   return {month:m,totals:AHI.map((_,i)=>Object.values(by).reduce((sum,v)=>sum+(v?.[i]||0),0)),by};
+ });
+}
+function renderKpi(){let d=HIST[period]?histCounts(period):currentCounts(period),tot=AHI.map((_,i)=>Object.values(d).reduce((s,v)=>s+(v?.[i]||0),0)),total=tot.reduce((a,b)=>a+b,0),names=["TOTAL ASET",...AHI.map(x=>x[0])],nums=[total,...tot],cls=["","vg","good","fair","poor","critical"];document.getElementById("kpis").innerHTML=names.map((n,i)=>`<div class="kpi"><small>${n}</small><div class="num">${fmt(nums[i])}</div><div class="pct ${cls[i]}">${i===0?"100%":pct(nums[i],total)}</div></div>`).join("")}
+function renderTrend(){
+ const data=trendData(),max=Math.max(1,...data.flatMap(d=>d.totals)),nice=Math.max(100,Math.ceil(max/5/100)*100);
+ document.getElementById("gridlines").innerHTML=[5,4,3,2,1,0].map((_,i)=>`<div class="gridline"><span>${fmt(Math.round(nice*(5-i)/5))}</span></div>`).join("");
+ document.getElementById("xlabels").innerHTML=MONTHS.map(m=>`<span>${m.slice(0,3)}</span>`).join("");
+ const svg=document.getElementById("trendSvg");svg.innerHTML="";
+ const W=1200,H=320,px=10,py=8,step=(W-px*2)/(MONTHS.length-1);
+ AHI.forEach(([name,color],idx)=>{
+   const yFor=v=>H-py-(Math.min(v,nice)/nice*(H-py*2));
+   const pts=data.map((d,i)=>`${px+i*step},${yFor(d.totals[idx])}`).join(" ");
+   const poly=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+   poly.setAttribute("points",pts);poly.setAttribute("fill","none");poly.setAttribute("stroke",color);poly.setAttribute("stroke-width","2.8");poly.setAttribute("vector-effect","non-scaling-stroke");svg.appendChild(poly);
+   data.forEach((d,i)=>{
+     const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+     c.setAttribute("cx",px+i*step);c.setAttribute("cy",yFor(d.totals[idx]));c.setAttribute("r","4.8");c.setAttribute("fill",color);c.setAttribute("stroke","#fff");c.setAttribute("stroke-width","2");c.classList.add("dot-hit");
+     c.addEventListener("mouseenter",e=>showTip(e,d,idx,name,color));c.addEventListener("mousemove",moveTip);c.addEventListener("mouseleave",hideTip);svg.appendChild(c);
+   });
+ });
+ document.getElementById("trendLegend").innerHTML=AHI.map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join("");
+}
 function showTip(e,d,idx,name,color){let rows=Object.entries(d.by).filter(([_,v])=>v&&v[idx]>0).sort((a,b)=>b[1][idx]-a[1][idx]),tip=document.getElementById("tooltip");tip.innerHTML=`<b>${d.month} 2026</b><div style="margin-top:4px"><span class="tip-dot" style="background:${color}"></span>${name}: <b>${fmt(d.totals[idx])}</b></div>`+(rows.length?rows.map(([t,v])=>`<div class="tip-row"><span>${t}</span><b>${fmt(v[idx])}</b></div>`).join(""):"<div style='margin-top:5px;color:#b9c7d8'>Tidak ada data</div>");tip.style.display="block";moveTip(e)}
 function moveTip(e){let t=document.getElementById("tooltip");t.style.left=(e.clientX+14)+"px";t.style.top=(e.clientY+14)+"px"}function hideTip(){document.getElementById("tooltip").style.display="none"}
 function monthValue(row,month,kind){let keys=Object.keys(row),m=norm(month),hits=keys.filter(k=>norm(k).includes(m)),key=hits.find(k=>{let n=norm(k);return(kind==="ahi"&&/(ahi|health|kategori)/.test(n))||(kind==="risk"&&/(risiko|risk)/.test(n))||(kind==="param"&&/(parameter|pemicu)/.test(n))||(kind==="p01"&&/(p0|p1)/.test(n))||(kind==="rencana"&&n.includes("rencana"))||(kind==="target"&&/(target|penyelesaian|tanggal)/.test(n))||(kind==="statususia"&&/(status usia|kategori umur|usia)/.test(n))});return key?row[key]:""}
@@ -85,5 +178,19 @@ function esc(v){return String(v??"—").replace(/[&<>"']/g,m=>({"&":"&amp;","<":
 function renderTable(){let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q)));document.getElementById("periodTitle").textContent=period+" 2026";document.getElementById("count").textContent=`Menampilkan ${Math.min(50,arr.length).toLocaleString("id-ID")} dari ${arr.length.toLocaleString("id-ID")} data`;document.getElementById("thead").innerHTML="<tr>"+detailCols.map(c=>`<th>${c}</th>`).join("")+"</tr>";document.getElementById("tbody").innerHTML=arr.slice(0,50).map(r=>"<tr>"+detailCols.map(c=>`<td>${c==="AHI FINAL"?badge(field(r,c)):esc(field(r,c))}</td>`).join("")+"</tr>").join("")}
 function render(){renderKpi();renderTrend();renderTable()}
 document.getElementById("search").addEventListener("input",e=>{search=e.target.value;renderTable()});document.getElementById("exportBtn").onclick=()=>{let q=norm(search),arr=filtered.filter(r=>!q||detailCols.some(c=>norm(field(r,c)).includes(q))),out=detailCols.join(";")+"\\n"+arr.map(r=>detailCols.map(c=>`"${String(field(r,c)).replaceAll('"','""')}"`).join(";")).join("\\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\\ufeff"+out],{type:"text/csv"}));a.download=`AHI_Evaluasi_${period}_2026.csv`;a.click()};
-async function load(){try{let t=await fetch("data/AHI-EVALUASI.csv?v="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(r.status);return r.text()});raw=parseCSV(t);populate();apply();let s=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});document.getElementById("lastDate").textContent=s;document.getElementById("sideDate").textContent=s}catch(e){populate();apply();document.getElementById("lastDate").textContent="CSV belum terbaca";document.getElementById("sideDate").textContent="CSV belum terbaca"}}load();
+async async function load(){
+ try{
+   const t=await fetch(DATA_URL+"?v="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.text()});
+   raw=parseCSV(t);if(!raw.length)throw Error("CSV kosong");
+   populate();apply();
+   const stamp=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});
+   document.getElementById("lastDate").textContent=stamp;document.getElementById("sideDate").textContent=stamp;
+ }catch(e){
+   console.error("AHI Evaluasi CSV:",e);
+   document.getElementById("lastDate").textContent="CSV belum terbaca";
+   document.getElementById("sideDate").textContent="CSV belum terbaca";
+   document.getElementById("count").textContent="CSV AHI-EVALUASI.csv belum dapat dibaca";
+ }
+}
+load();
 </script></body></html>
