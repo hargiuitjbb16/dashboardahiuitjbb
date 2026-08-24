@@ -1,0 +1,21 @@
+DASHBOARD AHI UIT JBB
+
+STRUKTUR:
+assets/
+data/
+index.html
+ahi-evaluasi.html
+app.js
+style.css
+
+UPLOAD:
+1. Buka repository GitHub.
+2. Upload/replace file sesuai struktur di atas.
+3. Pastikan data/Monitoring-AHI.csv tetap ada.
+4. Commit changes.
+5. Buka GitHub Pages.
+6. Klik AHI Evaluasi dari menu Dashboard.
+
+CATATAN:
+- index.html = Dashboard AHI Power Inspect + menu AHI Evaluasi.
+- ahi-evaluasi.html = halaman AHI Evaluasi.
