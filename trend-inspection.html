@@ -7,7 +7,7 @@
 <section class="filters" id="filters"></section><div class="kpis"><div class="kpi"><small>JUMLAH DATA INSPEKSI</small><b id="kt">0</b><span>sesuai filter</span></div><div class="kpi"><small>ASET / BAY TERPILIH</small><b id="ka">0</b><span>identitas unik</span></div><div class="kpi"><small>TAHUN DATA</small><b id="ky">—</b><span>rentang pemeriksaan</span></div><div class="kpi"><small>STATUS DATA</small><b id="ks">—</b><span>Google Sheet → CSV</span></div></div>
 <section class="charts" id="charts"></section><section class="detail"><div class="dh"><div><h3>Detail Pengujian PMT</h3><small id="cnt">0 data</small></div><input id="search" class="search" placeholder="Cari GI / BAY / Merk / Type / parameter..."></div><div class="tw"><table class="tbl"><thead id="th"></thead><tbody id="tb"></tbody></table></div><div class="pager"><button id="prev">‹</button> <span id="pi">Halaman 1</span> <button id="next">›</button></div></section></main>
 <script>
-const URLCSV="https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824";
+const URLCSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vSn85tLyctU25ccEYVYriFDyVrT1P7UHKUageKJeuHtWt2pKLvZgwkb9QH4yhMLpz2NwomzosEmZi_Z/pubhtml?gid=1202083824&single=true";
 let raw=[],filtered=[],page=1,size=20;const sel={unit:new Set,upt:new Set,ultg:new Set,gi:new Set,bay:new Set,pmt:new Set,phase:new Set,merk:new Set,type:new Set};
 const defs=[
 ["unit","Unit Induk","Unit Induk"],["upt","UPT","UPT"],["ultg","ULTG","ULTG"],
