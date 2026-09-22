@@ -8,6 +8,27 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.app{display:flex;min-height:100vh}.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:10px 8px;z-index:20}.logo{height:57px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #edf1f6;margin-bottom:7px;padding:4px 1px 10px;overflow:hidden}.logo img:first-child{width:70px;height:35px;object-fit:contain}.logo img:last-child{width:105px;height:34px;object-fit:contain}.nav a{display:block;padding:10px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:2px 0}.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}.nav a:hover{background:#f2f7fc}.nav .trend{color:#0873d1;font-weight:700;background:#eaf3ff}.nav .sub{font-size:12px;padding-left:30px;margin-left:8px}.nav .sub.active-sub{background:#dcecff;color:#0873d1;font-weight:700}.side-date{position:absolute;bottom:18px;left:8px;right:8px;border:1px solid #dfe7ef;background:#f8fafc;border-radius:8px;padding:10px}.side-date small{display:block;color:#65758a}.side-date b{display:block;margin-top:3px}main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:10px}.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}.brand p{margin:4px 0 0;color:#60748c}.actions{display:flex;gap:8px;align-items:center}.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}.date b{display:block;font-size:11px;margin-top:2px}.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}.status{display:none;border-radius:9px;padding:9px 12px;margin:10px 0;font-weight:700}.status.ok{display:block;color:#137a4a;background:#f4fbf7;border:1px solid #b7e2cc}.status.error{display:block;color:#b42318;background:#fff8f7;border:1px solid #f1b8b2}.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:10px 0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}.filter label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}.filter select{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}.filter-actions{display:flex;gap:8px;align-items:end}.filter-actions button{height:32px}.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.chart-card{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;min-width:0}.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}.chart-title{font-weight:800;font-size:12px}.chart-unit{font-size:10px;color:#73839a;margin-top:3px}.chart-years{font-size:9px;color:#6881a0}.chart-box{height:205px;position:relative}.detail{margin-top:10px;background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#73839a}.detail-actions{display:flex;gap:8px}.search{width:270px;border:1px solid #d2ddea;border-radius:7px;padding:8px 10px}.table-wrap{max-height:430px;overflow:auto;border:1px solid #e6ebf2;border-radius:7px}.table-wrap table{border-collapse:separate;border-spacing:0;min-width:2100px;width:max-content;font-size:10px}.table-wrap th,.table-wrap td{padding:7px 8px;border-bottom:1px solid #edf1f5;border-right:1px solid #edf1f5;white-space:nowrap;background:#fff}.table-wrap th{position:sticky;top:0;background:#f7f9fc;z-index:5;color:#526079}.pager{display:flex;justify-content:flex-end;align-items:center;gap:7px;padding-top:8px}.pager button{padding:5px 10px;border:1px solid #d2ddea;background:#fff;border-radius:6px}.muted{color:#7b8798}.loading{padding:35px;text-align:center;color:#73839a}.empty{padding:35px;text-align:center;color:#73839a}.legend-note{font-size:9px;color:#75849a;margin-top:6px}@media(max-width:1100px){.sidebar{width:175px}main{margin-left:175px;width:calc(100% - 175px)}.chart-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.sidebar{position:relative;width:100%;height:auto}.side-date{position:static;margin-top:10px}main{margin-left:0;width:100%}.app{display:block}.chart-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.header{gap:10px;flex-direction:column}.detail-head{align-items:stretch;flex-direction:column}.search{width:100%}}
 </style>
+<style>
+.ai-panel{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:12px;margin:10px 0}
+.ai-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ai-title{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13px;color:#17324f}
+.ai-title .dot{width:8px;height:8px;border-radius:50%;background:#20a46b}
+.ai-title .sub{font-weight:500;color:#8a99aa;font-size:10px}
+.ai-actions{display:flex;gap:7px;align-items:center}
+.ai-actions button{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:7px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:11px}
+.ai-actions button.primary{background:#0877d1;color:#fff}
+.ai-actions button:disabled{opacity:.55;cursor:wait}
+.ai-actions .gear{width:32px;padding:0;border-radius:7px;font-size:14px}
+.ai-settings{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #e3eaf2;gap:8px;grid-template-columns:1fr 1fr auto}
+.ai-settings.open{display:grid}
+.ai-settings label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}
+.ai-settings input{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;padding:0 9px;font-size:11px}
+.ai-settings .save-row{display:flex;align-items:end;gap:6px}
+.ai-body{margin-top:10px;font-size:12px;line-height:1.65;color:#2c435f;white-space:pre-wrap}
+.ai-body.placeholder{color:#8a99aa}
+.ai-note{font-size:9px;color:#8a99aa;margin-top:6px}
+@media(max-width:900px){.ai-settings{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -41,6 +62,22 @@
  <div class="filter"><label>From Year</label><select id="fromYear"></select></div>
  <div class="filter"><label>To Year</label><select id="toYear"></select></div>
 </section>
+<section class="panel ai-panel">
+ <div class="ai-head">
+  <div class="ai-title"><span class="dot"></span>AI Insight <span class="sub">Ringkasan otomatis dari data yang sedang difilter</span></div>
+  <div class="ai-actions">
+   <button class="gear" id="aiSettingsBtn" type="button" title="Pengaturan API Key">⚙</button>
+   <button class="primary" id="aiGenerateBtn" type="button">✨ Generate Insight</button>
+  </div>
+ </div>
+ <div class="ai-settings" id="aiSettings">
+  <div><label>Groq API Key</label><input type="password" id="aiKeyInput" placeholder="gsk_..." autocomplete="off"></div>
+  <div><label>Model ID</label><input type="text" id="aiModelInput" placeholder="qwen/qwen3.8-27b" autocomplete="off"></div>
+  <div class="save-row"><button class="btn primary" id="aiSaveBtn" type="button">Simpan</button><button class="btn" id="aiClearBtn" type="button">Hapus</button></div>
+ </div>
+ <div class="ai-body placeholder" id="aiBody">Klik "Generate Insight" untuk analisis otomatis dari data yang sedang ditampilkan pada tab ini.</div>
+ <div class="ai-note">Key hanya disimpan di browser ini (localStorage), tidak dikirim ke repository/GitHub.</div>
+</section>
 <section class="chart-grid" id="charts"><div class="loading" style="grid-column:1/-1">Memuat data...</div></section>
 <section class="detail">
  <div class="detail-head"><div><h3 id="detailTitle">Detail Pengujian PMT</h3><small id="count">Menampilkan 0 data</small></div><div class="detail-actions"><input class="search" id="search" placeholder="Search GI / Bay / Nama Aset..."><button class="btn" id="exportBtn">⇩ Export CSV</button></div></div>
@@ -73,15 +110,15 @@ $('viewSubtitle').textContent=TAB.subtitle;
 $('sourceLabel').textContent=TAB.sourceLabel;
 $('detailTitle').textContent=TAB.detailTitle;
 document.querySelectorAll('.nav a[data-tab-link]').forEach(a=>a.classList.toggle('active-sub',a.getAttribute('data-tab-link')===TAB.key));
+const THRESHOLDS={
+ purity:{value:97,label:'MIN 97%',mode:'min'},
+ dew:{value:-5,label:'MAX -5°C',mode:'max'},
+ so2:{value:12,label:'MAX 12 ppmV',mode:'max'}
+};
 const limitPlugin={
  id:'limitPlugin',
  afterDraw(chart){
-  const limits={
-   purity:{value:97,label:'MIN 97%'},
-   dew:{value:-5,label:'MAX -5°C'},
-   so2:{value:12,label:'MAX 12 ppmV'}
-  };
-  const lim=limits[chart.canvas.id];
+  const lim=THRESHOLDS[chart.canvas.id];
   if(!lim)return;
   const y=chart.scales.y,x=chart.scales.x;
   if(!y||!x)return;
@@ -107,6 +144,96 @@ const limitPlugin={
 };
 Chart.register(limitPlugin);
 
+const AI_KEY_STORAGE='trendAiGroqKey';
+const AI_MODEL_STORAGE='trendAiGroqModel';
+const AI_MODEL_DEFAULT='qwen/qwen3.8-27b';
+let aiHasResult=false;
+function aiGetKey(){return localStorage.getItem(AI_KEY_STORAGE)||''}
+function aiGetModel(){return localStorage.getItem(AI_MODEL_STORAGE)||AI_MODEL_DEFAULT}
+function aiSetBody(text,isPlaceholder){$('aiBody').textContent=text;$('aiBody').classList.toggle('placeholder',!!isPlaceholder);aiHasResult=!isPlaceholder}
+$('aiSettingsBtn').onclick=()=>{
+ const box=$('aiSettings');
+ box.classList.toggle('open');
+ if(box.classList.contains('open')){$('aiKeyInput').value=aiGetKey();$('aiModelInput').value=aiGetModel()}
+};
+$('aiSaveBtn').onclick=()=>{
+ const k=$('aiKeyInput').value.trim(),m=$('aiModelInput').value.trim();
+ if(k)localStorage.setItem(AI_KEY_STORAGE,k);
+ localStorage.setItem(AI_MODEL_STORAGE,m||AI_MODEL_DEFAULT);
+ $('aiSettings').classList.remove('open');
+ aiSetBody('Pengaturan disimpan. Klik "Generate Insight" untuk membuat analisis.',true);
+};
+$('aiClearBtn').onclick=()=>{
+ localStorage.removeItem(AI_KEY_STORAGE);
+ localStorage.removeItem(AI_MODEL_STORAGE);
+ $('aiKeyInput').value='';$('aiModelInput').value='';
+ aiSetBody('API key dihapus dari browser ini.',true);
+};
+function aiBuildSummary(){
+ const activeFilters=['unit','upt','ultg','gi','bay','phasa','merk','type'].map(id=>({label:$(id).previousElementSibling?.textContent||id,value:$(id).value})).filter(x=>x.value);
+ const chartsSummary=TAB.chartSpecs.map((spec,i)=>{
+  const c=charts[i];if(!c)return null;
+  const [id,title,unit]=spec;
+  const labels=c.data.labels;
+  const series=c.data.datasets.map(ds=>{
+   const vals=ds.data.filter(v=>v!==null&&v!==undefined);
+   const first=vals.length?vals[0]:null;
+   const last=ds.data.length?ds.data[ds.data.length-1]:null;
+   return {label:ds.label,firstValue:first,lastValue:last,trend:(first!=null&&last!=null)?(last>first?'naik':(last<first?'turun':'stabil')):'tidak cukup data'};
+  });
+  let breach=null;
+  const th=THRESHOLDS[id];
+  if(th){
+   const count=filtered.filter(r=>{const v=num(val(r,id));if(v==null)return false;return th.mode==='min'?v<th.value:v>th.value}).length;
+   breach={label:th.label,count};
+  }
+  return {title,unit,years:labels,series,breach};
+ }).filter(Boolean);
+ return {tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
+}
+async function generateInsight(){
+ const key=aiGetKey();
+ if(!key){
+  aiSetBody('Belum ada API key Groq. Klik ikon ⚙ untuk memasukkan API key terlebih dahulu.',true);
+  $('aiSettings').classList.add('open');
+  $('aiKeyInput').focus();
+  return;
+ }
+ const btn=$('aiGenerateBtn');
+ btn.disabled=true;btn.textContent='⏳ Menganalisis...';
+ aiSetBody('Sedang menganalisis data...',true);
+ try{
+  const summary=aiBuildSummary();
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+   body:JSON.stringify({
+    model:aiGetModel(),
+    temperature:0.3,
+    messages:[
+     {role:'system',content:'Anda adalah asisten analisis untuk dashboard pemantauan Asset Health Index (AHI) gardu induk PLN. Jawab dalam Bahasa Indonesia, ringkas (maksimal 6 kalimat atau poin), langsung ke inti: sebutkan tren penting, nilai yang mendekati/melewati ambang batas, dan rekomendasi tindakan inspeksi jika relevan. Jangan mengulang angka mentah secara berlebihan, fokus pada makna teknisnya. Tulis sebagai teks polos tanpa markdown (jangan pakai *, **, #, atau simbol format lain).'},
+     {role:'user',content:'Berikut data hasil pengujian tab "'+summary.tab+'" yang sedang difilter pada dashboard trend inspection:\n\n'+JSON.stringify(summary,null,2)+'\n\nBuatkan ringkasan insight teknisnya.'}
+    ]
+   })
+  });
+  if(!res.ok){
+   const errText=await res.text().catch(()=>'');
+   throw new Error('HTTP '+res.status+(errText?(' • '+errText.slice(0,200)):''));
+  }
+  const data=await res.json();
+  let text=data.choices?.[0]?.message?.content?.trim();
+  if(!text)throw new Error('Respons AI kosong');
+  text=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s*/gm,'');
+  aiSetBody(text,false);
+ }catch(e){
+  console.error('AI insight error:',e);
+  aiSetBody('Gagal membuat insight: '+String(e.message||e)+'. Periksa API key/model, atau koneksi ke Groq.',true);
+ }finally{
+  btn.disabled=false;btn.textContent='✨ Generate Insight';
+ }
+}
+$('aiGenerateBtn').onclick=generateInsight;
+
 function norm(s){return String(s??'').normalize('NFKC').replace(/\u00a0/g,' ').replace(/[–—−]/g,'-').replace(/\s+/g,' ').trim().toLowerCase()}
 function parseCSV(t){t=t.replace(/^\uFEFF/,'');let rows=[],row=[],cell='',q=false,delim=(t.split(/\r?\n/).find(Boolean)||'').split(';').length>(t.split(/\r?\n/).find(Boolean)||'').split(',').length?';':',';for(let i=0;i<t.length;i++){let c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===delim&&!q){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=''}else cell+=c}if(cell||row.length){row.push(cell);if(row.some(x=>x.trim()))rows.push(row)}if(!rows.length)return[];let headers=rows.shift().map(x=>x.trim());return rows.map(a=>Object.fromEntries(headers.map((h,i)=>[h,(a[i]??'').trim()])))}
 function headers(){return Object.keys(raw[0]||{})}
@@ -124,7 +251,7 @@ function escapeHtml(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;',
 function baseFiltered(stop){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];for(const id of ids){if(id===stop)break;let v=$(id).value;if(v)f=f.filter(r=>val(r,id=== 'type'?'type':id)===v)}return f}
 function refreshFilters(changed){let order=['unit','upt','ultg','gi','bay','phasa','merk','type'];let current={};order.forEach(id=>current[id]=$(id).value);for(let i=0;i<order.length;i++){let id=order[i],f=raw.slice();for(let j=0;j<i;j++){let v=current[order[j]];if(v)f=f.filter(r=>val(r,order[j])===v)}fill(id,uniqueBy(f,id),current[id])}updateYears();}
 function updateYears(){let ys=raw.map(r=>year(val(r,'date'))).filter(Boolean);let min=Math.min(...ys,2014),max=Math.max(...ys,new Date().getFullYear());let vals=[];for(let y=min;y<=max;y++)vals.push(String(y));fill('fromYear',vals,$('fromYear').value);fill('toYear',vals,$('toYear').value);if(!$('fromYear').value)$('fromYear').value=String(Math.max(min,max-12));if(!$('toYear').value)$('toYear').value=String(max)}
-function apply(){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});let fy=+$('fromYear').value,ty=+$('toYear').value;if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);filtered=f;page=1;render()}
+function apply(){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});let fy=+$('fromYear').value,ty=+$('toYear').value;if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);filtered=f;page=1;render();if(aiHasResult)aiSetBody('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.',true)}
 function makeChart(id,title,unit,keys,colors){
 let el=$(id);
 let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
