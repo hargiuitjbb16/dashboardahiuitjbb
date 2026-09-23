@@ -6,7 +6,7 @@
 <title id="docTitle">Trend Inspection PMT — DASHBOARD AHI UIT JBB</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.app{display:flex;min-height:100vh}.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:10px 8px;z-index:20}.logo{height:57px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #edf1f6;margin-bottom:7px;padding:4px 1px 10px;overflow:hidden}.logo img:first-child{width:70px;height:35px;object-fit:contain}.logo img:last-child{width:105px;height:34px;object-fit:contain}.nav a{display:block;padding:10px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:2px 0}.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}.nav a:hover{background:#f2f7fc}.nav .trend{color:#0873d1;font-weight:700;background:#eaf3ff}.nav .sub{font-size:12px;padding-left:30px;margin-left:8px}.nav .sub.active-sub{background:#dcecff;color:#0873d1;font-weight:700}.side-date{position:absolute;bottom:18px;left:8px;right:8px;border:1px solid #dfe7ef;background:#f8fafc;border-radius:8px;padding:10px}.side-date small{display:block;color:#65758a}.side-date b{display:block;margin-top:3px}main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:10px}.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}.brand p{margin:4px 0 0;color:#60748c}.actions{display:flex;gap:8px;align-items:center}.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}.date b{display:block;font-size:11px;margin-top:2px}.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}.status{display:none;border-radius:9px;padding:9px 12px;margin:10px 0;font-weight:700}.status.ok{display:block;color:#137a4a;background:#f4fbf7;border:1px solid #b7e2cc}.status.error{display:block;color:#b42318;background:#fff8f7;border:1px solid #f1b8b2}.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:10px 0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}.filter label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}.filter select{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}.filter-actions{display:flex;gap:8px;align-items:end}.filter-actions button{height:32px}.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.chart-card{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;min-width:0}.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}.chart-title{font-weight:800;font-size:12px}.chart-unit{font-size:10px;color:#73839a;margin-top:3px}.chart-years{font-size:9px;color:#6881a0}.chart-box{height:205px;position:relative}.detail{margin-top:10px;background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#73839a}.detail-actions{display:flex;gap:8px}.search{width:270px;border:1px solid #d2ddea;border-radius:7px;padding:8px 10px}.table-wrap{max-height:430px;overflow:auto;border:1px solid #e6ebf2;border-radius:7px}.table-wrap table{border-collapse:separate;border-spacing:0;min-width:2100px;width:max-content;font-size:10px}.table-wrap th,.table-wrap td{padding:7px 8px;border-bottom:1px solid #edf1f5;border-right:1px solid #edf1f5;white-space:nowrap;background:#fff}.table-wrap th{position:sticky;top:0;background:#f7f9fc;z-index:5;color:#526079}.pager{display:flex;justify-content:flex-end;align-items:center;gap:7px;padding-top:8px}.pager button{padding:5px 10px;border:1px solid #d2ddea;background:#fff;border-radius:6px}.muted{color:#7b8798}.loading{padding:35px;text-align:center;color:#73839a}.empty{padding:35px;text-align:center;color:#73839a}.legend-note{font-size:9px;color:#75849a;margin-top:6px}@media(max-width:1100px){.sidebar{width:175px}main{margin-left:175px;width:calc(100% - 175px)}.chart-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.sidebar{position:relative;width:100%;height:auto}.side-date{position:static;margin-top:10px}main{margin-left:0;width:100%}.app{display:block}.chart-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.header{gap:10px;flex-direction:column}.detail-head{align-items:stretch;flex-direction:column}.search{width:100%}}
+*{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.app{display:flex;min-height:100vh}.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:10px 8px;z-index:20}.logo{height:57px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #edf1f6;margin-bottom:7px;padding:4px 1px 10px;overflow:hidden}.logo img:first-child{width:70px;height:35px;object-fit:contain}.logo img:last-child{width:105px;height:34px;object-fit:contain}.nav a{display:block;padding:10px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:2px 0}.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}.nav a:hover{background:#f2f7fc}.nav .trend{color:#0873d1;font-weight:700;background:#eaf3ff}.nav .sub{font-size:12px;padding-left:30px;margin-left:8px}.nav .sub.active-sub{background:#dcecff;color:#0873d1;font-weight:700}.side-date{position:absolute;bottom:18px;left:8px;right:8px;border:1px solid #dfe7ef;background:#f8fafc;border-radius:8px;padding:10px}.side-date small{display:block;color:#65758a}.side-date b{display:block;margin-top:3px}main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:10px}.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}.brand p{margin:4px 0 0;color:#60748c}.actions{display:flex;gap:8px;align-items:center}.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}.date b{display:block;font-size:11px;margin-top:2px}.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}.status{display:none;border-radius:9px;padding:9px 12px;margin:10px 0;font-weight:700}.status.ok{display:block;color:#137a4a;background:#f4fbf7;border:1px solid #b7e2cc}.status.error{display:block;color:#b42318;background:#fff8f7;border:1px solid #f1b8b2}.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:10px 0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}.filter label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.filter select{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}.filter-actions{display:flex;gap:8px;align-items:end}.filter-actions button{height:32px}.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.chart-card{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;min-width:0}.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}.chart-title{font-weight:800;font-size:12px}.chart-unit{font-size:10px;color:#73839a;margin-top:3px}.chart-years{font-size:9px;color:#6881a0}.chart-box{height:205px;position:relative}.detail{margin-top:10px;background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#73839a}.detail-actions{display:flex;gap:8px}.search{width:270px;border:1px solid #d2ddea;border-radius:7px;padding:8px 10px}.table-wrap{max-height:430px;overflow:auto;border:1px solid #e6ebf2;border-radius:7px}.table-wrap table{border-collapse:separate;border-spacing:0;min-width:2100px;width:max-content;font-size:10px}.table-wrap th,.table-wrap td{padding:7px 8px;border-bottom:1px solid #edf1f5;border-right:1px solid #edf1f5;white-space:nowrap;background:#fff}.table-wrap th{position:sticky;top:0;background:#f7f9fc;z-index:5;color:#526079}.pager{display:flex;justify-content:flex-end;align-items:center;gap:7px;padding-top:8px}.pager button{padding:5px 10px;border:1px solid #d2ddea;background:#fff;border-radius:6px}.muted{color:#7b8798}.loading{padding:35px;text-align:center;color:#73839a}.empty{padding:35px;text-align:center;color:#73839a}.legend-note{font-size:9px;color:#75849a;margin-top:6px}@media(max-width:1100px){.sidebar{width:175px}main{margin-left:175px;width:calc(100% - 175px)}.chart-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.sidebar{position:relative;width:100%;height:auto}.side-date{position:static;margin-top:10px}main{margin-left:0;width:100%}.app{display:block}.chart-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.header{gap:10px;flex-direction:column}.detail-head{align-items:stretch;flex-direction:column}.search{width:100%}}
 </style>
 <style>
 .ai-panel{background:linear-gradient(180deg,#fbfdff,#fff);border:1px solid #dce6f0;border-radius:10px;padding:12px;margin:10px 0;position:relative;overflow:hidden}
@@ -95,7 +95,7 @@
  <div class="filter"><label>From Year</label><select id="fromYear"></select></div>
  <div class="filter"><label>To Year</label><select id="toYear"></select></div>
  <div class="filter"><label>Kondisi AHI</label><select id="ahiCondition"><option value="">Semua</option><option value="1">1 - Very Good</option><option value="2">2 - Good</option><option value="3">3 - Fair</option><option value="4">4 - Poor</option><option value="5">5 - Critical</option></select></div>
- <div class="filter"><label>Lonjakan Deviasi ≥50%</label><select id="deviationFilter"><option value="">Semua</option><option value="ya">Ya, ada deviasi ≥50%</option></select></div>
+ <div class="filter"><label>Deviasi ≥50%</label><select id="deviationFilter"><option value="">Semua</option><option value="ya">Ya, ada deviasi ≥50%</option></select></div>
 </section>
 <section class="panel ai-panel">
  <div class="ai-head">
@@ -1288,7 +1288,16 @@ function findAll(patterns){let hs=headers();return hs.filter(h=>patterns.some(p=
 const C=TAB.columns;
 let COL={};
 function resolveCols(){for(const k in C)COL[k]=findCol(C[k]);}
-function val(r,k){let h=COL[k];return h?r[h]:''}
+function val(r,k){
+ if(k==='deviasiKapasitansi'&&COL.kapasitansiNameplate&&COL.kapasitansiUji){
+  const np=num(r[COL.kapasitansiNameplate]),uji=num(r[COL.kapasitansiUji]);
+  if(np==null||uji==null||np===0)return'';
+  const pct=(uji-np)/np*100;
+  if(Math.abs(pct)>200)return''; // nameplate mendekati nol → rasio tidak masuk akal, bukan hasil ukur nyata
+  return String(pct.toFixed(3));
+ }
+ let h=COL[k];return h?r[h]:''
+}
 function num(v){let s=String(v??'').trim();if(!s)return null;s=s.replace(/\s/g,'').replace(/,/g,'');let m=s.match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):null}
 function year(v){let s=String(v||'');let m=s.match(/(20\d{2})/);return m?+m[1]:null}
 const AHI_CAT=[null,{n:'Very Good',c:'#20a46b'},{n:'Good',c:'#f2b400'},{n:'Fair',c:'#f07800'},{n:'Poor',c:'#e53935'},{n:'Critical',c:'#111'}];
@@ -1298,6 +1307,10 @@ function classifyInsulationPerKv_CT(v){if(v==null)return null;if(v<1)return 5;if
 function classifyInsulationPerKv_PT(v){if(v==null)return null;if(v<=2)return 5;if(v<=5)return 4;if(v<=10)return 3;return 2}
 function ctVoltageClass(v){const s=norm(v).replace(/\s+/g,'').replace(/kv$/,'');return(s==='70'||s==='150')?'70/150':((s==='275'||s==='500')?'275/500':'')}
 const BAD_DIRECTION={irAB:'down',irAG:'down',irBG:'down',contact:'up',closing:'up',opening:'up',purity:'down',dew:'up',so2:'up',primerGround:'down',primerSekunder:'down',tanDelta:'up',deviasiKapasitansi:'away-from-zero'};
+// Batas nilai wajar per parameter, untuk mengecualikan outlier kesalahan input data (bukan hasil ukur nyata)
+// dari rata-rata grafik. 99% data Primer-Ground/Sekunder PT di bawah ~1,1 juta MΩ; beberapa baris tercatat
+// sampai ratusan juta MΩ (jelas typo/kesalahan input), yang membuat skala grafik meledak.
+const MAX_SANE_VALUE={primerGround:10000000,primerSekunder:10000000};
 const SKIP_DEVIATION=['kapR','kapS','kapT'];
 function deviationAssetKey(r){return(val(r,'tech')||val(r,'serial')||'')+'|'+norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'phasa'))}
 function getDeviationValue(spec,r){const id=spec[0],keys=spec[3];if(TAB.phaseChartIds.includes(id))return num(val(r,keys[0].key));for(const k of keys){const v=num(val(r,k.key));if(v!=null)return v}return null}
@@ -1377,7 +1390,8 @@ if(phaseCharts.includes(id)){
   label:ph,
   data:labels.map(y=>{
    let rows=filtered.filter(r=>year(val(r,'date'))===y && norm(val(r,'phasa'))===ph.toLowerCase());
-   let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null&&v!==-1000);
+   const maxSane=MAX_SANE_VALUE[id];
+   let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null&&v!==-1000&&(maxSane===undefined||Math.abs(v)<=maxSane));
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
   borderColor:colors[i],backgroundColor:colors[i],pointRadius:3,borderWidth:2,tension:.25,spanGaps:true
@@ -1387,18 +1401,19 @@ if(phaseCharts.includes(id)){
   label:k.label,
   data:labels.map(y=>{
    let rows=filtered.filter(r=>year(val(r,'date'))===y && (!phaseFilter||norm(val(r,'phasa'))===phaseFilter));
-   let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null&&v!==-1000);
+   const maxSane=MAX_SANE_VALUE[id];
+   let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null&&v!==-1000&&(maxSane===undefined||Math.abs(v)<=maxSane));
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
   borderColor:colors[i],backgroundColor:colors[i],pointRadius:3,borderWidth:2,tension:.25,spanGaps:true
  }));
 }
 let ctx=$(id).getContext('2d');
-charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('id-ID',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{
- min:id==='purity'?96.5:(id==='tanDelta'?0:undefined),
- max:id==='dew'?-4:(id==='so2'?13:(id==='tanDelta'?1:undefined)),
+charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('en-US',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{
+ min:id==='purity'?96.5:(id==='tanDelta'?0:(id==='deviasiKapasitansi'?-10:undefined)),
+ max:id==='dew'?-4:(id==='so2'?13:(id==='tanDelta'?1:(id==='deviasiKapasitansi'?20:undefined))),
  grid:{color:'#e7edf4'},
- ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('id-ID')}
+ ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('en-US')}
 }}}}));
 $(id).parentElement.parentElement.querySelector('.chart-years').textContent=labels.length?`${labels.length} tahun`:'Tidak ada data'
 }function chartCard(id,title,unit,keys,colors){return `<div class="chart-card"><div class="chart-head"><div><div class="chart-title">${title}</div><div class="chart-unit">${unit}</div></div><div class="chart-years">5 tahun</div></div><div class="chart-box"><canvas id="${id}"></canvas></div></div>`}
@@ -1416,6 +1431,10 @@ function renderConditionCharts(){
  $('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');
  let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
  if(labels.length>5)labels=labels.slice(-5);
+ // Kalau filter Kondisi AHI aktif, grafik hanya menampilkan kategori itu saja (tidak ikut kategori lain),
+ // supaya konsisten dengan kategori yang dipilih user di filter.
+ const ahiVal=$('ahiCondition')?.value;
+ const catIndexes=ahiVal?[Number(ahiVal)-1]:[0,1,2,3,4];
  specs.forEach(spec=>{
   const [id,,,,,phaseFilter]=spec;
   const catFn=(TAB.categoryOf||{})[id];
@@ -1428,7 +1447,7 @@ function renderConditionCharts(){
    const cat=catFn(r);if(!cat)return;
    perYearCat[y][cat-1]++;
   });
-  const datasets=AHI_CAT.slice(1).map((meta,i)=>({label:meta.n,data:labels.map(y=>perYearCat[y][i]),backgroundColor:meta.c,borderColor:meta.c}));
+  const datasets=catIndexes.map(i=>{const meta=AHI_CAT[i+1];return{label:meta.n,data:labels.map(y=>perYearCat[y][i]),backgroundColor:meta.c,borderColor:meta.c}});
   charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
   $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
  });
