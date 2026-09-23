@@ -55,6 +55,11 @@
 .ai-note{font-size:9px;color:#8a99aa;margin-top:8px}
 .ai-key-status{font-size:9.5px;color:#5b7796;margin-top:2px}
 .ai-key-status.warn{color:#c62828}
+.subtab-bar{display:flex;gap:7px;margin:10px 0 4px;flex-wrap:wrap}
+.subtab-btn{border:1px solid #d2ddea;background:#fff;color:#3a4f68;border-radius:20px;padding:8px 15px;font-size:11px;font-weight:700;cursor:pointer}
+.subtab-btn:hover{border-color:#9ec9ee;background:#f5faff}
+.subtab-btn.active{background:#0877d1;color:#fff;border-color:#0877d1}
+.chart-empty-note{padding:34px 10px;text-align:center;color:#8a99aa;font-size:10.5px;line-height:1.6}
 @media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -89,6 +94,8 @@
  <div class="filter"><label>Type</label><select id="type"></select></div>
  <div class="filter"><label>From Year</label><select id="fromYear"></select></div>
  <div class="filter"><label>To Year</label><select id="toYear"></select></div>
+ <div class="filter"><label>Kondisi AHI</label><select id="ahiCondition"><option value="">Semua</option><option value="1">1 - Very Good</option><option value="2">2 - Good</option><option value="3">3 - Fair</option><option value="4">4 - Poor</option><option value="5">5 - Critical</option></select></div>
+ <div class="filter"><label>Lonjakan Deviasi ≥50%</label><select id="deviationFilter"><option value="">Semua</option><option value="ya">Ya, ada deviasi ≥50%</option></select></div>
 </section>
 <section class="panel ai-panel">
  <div class="ai-head">
@@ -107,6 +114,11 @@
  <div class="ai-body" id="aiBody"><div class="ai-placeholder">Klik "Generate Insight" untuk analisis otomatis dari data yang sedang ditampilkan pada tab ini.</div></div>
  <div class="ai-note">Key hanya disimpan di browser ini (localStorage), tidak dikirim ke repository/GitHub.</div>
 </section>
+<div class="subtab-bar" id="subtabBar">
+ <button class="subtab-btn active" data-subtab="trend" type="button">Grafik Trending Pengujian</button>
+ <button class="subtab-btn" data-subtab="condition" type="button">Radar Kondisi AHI</button>
+ <button class="subtab-btn" data-subtab="deviation" type="button">Lonjakan Deviasi ≥50%</button>
+</div>
 <section class="chart-grid" id="charts"><div class="loading" style="grid-column:1/-1">Memuat data...</div></section>
 <section class="detail">
  <div class="detail-head"><div><h3 id="detailTitle">Detail Pengujian PMT</h3><small id="count">Menampilkan 0 data</small></div><div class="detail-actions"><input class="search" id="search" placeholder="Search GI / Bay / Nama Aset..."><button class="btn" id="exportBtn">⇩ Export CSV</button></div></div>
@@ -1027,27 +1039,55 @@ J. ATURAN PENTING
    dan batas yang tercantum di atas.`;
 const TABS={
  pmt:{key:'pmt',label:'PMT',aiSystemPrompt:AI_SYSTEM_PROMPT_PMT,sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
-  columns:{unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay']},
+  columns:{unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay'],evalContact:['1-best tahanan kontak'],evalClosing:['1-best closing time'],evalOpening:['1-best opening time'],evalKeserempakan:['1-best keserempakan'],evalPurity:['1-best purity'],evalDew:['1-best dew point']},
   phaseChartIds:['irAB','irAG','irBG','purity','dew','so2'],
+  categoryOf:{
+   irAB:r=>classifyIR(num(val(r,'irAB'))),
+   irAG:r=>classifyIR(num(val(r,'irAG'))),
+   irBG:r=>classifyIR(num(val(r,'irBG'))),
+   contact:r=>parseEvalCell(val(r,'evalContact')),
+   closing:r=>parseEvalCell(val(r,'evalClosing')),
+   opening:r=>parseEvalCell(val(r,'evalOpening')),
+   purity:r=>parseEvalCell(val(r,'evalPurity')),
+   dew:r=>parseEvalCell(val(r,'evalDew')),
+   so2:r=>{const v=num(val(r,'so2'));return v==null?null:(v>=12?5:2)}
+  },
   chartSpecs:[['irAB','IR Atas-Bawah','Mega Ohm',[{key:'irAB',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irAG','IR Atas-Ground','Mega Ohm',[{key:'irAG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irBG','IR Bawah-Ground','Mega Ohm',[{key:'irBG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['contact','Tahanan Kontak','mikro Ohm (µΩ)',[{key:'contactR',label:'R'},{key:'contactS',label:'S'},{key:'contactT',label:'T'}],['#e53935','#f29a00','#1688f0']],['closing','Closing Time','ms',[{key:'closingR',label:'R'},{key:'closingS',label:'S'},{key:'closingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['opening','Opening Time','ms',[{key:'openingR',label:'R'},{key:'openingS',label:'S'},{key:'openingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['purity','SF6 Purity','%',[{key:'purity',label:'Purity'}],['#e53935','#f29a00','#1688f0']],['dew','SF6 Dew Point','°C',[{key:'dew',label:'Dew Point'}],['#e53935','#f29a00','#1688f0']],['so2','SF6 SO2','ppmV',[{key:'so2',label:'SO2'}],['#e53935','#f29a00','#1688f0']]],
   detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['IR ATAS-BAWAH','irAB'],['IR ATAS-GROUND','irAG'],['IR BAWAH-GROUND','irBG'],['KONTAK R','contactR'],['KONTAK S','contactS'],['KONTAK T','contactT'],['CLOSING R','closingR'],['CLOSING S','closingS'],['CLOSING T','closingT'],['OPENING R','openingR'],['OPENING S','openingS'],['OPENING T','openingT'],['SF6 PURITY','purity'],['SF6 DEW POINT','dew'],['SF6 SO2','so2']]
  },
  ct:{key:'ct',label:'CT',aiSystemPrompt:AI_SYSTEM_PROMPT_CT,sheetCsv:'https://docs.google.com/spreadsheets/d/1BFlYecP0qpbC14wadP_UGC7Y3lSBEjByN2oIwKhIOcw/export?format=csv&gid=790904160',sourceLabel:'Google Sheet • NORM AHI CT',docTitle:'Trend Inspection CT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – CT',detailTitle:'Detail Pengujian CT',exportFile:'Trend_Inspection_CT_Filtered.csv',
   columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],tegangan:['teg','tegangan'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],primerGround:['primer - ground (mega ohm)','primer - ground','primer ground'],primerSekunder:['primer - sekunder (mega ohm)','primer - sekunder(mega ohm)','primer - sekunder','primer sekunder'],tanDelta:['tan delta (%)','tan delta']},
   phaseChartIds:['primerGround','primerSekunder','tanDelta'],
+  categoryOf:{
+   primerGround:r=>{const kv=num(val(r,'tegangan')),mo=num(val(r,'primerGround'));return(mo==null||mo===-1000||!kv)?null:classifyInsulationPerKv_CT(mo/kv)},
+   primerSekunder:r=>{const kv=num(val(r,'tegangan')),mo=num(val(r,'primerSekunder'));return(mo==null||mo===-1000||!kv)?null:classifyInsulationPerKv_CT(mo/kv)},
+   tanDelta:r=>{
+    const cls=ctVoltageClass(val(r,'tegangan')),v=num(val(r,'tanDelta'));
+    if(v==null||v===-1000)return null;
+    if(cls==='70/150'){if(v>1)return 5;if(v>=0.7)return 4;if(v>0.5)return 3;return 2}
+    if(cls==='275/500'){if(v>0.5)return 5;if(v>=0.3)return 4;return 2}
+    return null;
+   }
+  },
   chartSpecs:[['primerGround','Primer - Ground','Mega Ohm',[{key:'primerGround',label:'Primer-Ground'}],['#e53935','#f29a00','#1688f0']],['primerSekunder','Primer - Sekunder','Mega Ohm',[{key:'primerSekunder',label:'Primer-Sekunder'}],['#e53935','#f29a00','#1688f0']],['tanDelta','Tan Delta','%',[{key:'tanDelta',label:'Tan Delta'}],['#e53935','#f29a00','#1688f0']]],
   detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta']]
  },
  pt:{key:'pt',label:'CVT/PT',aiSystemPrompt:AI_SYSTEM_PROMPT_PT,sheetCsv:'https://docs.google.com/spreadsheets/d/1bRAHSBiEj3pGEX6toISCD_kSH9rkSLPdQTxS3HWG5L0/gviz/tq?tqx=out:csv&sheet=PT',sourceLabel:'Google Sheet • NORM AHI PT',docTitle:'Trend Inspection CVT/PT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – CVT/PT',detailTitle:'Detail Pengujian CVT/PT',exportFile:'Trend_Inspection_CVTPT_Filtered.csv',
   columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],tegangan:['tegangan operasi (kv)','tegangan operasi','tegangan'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],serial:['nomor seri','serial'],primerGround:['uji tahanan isolasi - hasil ukur primer-ground (mega ohm)','primer-ground (mega ohm)','primer ground'],primerSekunder:['uji tahanan isolasi - hasil ukur primer-sekunder (mega ohm)','primer-sekunder (mega ohm)','primer sekunder'],tanDelta:['hasil uji tan delta (%)','tan delta (%)','tan delta'],kapasitansiNameplate:['kapasitansi nameplate'],kapasitansiUji:['hasil uji kapasitansi'],deviasiKapasitansi:['deviasi hasil uji kapasitansi (%)','deviasi hasil uji kapasitansi']},
   phaseChartIds:['primerGround','primerSekunder','tanDelta','deviasiKapasitansi'],
+  categoryOf:{
+   primerGround:r=>{const kv=num(val(r,'tegangan')),mo=num(val(r,'primerGround'));return(mo==null||mo===-1000||!kv)?null:classifyInsulationPerKv_PT(mo/kv)},
+   primerSekunder:r=>{const kv=num(val(r,'tegangan')),mo=num(val(r,'primerSekunder'));return(mo==null||mo===-1000||!kv)?null:classifyInsulationPerKv_PT(mo/kv)},
+   tanDelta:r=>{const v=num(val(r,'tanDelta'));if(v==null||v===-1000)return null;if(v>=1)return 5;if(v>0.5)return 4;return 2},
+   deviasiKapasitansi:r=>{const v=num(val(r,'deviasiKapasitansi'));return v==null?null:((v>10||v<-5)?5:2)}
+  },
   chartSpecs:[['primerGround','Primer - Ground','Mega Ohm',[{key:'primerGround',label:'Primer-Ground'}],['#e53935','#f29a00','#1688f0']],['primerSekunder','Primer - Sekunder','Mega Ohm',[{key:'primerSekunder',label:'Primer-Sekunder'}],['#e53935','#f29a00','#1688f0']],['tanDelta','Tan Delta','%',[{key:'tanDelta',label:'Tan Delta'}],['#e53935','#f29a00','#1688f0']],['kapR','Kapasitansi Nameplate vs Uji – Fasa R','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'r'],['kapS','Kapasitansi Nameplate vs Uji – Fasa S','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'s'],['kapT','Kapasitansi Nameplate vs Uji – Fasa T','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'t'],['deviasiKapasitansi','Deviasi Hasil Uji Kapasitansi','%',[{key:'deviasiKapasitansi',label:'Deviasi'}],['#e53935','#f29a00','#1688f0']]],
   detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta'],['KAPASITANSI NAMEPLATE','kapasitansiNameplate'],['HASIL UJI KAPASITANSI','kapasitansiUji'],['DEVIASI KAPASITANSI (%)','deviasiKapasitansi']]
  }
 };
 const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
 const SHEET_CSV=TAB.sheetCsv;
-const PAGE_SIZE=10;let raw=[],filtered=[],page=1,charts=[];
+const PAGE_SIZE=10;let raw=[],filtered=[],deviationFlags=new Map(),page=1,charts=[];
 const $=id=>document.getElementById(id);
 document.title=TAB.docTitle;
 $('docTitle').textContent=TAB.docTitle;
@@ -1060,34 +1100,6 @@ const THRESHOLDS={
  dew:{value:-5,label:'MAX -5°C',mode:'max'},
  so2:{value:12,label:'MAX 12 ppmV',mode:'max'}
 };
-const limitPlugin={
- id:'limitPlugin',
- afterDraw(chart){
-  const lim=THRESHOLDS[chart.canvas.id];
-  if(!lim)return;
-  const y=chart.scales.y,x=chart.scales.x;
-  if(!y||!x)return;
-  const py=y.getPixelForValue(lim.value);
-  if(!Number.isFinite(py))return;
-  const ctx=chart.ctx;
-  ctx.save();
-  ctx.beginPath();
-  ctx.setLineDash([8,6]);
-  ctx.lineWidth=2;
-  ctx.strokeStyle='#e53935';
-  ctx.moveTo(x.left,py);
-  ctx.lineTo(x.right,py);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle='#e53935';
-  ctx.font='700 11px Inter,Segoe UI,Arial,sans-serif';
-  ctx.textAlign='right';
-  ctx.textBaseline='bottom';
-  ctx.fillText(lim.label,x.right-6,Math.max(y.top+14,py-7));
-  ctx.restore();
- }
-};
-Chart.register(limitPlugin);
 
 const AI_KEY_STORAGE='trendAiGroqKey';
 const AI_KEY_EXPIRY_STORAGE='trendAiGroqKeyExpiry';
@@ -1279,13 +1291,80 @@ function resolveCols(){for(const k in C)COL[k]=findCol(C[k]);}
 function val(r,k){let h=COL[k];return h?r[h]:''}
 function num(v){let s=String(v??'').trim();if(!s)return null;s=s.replace(/\s/g,'').replace(/,/g,'');let m=s.match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):null}
 function year(v){let s=String(v||'');let m=s.match(/(20\d{2})/);return m?+m[1]:null}
+const AHI_CAT=[null,{n:'Very Good',c:'#20a46b'},{n:'Good',c:'#f2b400'},{n:'Fair',c:'#f07800'},{n:'Poor',c:'#e53935'},{n:'Critical',c:'#111'}];
+function parseEvalCell(v){const s=String(v??'').trim();const m=s.match(/^([1-5])\b/);return m?Number(m[1]):null}
+function classifyIR(v){if(v==null)return null;if(v<1000)return 5;if(v<=2000)return 4;if(v<=5000)return 3;if(v<=10000)return 2;return 1}
+function classifyInsulationPerKv_CT(v){if(v==null)return null;if(v<1)return 5;if(v<=5)return 4;if(v<=10)return 3;return 2}
+function classifyInsulationPerKv_PT(v){if(v==null)return null;if(v<=2)return 5;if(v<=5)return 4;if(v<=10)return 3;return 2}
+function ctVoltageClass(v){const s=norm(v).replace(/\s+/g,'').replace(/kv$/,'');return(s==='70'||s==='150')?'70/150':((s==='275'||s==='500')?'275/500':'')}
+const BAD_DIRECTION={irAB:'down',irAG:'down',irBG:'down',contact:'up',closing:'up',opening:'up',purity:'down',dew:'up',so2:'up',primerGround:'down',primerSekunder:'down',tanDelta:'up',deviasiKapasitansi:'away-from-zero'};
+const SKIP_DEVIATION=['kapR','kapS','kapT'];
+function deviationAssetKey(r){return(val(r,'tech')||val(r,'serial')||'')+'|'+norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'phasa'))}
+function getDeviationValue(spec,r){const id=spec[0],keys=spec[3];if(TAB.phaseChartIds.includes(id))return num(val(r,keys[0].key));for(const k of keys){const v=num(val(r,k.key));if(v!=null)return v}return null}
+function isWorseningBy50(prev,curr,direction){if(prev==null||curr==null||prev===0)return false;const pctChange=(curr-prev)/Math.abs(prev);if(direction==='up')return pctChange>=0.5;if(direction==='down')return pctChange<=-0.5;if(direction==='away-from-zero')return Math.abs(curr)>Math.abs(prev)&&Math.abs(curr)>=Math.abs(prev)*1.5;return false}
+function chartTitleById(id){const s=TAB.chartSpecs.find(x=>x[0]===id);return s?s[1]:id}
+function rowCategoryInfo(r){
+ const catFns=TAB.categoryOf||{};
+ let worst=0,params=[];
+ for(const id in catFns){
+  const cat=catFns[id](r);
+  if(!cat)continue;
+  if(cat>worst){worst=cat;params=[chartTitleById(id)]}
+  else if(cat===worst){params.push(chartTitleById(id))}
+ }
+ return {cat:worst,params};
+}
+function computeDeviationFlags(rows){
+ const flags=new Map();
+ (TAB.chartSpecs||[]).forEach(spec=>{
+  const [id,title,,,,phaseFilter]=spec;
+  if(SKIP_DEVIATION.includes(id))return;
+  const direction=BAD_DIRECTION[id];
+  if(!direction)return;
+  const groups={};
+  rows.forEach(r=>{
+   if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
+   const y=year(val(r,'date'));if(!y)return;
+   const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
+   const gk=deviationAssetKey(r);
+   (groups[gk]=groups[gk]||[]).push({y,v,row:r});
+  });
+  Object.values(groups).forEach(arr=>{
+   arr.sort((a,b)=>a.y-b.y);
+   for(let i=1;i<arr.length;i++){
+    if(arr[i].y===arr[i-1].y)continue;
+    if(isWorseningBy50(arr[i-1].v,arr[i].v,direction)){
+     if(!flags.has(arr[i].row))flags.set(arr[i].row,[]);
+     flags.get(arr[i].row).push(title);
+    }
+   }
+  });
+ });
+ return flags;
+}
 function uniqueBy(rows,k){return [...new Set(rows.map(r=>val(r,k)).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'id'))}
 function fill(id,values,keep){let s=$(id),old=keep??s.value;s.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option>${escapeHtml(v)}</option>`).join('');if(values.includes(old))s.value=old}
 function escapeHtml(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function baseFiltered(stop){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];for(const id of ids){if(id===stop)break;let v=$(id).value;if(v)f=f.filter(r=>val(r,id=== 'type'?'type':id)===v)}return f}
 function refreshFilters(changed){let order=['unit','upt','ultg','gi','bay','phasa','merk','type'];let current={};order.forEach(id=>current[id]=$(id).value);for(let i=0;i<order.length;i++){let id=order[i],f=raw.slice();for(let j=0;j<i;j++){let v=current[order[j]];if(v)f=f.filter(r=>val(r,order[j])===v)}fill(id,uniqueBy(f,id),current[id])}updateYears();}
 function updateYears(){let ys=raw.map(r=>year(val(r,'date'))).filter(Boolean);let min=Math.min(...ys,2014),max=Math.max(...ys,new Date().getFullYear());let vals=[];for(let y=min;y<=max;y++)vals.push(String(y));fill('fromYear',vals,$('fromYear').value);fill('toYear',vals,$('toYear').value);if(!$('fromYear').value)$('fromYear').value=String(Math.max(min,max-12));if(!$('toYear').value)$('toYear').value=String(max)}
-function apply(){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});let fy=+$('fromYear').value,ty=+$('toYear').value;if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);filtered=f;page=1;render();if(aiHasResult)aiRenderPlaceholder('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.')}
+function apply(){
+ let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];
+ ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});
+ let fy=+$('fromYear').value,ty=+$('toYear').value;
+ if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);
+ if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);
+ // f = hasil filter standar (konteks riwayat penuh, dipakai untuk pasangan tahun-ke-tahun deviasi)
+ deviationFlags=computeDeviationFlags(f);
+ const ahiVal=$('ahiCondition')?.value,devVal=$('deviationFilter')?.value;
+ filtered=f.filter(r=>{
+  if(ahiVal){const info=rowCategoryInfo(r);if(String(info.cat)!==ahiVal)return false}
+  if(devVal==='ya'&&!deviationFlags.has(r))return false;
+  return true;
+ });
+ page=1;render();
+ if(aiHasResult)aiRenderPlaceholder('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.')
+}
 function makeChart(id,title,unit,keys,colors,phaseFilter){
 let el=$(id);
 let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
@@ -1323,11 +1402,77 @@ charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsiv
 }}}}));
 $(id).parentElement.parentElement.querySelector('.chart-years').textContent=labels.length?`${labels.length} tahun`:'Tidak ada data'
 }function chartCard(id,title,unit,keys,colors){return `<div class="chart-card"><div class="chart-head"><div><div class="chart-title">${title}</div><div class="chart-unit">${unit}</div></div><div class="chart-years">5 tahun</div></div><div class="chart-box"><canvas id="${id}"></canvas></div></div>`}
-function renderCharts(){charts.forEach(c=>c.destroy());charts=[];let specs=TAB.chartSpecs;$('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');specs.forEach(s=>makeChart(s[0],s[1],s[2],s[3],s[4],s[5]))}
-const detailCols=TAB.detailCols;
-function detailRows(){let q=norm($('search').value);let rows=filtered.filter(r=>!q||detailCols.some(([_,k])=>norm(val(r,k)).includes(q)));let pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(page>pages)page=pages;let view=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);$('count').textContent=`Menampilkan ${rows.length.toLocaleString('id-ID')} data`;$('pageInfo').textContent=`Halaman ${page} / ${pages}`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;$('thead').innerHTML='<tr>'+detailCols.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';$('tbody').innerHTML=view.length?view.map(r=>'<tr>'+detailCols.map(([_,k])=>`<td>${escapeHtml(k==='date'?val(r,k):val(r,k))}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="${detailCols.length}" class="empty">Tidak ada data sesuai filter.</td></tr>`;}
+let subTab='trend';
+function renderCharts(){
+ charts.forEach(c=>c.destroy());charts=[];
+ if(subTab==='condition')renderConditionCharts();
+ else if(subTab==='deviation')renderDeviationCharts();
+ else renderTrendCharts();
+}
+function renderTrendCharts(){let specs=TAB.chartSpecs;$('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');specs.forEach(s=>makeChart(s[0],s[1],s[2],s[3],s[4],s[5]))}
+function setChartEmpty(id,msg){const box=$(id)?.parentElement;if(!box)return;box.innerHTML=`<div class="chart-empty-note">${msg}</div>`;box.parentElement.querySelector('.chart-years').textContent=''}
+function renderConditionCharts(){
+ let specs=TAB.chartSpecs;
+ $('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');
+ let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
+ if(labels.length>5)labels=labels.slice(-5);
+ specs.forEach(spec=>{
+  const [id,,,,,phaseFilter]=spec;
+  const catFn=(TAB.categoryOf||{})[id];
+  if(!catFn){setChartEmpty(id,'Kategori AHI belum tersedia untuk parameter ini.');return}
+  if(!labels.length){setChartEmpty(id,'Tidak ada data pada rentang tahun/filter ini.');return}
+  const rows=phaseFilter?filtered.filter(r=>norm(val(r,'phasa'))===phaseFilter):filtered;
+  const perYearCat={};labels.forEach(y=>perYearCat[y]=[0,0,0,0,0]);
+  rows.forEach(r=>{
+   const y=year(val(r,'date'));if(!labels.includes(y))return;
+   const cat=catFn(r);if(!cat)return;
+   perYearCat[y][cat-1]++;
+  });
+  const datasets=AHI_CAT.slice(1).map((meta,i)=>({label:meta.n,data:labels.map(y=>perYearCat[y][i]),backgroundColor:meta.c,borderColor:meta.c}));
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
+  $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
+ });
+}
+function renderDeviationCharts(){
+ let specs=TAB.chartSpecs;
+ $('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');
+ let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
+ if(labels.length>5)labels=labels.slice(-5);
+ specs.forEach(spec=>{
+  const [id,title]=spec;
+  if(SKIP_DEVIATION.includes(id)){setChartEmpty(id,'Gunakan grafik "Deviasi Hasil Uji Kapasitansi" untuk analisis deviasi parameter ini.');return}
+  if(!BAD_DIRECTION[id]){setChartEmpty(id,'Arah "memburuk" belum ditentukan untuk parameter ini.');return}
+  if(!labels.length){setChartEmpty(id,'Tidak ada data pada rentang tahun/filter ini.');return}
+  // deviationFlags sudah dihitung dari konteks riwayat penuh (apply()); di sini tinggal hitung berapa
+  // baris pada set filtered saat ini (termasuk filter Kondisi AHI/Deviasi) yang tertandai untuk parameter ini.
+  const yearCounts={};labels.forEach(y=>yearCounts[y]=0);
+  filtered.forEach(r=>{
+   const y=year(val(r,'date'));if(!labels.includes(y))return;
+   const params=deviationFlags.get(r);
+   if(params&&params.includes(title))yearCounts[y]++;
+  });
+  const data=labels.map(y=>yearCounts[y]);
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Jumlah deviasi ≥50%',data,backgroundColor:'#e53935'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y} aset mengalami perubahan ≥50% ke arah buruk`}}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
+  $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
+ });
+}
+const CATEGORY_DETAIL_COLS=Object.keys(TAB.categoryOf||{}).map(id=>['AHI '+chartTitleById(id).toUpperCase(),'__cat_'+id]);
+const detailCols=[...TAB.detailCols,...CATEGORY_DETAIL_COLS,['DEVIASI ≥50%','__deviationInfo']];
+function detailCellValue(r,k){
+ if(k.startsWith('__cat_')){
+  const id=k.slice(6);
+  const cat=(TAB.categoryOf||{})[id]?.(r);
+  return cat?`${cat} - ${AHI_CAT[cat].n}`:'—';
+ }
+ if(k==='__deviationInfo'){
+  const dev=deviationFlags.get(r)||[];
+  return dev.length?dev.join(', '):'—';
+ }
+ return val(r,k);
+}
+function detailRows(){let q=norm($('search').value);let rows=filtered.filter(r=>!q||detailCols.some(([_,k])=>norm(detailCellValue(r,k)).includes(q)));let pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(page>pages)page=pages;let view=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);$('count').textContent=`Menampilkan ${rows.length.toLocaleString('id-ID')} data`;$('pageInfo').textContent=`Halaman ${page} / ${pages}`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;$('thead').innerHTML='<tr>'+detailCols.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';$('tbody').innerHTML=view.length?view.map(r=>'<tr>'+detailCols.map(([_,k])=>`<td>${escapeHtml(detailCellValue(r,k))}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="${detailCols.length}" class="empty">Tidak ada data sesuai filter.</td></tr>`;}
 function render(){renderCharts();detailRows();$('lastDate').textContent=new Date().toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}
-function exportCSV(){let head=detailCols.map(x=>x[0]).join(';');let body=filtered.map(r=>detailCols.map(([_,k])=>`"${String(val(r,k)||'').replaceAll('"','""')}"`).join(';')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+head+'\n'+body],{type:'text/csv'}));a.download=TAB.exportFile;a.click()}
+function exportCSV(){let head=detailCols.map(x=>x[0]).join(';');let body=filtered.map(r=>detailCols.map(([_,k])=>`"${String(detailCellValue(r,k)||'').replaceAll('"','""')}"`).join(';')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+head+'\n'+body],{type:'text/csv'}));a.download=TAB.exportFile;a.click()}
 const TAB_CACHE_TTL_MS=10*60*1000;
 const TAB_CACHE_DB='trendInspectionCache',TAB_CACHE_STORE='csvCache';
 function tabCacheDb(){
@@ -1364,6 +1509,8 @@ if(!manual){t=await getCachedCsv(TAB.key);if(t)fromCache=true;}
 if(!t){let r=await fetch(SHEET_CSV+'&_update='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);t=await r.text();setCachedCsv(TAB.key,t);}
 raw=parseCSV(t);if(!raw.length)throw Error('CSV kosong');resolveCols();populateAll();$('status').className='status ok';$('status').textContent=`Data ${TAB.label} berhasil dimuat • ${raw.length.toLocaleString('id-ID')} baris ${fromCache?'(dari cache sesi, tanpa fetch ulang)':'dari Google Sheet NORM AHI '+TAB.label}`;apply();if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}}catch(e){console.error(e);if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}$('status').className='status error';$('status').textContent='Google Sheet belum dapat dibaca. Pastikan spreadsheet dapat diakses publik atau dipublikasikan sebagai CSV.';$('charts').innerHTML='<div class="empty" style="grid-column:1/-1">Data belum tersedia.</div>';}}
 function populateAll(){refreshFilters();updateYears();}
-['unit','upt','ultg','gi','bay','phasa','merk','type'].forEach(id=>$(id).addEventListener('change',()=>{refreshFilters(id);apply()}));['fromYear','toYear'].forEach(id=>$(id).addEventListener('change',apply));$('search').addEventListener('input',()=>{page=1;detailRows()});$('prev').onclick=()=>{if(page>1){page--;detailRows()}};$('next').onclick=()=>{page++;detailRows()};$('resetBtn').onclick=()=>{['unit','upt','ultg','gi','bay','phasa','merk','type'].forEach(id=>$(id).value='');updateYears();apply()};$('exportBtn').onclick=exportCSV;$('updateBtn').onclick=()=>load(true);load();
+['unit','upt','ultg','gi','bay','phasa','merk','type'].forEach(id=>$(id).addEventListener('change',()=>{refreshFilters(id);apply()}));['fromYear','toYear','ahiCondition','deviationFilter'].forEach(id=>$(id).addEventListener('change',apply));$('search').addEventListener('input',()=>{page=1;detailRows()});$('prev').onclick=()=>{if(page>1){page--;detailRows()}};$('next').onclick=()=>{page++;detailRows()};$('resetBtn').onclick=()=>{['unit','upt','ultg','gi','bay','phasa','merk','type','ahiCondition','deviationFilter'].forEach(id=>$(id).value='');updateYears();apply()};$('exportBtn').onclick=exportCSV;$('updateBtn').onclick=()=>load(true);
+document.querySelectorAll('.subtab-btn').forEach(b=>{b.onclick=()=>{subTab=b.dataset.subtab;document.querySelectorAll('.subtab-btn').forEach(x=>x.classList.toggle('active',x===b));renderCharts()}});
+load();
 </script>
 </body></html>
