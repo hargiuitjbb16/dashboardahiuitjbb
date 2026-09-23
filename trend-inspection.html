@@ -9,14 +9,15 @@
 *{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.app{display:flex;min-height:100vh}.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:10px 8px;z-index:20}.logo{height:57px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #edf1f6;margin-bottom:7px;padding:4px 1px 10px;overflow:hidden}.logo img:first-child{width:70px;height:35px;object-fit:contain}.logo img:last-child{width:105px;height:34px;object-fit:contain}.nav a{display:block;padding:10px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:2px 0}.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}.nav a:hover{background:#f2f7fc}.nav .trend{color:#0873d1;font-weight:700;background:#eaf3ff}.nav .sub{font-size:12px;padding-left:30px;margin-left:8px}.nav .sub.active-sub{background:#dcecff;color:#0873d1;font-weight:700}.side-date{position:absolute;bottom:18px;left:8px;right:8px;border:1px solid #dfe7ef;background:#f8fafc;border-radius:8px;padding:10px}.side-date small{display:block;color:#65758a}.side-date b{display:block;margin-top:3px}main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:10px}.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}.brand p{margin:4px 0 0;color:#60748c}.actions{display:flex;gap:8px;align-items:center}.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}.date b{display:block;font-size:11px;margin-top:2px}.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}.status{display:none;border-radius:9px;padding:9px 12px;margin:10px 0;font-weight:700}.status.ok{display:block;color:#137a4a;background:#f4fbf7;border:1px solid #b7e2cc}.status.error{display:block;color:#b42318;background:#fff8f7;border:1px solid #f1b8b2}.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:10px 0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}.filter label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}.filter select{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}.filter-actions{display:flex;gap:8px;align-items:end}.filter-actions button{height:32px}.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.chart-card{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;min-width:0}.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}.chart-title{font-weight:800;font-size:12px}.chart-unit{font-size:10px;color:#73839a;margin-top:3px}.chart-years{font-size:9px;color:#6881a0}.chart-box{height:205px;position:relative}.detail{margin-top:10px;background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#73839a}.detail-actions{display:flex;gap:8px}.search{width:270px;border:1px solid #d2ddea;border-radius:7px;padding:8px 10px}.table-wrap{max-height:430px;overflow:auto;border:1px solid #e6ebf2;border-radius:7px}.table-wrap table{border-collapse:separate;border-spacing:0;min-width:2100px;width:max-content;font-size:10px}.table-wrap th,.table-wrap td{padding:7px 8px;border-bottom:1px solid #edf1f5;border-right:1px solid #edf1f5;white-space:nowrap;background:#fff}.table-wrap th{position:sticky;top:0;background:#f7f9fc;z-index:5;color:#526079}.pager{display:flex;justify-content:flex-end;align-items:center;gap:7px;padding-top:8px}.pager button{padding:5px 10px;border:1px solid #d2ddea;background:#fff;border-radius:6px}.muted{color:#7b8798}.loading{padding:35px;text-align:center;color:#73839a}.empty{padding:35px;text-align:center;color:#73839a}.legend-note{font-size:9px;color:#75849a;margin-top:6px}@media(max-width:1100px){.sidebar{width:175px}main{margin-left:175px;width:calc(100% - 175px)}.chart-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.sidebar{position:relative;width:100%;height:auto}.side-date{position:static;margin-top:10px}main{margin-left:0;width:100%}.app{display:block}.chart-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.header{gap:10px;flex-direction:column}.detail-head{align-items:stretch;flex-direction:column}.search{width:100%}}
 </style>
 <style>
-.ai-panel{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:12px;margin:10px 0}
+.ai-panel{background:linear-gradient(180deg,#fbfdff,#fff);border:1px solid #dce6f0;border-radius:10px;padding:12px;margin:10px 0;position:relative;overflow:hidden}
+.ai-panel:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#0877d1,#7b61a8)}
 .ai-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.ai-title{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13px;color:#17324f}
-.ai-title .dot{width:8px;height:8px;border-radius:50%;background:#20a46b}
+.ai-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:#17324f}
+.ai-badge{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#0877d1,#7b61a8);color:#fff;display:grid;place-items:center;font-size:11px;flex:0 0 22px;box-shadow:0 2px 6px rgba(11,97,197,.25)}
 .ai-title .sub{font-weight:500;color:#8a99aa;font-size:10px}
 .ai-actions{display:flex;gap:7px;align-items:center}
 .ai-actions button{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:7px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:11px}
-.ai-actions button.primary{background:#0877d1;color:#fff}
+.ai-actions button.primary{background:linear-gradient(135deg,#0877d1,#5f8fe0);color:#fff;border-color:transparent}
 .ai-actions button:disabled{opacity:.55;cursor:wait}
 .ai-actions .gear{width:32px;padding:0;border-radius:7px;font-size:14px}
 .ai-settings{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #e3eaf2;gap:8px;grid-template-columns:1fr 1fr auto}
@@ -24,10 +25,37 @@
 .ai-settings label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}
 .ai-settings input{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;padding:0 9px;font-size:11px}
 .ai-settings .save-row{display:flex;align-items:end;gap:6px}
-.ai-body{margin-top:10px;font-size:12px;line-height:1.65;color:#2c435f;white-space:pre-wrap}
-.ai-body.placeholder{color:#8a99aa}
-.ai-note{font-size:9px;color:#8a99aa;margin-top:6px}
-@media(max-width:900px){.ai-settings{grid-template-columns:1fr}}
+.ai-body{margin-top:11px}
+.ai-placeholder{color:#8a99aa;font-size:11.5px}
+.ai-error{color:#c62828;font-size:11.5px}
+.ai-loading{display:flex;align-items:center;gap:8px;color:#5b7796;font-size:11.5px;padding:2px 0}
+.ai-loading .dots{display:inline-flex;gap:3px}
+.ai-loading .dots span{width:5px;height:5px;border-radius:50%;background:#0877d1;display:inline-block;animation:aiPulse 1.1s infinite ease-in-out}
+.ai-loading .dots span:nth-child(2){animation-delay:.15s}
+.ai-loading .dots span:nth-child(3){animation-delay:.3s}
+@keyframes aiPulse{0%,80%,100%{opacity:.25;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+.ai-result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.ai-card{border-radius:9px;padding:9px 10px;min-width:0;border:1px solid}
+.ai-card.trend{border-color:#bfe8d3;background:#f4fbf7}
+.ai-card.warn{border-color:#f5d0c2;background:#fff8f5}
+.ai-card.reco{border-color:#c9dff5;background:#f5f9ff}
+.ai-card-head{display:flex;align-items:center;gap:6px;font-weight:800;font-size:9.5px;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.ai-card.trend .ai-card-head{color:#178a56}
+.ai-card.warn .ai-card-head{color:#d1550f}
+.ai-card.reco .ai-card-head{color:#0d68b5}
+.ai-card-icon{width:17px;height:17px;border-radius:5px;display:grid;place-items:center;font-size:10px;flex:0 0 17px;color:#fff}
+.ai-card.trend .ai-card-icon{background:#20a46b}
+.ai-card.warn .ai-card-icon{background:#e5622a}
+.ai-card.reco .ai-card-icon{background:#0877d1}
+.ai-card ul{margin:0;padding-left:14px;font-size:10.5px;line-height:1.55;color:#33475f}
+.ai-card ul li{margin:3px 0}
+.ai-card .ai-empty{font-size:10px;color:#9aa8b8;font-style:italic}
+.ai-fallback{font-size:12px;line-height:1.65;color:#2c435f;white-space:pre-wrap}
+.ai-meta{margin-top:8px;font-size:9px;color:#95a3b3}
+.ai-note{font-size:9px;color:#8a99aa;margin-top:8px}
+.ai-key-status{font-size:9.5px;color:#5b7796;margin-top:2px}
+.ai-key-status.warn{color:#c62828}
+@media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -64,7 +92,7 @@
 </section>
 <section class="panel ai-panel">
  <div class="ai-head">
-  <div class="ai-title"><span class="dot"></span>AI Insight <span class="sub">Ringkasan otomatis dari data yang sedang difilter</span></div>
+  <div class="ai-title"><span class="ai-badge">✦</span>AI Insight <span class="sub">Ringkasan otomatis dari data yang sedang difilter</span></div>
   <div class="ai-actions">
    <button class="gear" id="aiSettingsBtn" type="button" title="Pengaturan API Key">⚙</button>
    <button class="primary" id="aiGenerateBtn" type="button">✨ Generate Insight</button>
@@ -74,8 +102,9 @@
   <div><label>Groq API Key</label><input type="password" id="aiKeyInput" placeholder="gsk_..." autocomplete="off"></div>
   <div><label>Model ID</label><input type="text" id="aiModelInput" placeholder="qwen/qwen3.8-27b" autocomplete="off"></div>
   <div class="save-row"><button class="btn primary" id="aiSaveBtn" type="button">Simpan</button><button class="btn" id="aiClearBtn" type="button">Hapus</button></div>
+  <div class="ai-key-status" id="aiKeyExpiryNote" style="grid-column:1/-1"></div>
  </div>
- <div class="ai-body placeholder" id="aiBody">Klik "Generate Insight" untuk analisis otomatis dari data yang sedang ditampilkan pada tab ini.</div>
+ <div class="ai-body" id="aiBody"><div class="ai-placeholder">Klik "Generate Insight" untuk analisis otomatis dari data yang sedang ditampilkan pada tab ini.</div></div>
  <div class="ai-note">Key hanya disimpan di browser ini (localStorage), tidak dikirim ke repository/GitHub.</div>
 </section>
 <section class="chart-grid" id="charts"><div class="loading" style="grid-column:1/-1">Memuat data...</div></section>
@@ -86,8 +115,693 @@
 </section>
 </main></div>
 <script>
+const AI_SYSTEM_PROMPT_PMT=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
+PERALATAN PMT (Pemutus Tenaga) dan PERHITUNGAN ASSET HEALTH INDEX (AHI)
+berdasarkan "Dokumen Panduan Perhitungan Skor AHI 2024 – PMT".
+
+TUJUAN PEMBELAJARAN
+-------------------
+Pelajari dan gunakan dokumen tersebut sebagai sumber utama untuk:
+
+1. Memahami failure mode PMT.
+2. Memahami indikator kondisi PMT.
+3. Memahami jenis aktivitas inspeksi.
+4. Memahami batas nilai Critical, Poor, Fair, Good, dan Very Good.
+5. Mengubah hasil inspeksi/pengujian PMT menjadi skor AHI.
+6. Menentukan kategori AHI berdasarkan hasil pengujian.
+7. Menjelaskan parameter apa yang menjadi pemicu AHI.
+8. Membantu melakukan analisis kondisi PMT berdasarkan data inspeksi.
+9. Membantu membuat rekomendasi tindak lanjut berdasarkan parameter yang
+   mendapatkan kategori AHI rendah.
+
+==================================================
+A. SISTEM SKOR AHI
+==================================================
+
+Gunakan klasifikasi berikut:
+
+Critical    = Skor 100 = Kategori 5
+Poor        = Skor 30  = Kategori 4
+Fair        = Skor 10  = Kategori 3
+Good        = Skor 3   = Kategori 2
+Very Good   = Skor 1   = Kategori 1
+
+Jangan mengubah nilai skor tersebut kecuali terdapat instruksi resmi baru.
+
+==================================================
+B. PARAMETER AHI PMT
+==================================================
+
+Pelajari setiap parameter berikut sebagai parameter independen:
+
+1. Tahanan Isolasi
+2. Purity SF6
+3. Dew Point SF6
+4. SO2 SF6
+5. Kevakuman PMT
+6. BDV Oil Main Tank
+7. Kebocoran Media Isolasi
+8. Kondisi Insulator
+9. Opening Time CB 70 kV
+10. Opening Time CB 150 kV
+11. Opening Time CB 275 kV
+12. Opening Time CB 500 kV
+13. Closing Time CB
+14. Keserempakan Opening
+15. [Nomor 15 tidak ditampilkan pada bagian dokumen yang tersedia]
+16. Keserempakan Closing
+17. Tahanan Kontak
+18. Hotspot pada Body PMT
+19. Kapasitansi Grading Capacitor
+20. Resistansi Closing Resistor
+
+Jika sebuah parameter tidak tersedia dalam dokumen,
+JANGAN mengarang nilai atau batas kategorinya.
+
+==================================================
+C. PARAMETER DIELEKTRIK
+==================================================
+
+1. TAHANAN ISOLASI
+------------------
+
+Aktivitas:
+Pengujian Tahanan Isolasi.
+
+Objek:
+IL3 – All:
+- atas
+- bawah
+- atas-ground
+- bawah-ground
+
+Satuan:
+MΩ
+
+Klasifikasi:
+
+< 1000 MΩ
+→ Critical
+
+1000 – 2000 MΩ
+→ Poor
+
+> 2000 – 5000 MΩ
+→ Fair
+
+> 5000 – 10000 MΩ
+→ Good
+
+> 10000 MΩ
+→ Very Good
+
+
+2. PURITY SF6
+-------------
+
+Aktivitas:
+Pengujian Gas SF6.
+
+Acuan:
+SKDIR 520.
+
+Objek:
+PMT SF6 >20 kV.
+
+Satuan:
+%
+
+Gunakan batas pada dokumen untuk menentukan kategori AHI.
+
+Kondisi yang ditampilkan dalam dokumen:
+< 97%
+≥ 97% sampai < 98,5%
+≥ 98,5%
+
+Jangan membuat kategori tambahan jika dokumen tidak
+memberikan batas tersebut secara eksplisit.
+
+
+3. DEW POINT SF6
+----------------
+
+Aktivitas:
+Pengujian Gas SF6.
+
+Acuan:
+SKDIR 520.
+
+Objek:
+PMT SF6 >20 kV.
+
+Satuan:
+°C
+
+Batas yang tercantum:
+
+≥ -5 °C
+dan
+< -5 °C
+
+Gunakan pembagian kategori persis sesuai dokumen.
+
+
+4. SO2 SF6
+----------
+
+Aktivitas:
+Pengujian Gas SF6.
+
+Acuan:
+SKDIR 520.
+
+Objek:
+PMT SF6 >20 kV.
+
+Satuan:
+ppmv
+
+Batas:
+
+≥ 12 ppmv
+< 12 ppmv
+
+Gunakan kategori sesuai tabel AHI.
+
+
+5. KEVAKUMAN PMT
+----------------
+
+Aktivitas:
+Pengujian Kevakuman PMT secara elektrik.
+
+Acuan:
+SKDIR 520.
+
+Objek:
+PMT Vakum.
+
+Hasil:
+FAIL / PASS
+
+Gunakan hasil tersebut untuk menentukan kategori
+berdasarkan tabel dokumen.
+
+
+6. BDV OIL MAIN TANK
+--------------------
+
+Parameter:
+BDV Oil Main Tank (kV at 2.5 mm)
+
+Aktivitas:
+Pengujian Karakteristik Minyak.
+
+Acuan:
+- IEEE C57.106
+- IEEE C57.147
+- IEC 60422
+- IEC 62975
+
+Keterangan:
+Um < 72,5 kV.
+
+Satuan:
+kV per 2,5 mm
+
+Batas yang tercantum:
+
+< 30
+30 – 40
+> 40 – 55
+> 55
+
+Gunakan klasifikasi AHI sesuai tabel dokumen.
+
+
+7. KEBOCORAN MEDIA ISOLASI
+--------------------------
+
+Failure Mode:
+Rembesan/Kebocoran.
+
+Media:
+- Minyak
+- Gas
+
+Aktivitas:
+Pengecekan visual.
+
+Acuan:
+SKDIR 520 IL1.
+
+Kondisi yang diperhatikan:
+- oil level indicator kosong
+- low level indikator minyak/gas
+- ada tetesan/spot/bekas minyak
+- rembesan
+- tidak ada rembesan
+
+Gunakan kondisi visual tersebut sebagai indikator kondisi
+PMT.
+
+
+8. KONDISI INSULATOR
+--------------------
+
+Failure Mode:
+Penurunan fungsi insulator.
+
+Pemeriksaan pada:
+- grading kapasitor
+- closing resistor jika ada
+- chamber
+
+Aktivitas:
+Pengecekan visual.
+
+Acuan:
+SKDIR 520 IL1.
+
+Klasifikasi kondisi:
+
+Cacat Mayor:
+- pecah
+- ada bekas flashover
+
+Cacat Minor:
+- retak insulator
+- kotor permukaan/polutan
+- warna pudar
+
+Tidak ada cacat / normal.
+
+Gunakan tingkat cacat sesuai tabel AHI.
+
+
+==================================================
+D. PARAMETER MEKANISME PENGGERAK
+==================================================
+
+9. OPENING TIME – 70 kV
+-----------------------
+
+Acuan:
+KEPDIR 149.
+
+Aktivitas:
+Pengujian Keserempakan CB.
+
+Satuan:
+ms
+
+Batas:
+
+> 50 ms
+→ kategori terburuk
+
+17 – 50 ms
+
+≤ 17 ms
+→ kategori terbaik
+
+
+10. OPENING TIME – 150 kV
+-------------------------
+
+Batas:
+
+> 40 ms
+17 – 40 ms
+≤ 17 ms
+
+
+11. OPENING TIME – 275 kV
+-------------------------
+
+Batas:
+
+> 30 ms
+17 – 30 ms
+≤ 17 ms
+
+
+12. OPENING TIME – 500 kV
+-------------------------
+
+Batas:
+
+> 30 ms
+17 – 30 ms
+≤ 17 ms
+
+
+13. CLOSING TIME
+----------------
+
+Aktivitas:
+Pengujian Keserempakan CB.
+
+Acuan:
+IEC 62271 / SPLN.
+
+Batas:
+
+> 110 ms
+≤ 110 ms
+
+
+14. KESEREMPAKAN OPENING
+------------------------
+
+Aktivitas:
+Pengujian Keserempakan CB.
+
+Acuan:
+SKDIR 520 / SPLN.
+
+Batas:
+
+> 4 ms
+≤ 4 ms
+
+
+15. PARAMETER TIDAK TERSEDIA
+----------------------------
+
+Nomor 15 tidak terlihat pada dokumen yang tersedia.
+
+Jangan membuat definisi atau batas nilai sendiri.
+
+Jika user memberikan data parameter nomor 15,
+nyatakan bahwa parameter tersebut perlu dicocokkan dengan
+dokumen/manual resmi.
+
+
+16. KESEREMPAKAN CLOSING
+------------------------
+
+Aktivitas:
+Pengujian Keserempakan CB.
+
+Acuan:
+SKDIR 520 / SPLN.
+
+Untuk bay selain Kapasitor/Reaktor:
+
+> 10 ms
+≤ 10 ms
+
+Gunakan batas tersebut sesuai tabel.
+
+
+==================================================
+E. PARAMETER PRIMARY
+==================================================
+
+17. TAHANAN KONTAK
+------------------
+
+Failure Mode:
+Kontak tidak tertutup dengan sempurna /
+kontak mengalami pengotoran.
+
+Aktivitas:
+Pengujian Tahanan Kontak.
+
+Acuan:
+- SKDIR 520
+- KEPDIR 149
+- SME (2,3)
+
+Satuan:
+µΩ
+
+Batas:
+
+> 100 µΩ
+→ Critical
+
+> 80 – 100 µΩ
+→ Poor
+
+40 – 80 µΩ
+→ Fair
+
+< 40 µΩ
+→ Very Good
+
+Perhatikan bahwa klasifikasi harus mengikuti tabel
+dokumen dan jangan mengubah interval.
+
+
+18. HOTSPOT BODY PMT
+--------------------
+
+Failure Mode:
+Temuan hotspot pada body.
+
+Aktivitas:
+Thermovisi pada body insulator.
+
+Acuan:
+- SKDIR 520
+- NETA MTS-2023
+
+Terdapat dua kondisi pembanding:
+
+A. Selisih suhu pada sisi body PMT atau antar fasa
+   pada loading/beban yang sama.
+
+B. Selisih suhu dengan suhu ambient pada PMT
+   yang berdiri sendiri.
+
+Batas:
+
+Kondisi A:
+> 3 °C
+≤ 3 °C
+
+Kondisi B:
+> 10 °C
+≤ 10 °C
+
+Gunakan konteks pengukuran yang tepat sebelum
+menentukan kategori.
+
+
+19. GRADING CAPACITOR
+--------------------
+
+Failure Mode:
+Kerusakan Grading Kapasitor.
+
+Parameter:
+Nilai Kapasitansi.
+
+Aktivitas:
+Pengukuran Kapasitansi pada grading kapasitor.
+
+Acuan:
+SKDIR 520.
+
+Khusus:
+PMT dengan grading kapasitor.
+
+Satuan:
+pF
+
+Kondisi:
+
+Tidak sesuai manual book
+→ kondisi abnormal
+
+Sesuai manual book
+→ kondisi normal
+
+Jangan menentukan batas kapasitansi sendiri jika
+nilai manual book pabrikan tidak diberikan.
+
+
+20. CLOSING RESISTOR
+--------------------
+
+Failure Mode:
+Kerusakan Closing Resistor.
+
+Parameter:
+Nilai Resistansi.
+
+Aktivitas:
+Pengukuran Resistansi pada closing resistor.
+
+Acuan:
+SKDIR 520.
+
+Khusus:
+PMT dengan closing resistor.
+
+Satuan:
+Ohm
+
+Kondisi:
+
+Tidak sesuai manual book
+→ kondisi abnormal
+
+Sesuai manual book
+→ kondisi normal
+
+Jangan membuat nilai standar sendiri apabila
+manual book pabrikan tidak tersedia.
+
+
+==================================================
+F. ATURAN KHUSUS MANUAL PABRIKAN
+==================================================
+
+Untuk point 9 sampai 16 pada subsistem mekanisme
+penggerak:
+
+APABILA nilai batas pada dokumen berbeda dengan
+nilai pada manual pabrikan, maka nilai rujukan yang
+digunakan adalah NILAI PABRIKAN TERLEBIH DAHULU.
+
+Ini adalah aturan penting dalam melakukan assessment.
+
+
+==================================================
+G. CARA AI MENGANALISIS DATA PMT
+==================================================
+
+Jika user memberikan data pengujian PMT, lakukan proses:
+
+STEP 1
+Identifikasi:
+- jenis PMT
+- tegangan
+- merk
+- tipe
+- parameter yang diuji
+- nilai hasil pengujian
+- satuan
+- acuan yang digunakan
+
+STEP 2
+Cari parameter tersebut dalam tabel AHI PMT.
+
+STEP 3
+Cocokkan nilai hasil pengujian dengan batas kategori.
+
+STEP 4
+Tentukan:
+- Kategori AHI
+- Skor AHI
+- Parameter pemicu
+- Failure mode
+- Acuan
+
+STEP 5
+Jika terdapat beberapa parameter abnormal,
+identifikasi seluruh parameter tersebut.
+
+STEP 6
+Tampilkan hasil dalam tabel:
+
+| No | Parameter | Hasil Uji | Satuan |
+| Kategori AHI | Skor | Failure Mode | Acuan |
+| Pemicu |
+
+STEP 7
+Berikan analisis teknis singkat:
+- kondisi yang ditemukan
+- parameter yang paling perlu diperhatikan
+- alasan parameter masuk kategori tersebut
+- data tambahan yang diperlukan jika belum cukup
+
+JANGAN langsung memberikan rekomendasi penggantian PMT
+hanya karena satu parameter buruk. Jelaskan terlebih dahulu
+parameter dan kondisi yang mendasarinya.
+
+
+==================================================
+H. ATURAN PENTING
+==================================================
+
+1. Dokumen AHI 2024 adalah sumber utama.
+2. Jangan mengarang nilai batas yang tidak ada.
+3. Jangan mengubah satuan.
+4. Jangan mengubah definisi kategori.
+5. Bedakan antara hasil pengujian dan interpretasi.
+6. Jika data tidak cukup, katakan "data tidak cukup".
+7. Jika terdapat manual pabrikan, gunakan manual pabrikan
+   terlebih dahulu untuk point 9–16 apabila nilainya berbeda.
+8. Jangan menyamakan batas PMT 70 kV, 150 kV, 275 kV,
+   dan 500 kV karena batas opening time berbeda.
+9. Bedakan PMT SF6 dan PMT Vakum.
+10. Untuk parameter yang membutuhkan manual book, jangan
+    membuat nilai referensi sendiri.
+11. Jika user memberikan data dalam Excel/CSV, lakukan
+    assessment per baris aset.
+12. Jika terdapat beberapa parameter pemicu pada satu PMT,
+    tampilkan seluruh parameter pemicu tanpa duplikasi.
+
+==================================================
+I. FORMAT JAWABAN AI (mode chat interaktif di luar dashboard ini)
+==================================================
+
+Jika user bertanya:
+
+"Berapa AHI PMT ini?"
+
+Jawab:
+
+1. Identifikasi aset
+2. Parameter yang diuji
+3. Hasil pengujian
+4. Batas AHI
+5. Kategori
+6. Skor
+7. Parameter pemicu
+8. Failure mode
+9. Acuan
+10. Analisis kondisi
+11. Data yang masih diperlukan
+
+Gunakan bahasa teknis yang mudah dipahami oleh
+Officer Assessment / Engineer PLN.
+
+Jangan memberikan jawaban hanya berupa angka.
+Selalu jelaskan bagaimana kategori tersebut diperoleh.
+
+==================================================
+J. TUJUAN AKHIR
+==================================================
+
+AI harus mampu berfungsi sebagai:
+
+"AI Assistant Asset Health Index PMT"
+
+yang dapat membantu Officer Assessment untuk:
+
+- membaca hasil inspeksi
+- membaca hasil pengujian
+- menentukan kategori AHI
+- menentukan skor AHI
+- menemukan parameter pemicu
+- menjelaskan failure mode
+- melakukan screening kondisi PMT
+- membantu analisis data AHI dalam jumlah besar
+- membantu membuat insight dashboard AHI
+- membantu melakukan trending kondisi PMT
+- membantu mengidentifikasi parameter yang paling sering
+  menjadi pemicu AHI rendah.
+
+Setiap jawaban harus dapat ditelusuri kembali ke
+parameter dan batas yang terdapat dalam Dokumen
+Panduan Perhitungan Skor AHI 2024.`;
 const TABS={
- pmt:{key:'pmt',label:'PMT',sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
+ pmt:{key:'pmt',label:'PMT',aiSystemPrompt:AI_SYSTEM_PROMPT_PMT,sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
   columns:{unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay']},
   phaseChartIds:['irAB','irAG','irBG','purity','dew','so2'],
   chartSpecs:[['irAB','IR Atas-Bawah','Mega Ohm',[{key:'irAB',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irAG','IR Atas-Ground','Mega Ohm',[{key:'irAG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irBG','IR Bawah-Ground','Mega Ohm',[{key:'irBG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['contact','Tahanan Kontak','mikro Ohm (µΩ)',[{key:'contactR',label:'R'},{key:'contactS',label:'S'},{key:'contactT',label:'T'}],['#e53935','#f29a00','#1688f0']],['closing','Closing Time','ms',[{key:'closingR',label:'R'},{key:'closingS',label:'S'},{key:'closingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['opening','Opening Time','ms',[{key:'openingR',label:'R'},{key:'openingS',label:'S'},{key:'openingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['purity','SF6 Purity','%',[{key:'purity',label:'Purity'}],['#e53935','#f29a00','#1688f0']],['dew','SF6 Dew Point','°C',[{key:'dew',label:'Dew Point'}],['#e53935','#f29a00','#1688f0']],['so2','SF6 SO2','ppmV',[{key:'so2',label:'SO2'}],['#e53935','#f29a00','#1688f0']]],
@@ -145,29 +859,80 @@ const limitPlugin={
 Chart.register(limitPlugin);
 
 const AI_KEY_STORAGE='trendAiGroqKey';
+const AI_KEY_EXPIRY_STORAGE='trendAiGroqKeyExpiry';
 const AI_MODEL_STORAGE='trendAiGroqModel';
 const AI_MODEL_DEFAULT='qwen/qwen3.8-27b';
+const AI_KEY_TTL_MS=8*60*60*1000;
+function aiFormatDuration(ms){
+ const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+ return h>0?`${h} jam ${m} menit`:`${m} menit`;
+}
+function aiKeyStatus(){
+ const k=localStorage.getItem(AI_KEY_STORAGE);
+ const exp=+localStorage.getItem(AI_KEY_EXPIRY_STORAGE)||0;
+ if(!k)return {key:'',expired:false};
+ if(Date.now()>exp){
+  localStorage.removeItem(AI_KEY_STORAGE);
+  localStorage.removeItem(AI_KEY_EXPIRY_STORAGE);
+  return {key:'',expired:true};
+ }
+ return {key:k,expired:false,remainingMs:exp-Date.now()};
+}
+const AI_SYSTEM_PROMPT_DEFAULT='Anda adalah asisten analisis untuk dashboard pemantauan Asset Health Index (AHI) gardu induk PLN.';
+const AI_OUTPUT_FORMAT_INSTRUCTION='Untuk kebutuhan panel "AI Insight" pada dashboard ini (mode ringkasan otomatis, bukan sesi chat interaktif satu-per-satu), balas HANYA dengan JSON valid, tanpa markdown dan tanpa teks lain di luar JSON, persis bentuk ini: {"tren":["poin singkat"],"perhatian":["poin singkat"],"rekomendasi":["poin singkat"]}. Maksimal 3 poin per array, masing-masing satu kalimat pendek dan padat dalam Bahasa Indonesia, sebutkan nama parameter dan kategori AHI (Critical/Poor/Fair/Good/Very Good) bila relevan berdasarkan aturan di atas. "tren" = parameter dengan kategori Good/Very Good atau kondisi membaik; "perhatian" = parameter berkategori Poor/Critical atau mendekati batas tersebut (array kosong jika tidak ada); "rekomendasi" = saran tindak lanjut untuk parameter pada "perhatian", mengacu pada failure mode/aturan di atas bila tersedia — jangan langsung merekomendasikan penggantian aset hanya karena satu parameter buruk. Jika ringkasan data yang diberikan tidak mencakup parameter yang dibutuhkan untuk menentukan kategori, jangan mengarang, cukup lewati parameter tersebut.';
 let aiHasResult=false;
-function aiGetKey(){return localStorage.getItem(AI_KEY_STORAGE)||''}
+function aiGetKey(){return aiKeyStatus().key}
 function aiGetModel(){return localStorage.getItem(AI_MODEL_STORAGE)||AI_MODEL_DEFAULT}
-function aiSetBody(text,isPlaceholder){$('aiBody').textContent=text;$('aiBody').classList.toggle('placeholder',!!isPlaceholder);aiHasResult=!isPlaceholder}
+function aiRenderPlaceholder(text){$('aiBody').innerHTML=`<div class="ai-placeholder">${escapeHtml(text)}</div>`;aiHasResult=false}
+function aiRenderError(text){$('aiBody').innerHTML=`<div class="ai-error">${escapeHtml(text)}</div>`;aiHasResult=false}
+function aiRenderLoading(){$('aiBody').innerHTML='<div class="ai-loading">AI sedang menganalisis data<span class="dots"><span></span><span></span><span></span></span></div>';aiHasResult=false}
+function aiRenderFallback(text){$('aiBody').innerHTML=`<div class="ai-fallback">${escapeHtml(text)}</div>`;aiHasResult=true}
+function aiCardHtml(cls,icon,label,items){
+ const body=items&&items.length?('<ul>'+items.map(x=>`<li>${escapeHtml(x)}</li>`).join('')+'</ul>'):'<div class="ai-empty">Tidak ada catatan.</div>';
+ return `<div class="ai-card ${cls}"><div class="ai-card-head"><span class="ai-card-icon">${icon}</span>${label}</div>${body}</div>`;
+}
+function aiRenderStructured(obj){
+ const grid=aiCardHtml('trend','▲','Tren Positif',obj.tren)+aiCardHtml('warn','⚠','Perlu Perhatian',obj.perhatian)+aiCardHtml('reco','➔','Rekomendasi',obj.rekomendasi);
+ const time=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+ $('aiBody').innerHTML=`<div class="ai-result-grid">${grid}</div><div class="ai-meta">Dibuat pukul ${time} • model ${escapeHtml(aiGetModel())}</div>`;
+ aiHasResult=true;
+}
+function aiRefreshKeyStatusNote(){
+ const el=$('aiKeyExpiryNote');if(!el)return;
+ const status=aiKeyStatus();
+ if(status.key){
+  el.textContent='Key aktif, berlaku lagi selama '+aiFormatDuration(status.remainingMs)+' (otomatis hilang setelahnya).';
+  el.classList.remove('warn');
+ }else if(status.expired){
+  el.textContent='Key sebelumnya sudah kedaluwarsa dan telah dihapus otomatis. Masukkan key baru untuk melanjutkan.';
+  el.classList.add('warn');
+ }else{
+  el.textContent='Belum ada key tersimpan. Key akan otomatis kedaluwarsa '+aiFormatDuration(AI_KEY_TTL_MS)+' setelah disimpan.';
+  el.classList.remove('warn');
+ }
+}
 $('aiSettingsBtn').onclick=()=>{
  const box=$('aiSettings');
  box.classList.toggle('open');
- if(box.classList.contains('open')){$('aiKeyInput').value=aiGetKey();$('aiModelInput').value=aiGetModel()}
+ if(box.classList.contains('open')){$('aiKeyInput').value=aiGetKey();$('aiModelInput').value=aiGetModel();aiRefreshKeyStatusNote()}
 };
 $('aiSaveBtn').onclick=()=>{
  const k=$('aiKeyInput').value.trim(),m=$('aiModelInput').value.trim();
- if(k)localStorage.setItem(AI_KEY_STORAGE,k);
+ if(k){
+  localStorage.setItem(AI_KEY_STORAGE,k);
+  localStorage.setItem(AI_KEY_EXPIRY_STORAGE,String(Date.now()+AI_KEY_TTL_MS));
+ }
  localStorage.setItem(AI_MODEL_STORAGE,m||AI_MODEL_DEFAULT);
  $('aiSettings').classList.remove('open');
- aiSetBody('Pengaturan disimpan. Klik "Generate Insight" untuk membuat analisis.',true);
+ aiRenderPlaceholder(k?('Pengaturan disimpan. Key berlaku '+aiFormatDuration(AI_KEY_TTL_MS)+' sejak sekarang. Klik "Generate Insight" untuk membuat analisis.'):'Pengaturan disimpan. Klik "Generate Insight" untuk membuat analisis.');
 };
 $('aiClearBtn').onclick=()=>{
  localStorage.removeItem(AI_KEY_STORAGE);
+ localStorage.removeItem(AI_KEY_EXPIRY_STORAGE);
  localStorage.removeItem(AI_MODEL_STORAGE);
  $('aiKeyInput').value='';$('aiModelInput').value='';
- aiSetBody('API key dihapus dari browser ini.',true);
+ aiRefreshKeyStatusNote();
+ aiRenderPlaceholder('API key dihapus dari browser ini.');
 };
 function aiBuildSummary(){
  const activeFilters=['unit','upt','ultg','gi','bay','phasa','merk','type'].map(id=>({label:$(id).previousElementSibling?.textContent||id,value:$(id).value})).filter(x=>x.value);
@@ -192,16 +957,18 @@ function aiBuildSummary(){
  return {tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
 }
 async function generateInsight(){
- const key=aiGetKey();
+ const status=aiKeyStatus();
+ const key=status.key;
  if(!key){
-  aiSetBody('Belum ada API key Groq. Klik ikon ⚙ untuk memasukkan API key terlebih dahulu.',true);
+  aiRenderPlaceholder(status.expired?('API key Groq sudah kedaluwarsa (berlaku '+aiFormatDuration(AI_KEY_TTL_MS)+') dan otomatis dihapus. Klik ikon ⚙ untuk memasukkan API key lagi.'):'Belum ada API key Groq. Klik ikon ⚙ untuk memasukkan API key terlebih dahulu.');
   $('aiSettings').classList.add('open');
+  aiRefreshKeyStatusNote();
   $('aiKeyInput').focus();
   return;
  }
  const btn=$('aiGenerateBtn');
  btn.disabled=true;btn.textContent='⏳ Menganalisis...';
- aiSetBody('Sedang menganalisis data...',true);
+ aiRenderLoading();
  try{
   const summary=aiBuildSummary();
   const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -211,8 +978,8 @@ async function generateInsight(){
     model:aiGetModel(),
     temperature:0.3,
     messages:[
-     {role:'system',content:'Anda adalah asisten analisis untuk dashboard pemantauan Asset Health Index (AHI) gardu induk PLN. Jawab dalam Bahasa Indonesia, ringkas (maksimal 6 kalimat atau poin), langsung ke inti: sebutkan tren penting, nilai yang mendekati/melewati ambang batas, dan rekomendasi tindakan inspeksi jika relevan. Jangan mengulang angka mentah secara berlebihan, fokus pada makna teknisnya. Tulis sebagai teks polos tanpa markdown (jangan pakai *, **, #, atau simbol format lain).'},
-     {role:'user',content:'Berikut data hasil pengujian tab "'+summary.tab+'" yang sedang difilter pada dashboard trend inspection:\n\n'+JSON.stringify(summary,null,2)+'\n\nBuatkan ringkasan insight teknisnya.'}
+     {role:'system',content:(TAB.aiSystemPrompt||AI_SYSTEM_PROMPT_DEFAULT)+'\n\n'+AI_OUTPUT_FORMAT_INSTRUCTION},
+     {role:'user',content:'Berikut data hasil pengujian tab "'+summary.tab+'" yang sedang difilter pada dashboard trend inspection:\n\n'+JSON.stringify(summary,null,2)+'\n\nBuatkan ringkasan insight teknisnya sebagai JSON sesuai instruksi.'}
     ]
    })
   });
@@ -223,11 +990,24 @@ async function generateInsight(){
   const data=await res.json();
   let text=data.choices?.[0]?.message?.content?.trim();
   if(!text)throw new Error('Respons AI kosong');
-  text=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s*/gm,'');
-  aiSetBody(text,false);
+  let parsed=null;
+  try{
+   const s=text.indexOf('{'),e=text.lastIndexOf('}');
+   const jsonStr=(s>=0&&e>s)?text.slice(s,e+1):text;
+   const obj=JSON.parse(jsonStr);
+   if(obj&&(Array.isArray(obj.tren)||Array.isArray(obj.perhatian)||Array.isArray(obj.rekomendasi))){
+    parsed={tren:obj.tren||[],perhatian:obj.perhatian||[],rekomendasi:obj.rekomendasi||[]};
+   }
+  }catch(_e){}
+  if(parsed){
+   aiRenderStructured(parsed);
+  }else{
+   const clean=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s*/gm,'');
+   aiRenderFallback(clean);
+  }
  }catch(e){
   console.error('AI insight error:',e);
-  aiSetBody('Gagal membuat insight: '+String(e.message||e)+'. Periksa API key/model, atau koneksi ke Groq.',true);
+  aiRenderError('Gagal membuat insight: '+String(e.message||e)+'. Periksa API key/model, atau koneksi ke Groq.');
  }finally{
   btn.disabled=false;btn.textContent='✨ Generate Insight';
  }
@@ -251,7 +1031,7 @@ function escapeHtml(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;',
 function baseFiltered(stop){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];for(const id of ids){if(id===stop)break;let v=$(id).value;if(v)f=f.filter(r=>val(r,id=== 'type'?'type':id)===v)}return f}
 function refreshFilters(changed){let order=['unit','upt','ultg','gi','bay','phasa','merk','type'];let current={};order.forEach(id=>current[id]=$(id).value);for(let i=0;i<order.length;i++){let id=order[i],f=raw.slice();for(let j=0;j<i;j++){let v=current[order[j]];if(v)f=f.filter(r=>val(r,order[j])===v)}fill(id,uniqueBy(f,id),current[id])}updateYears();}
 function updateYears(){let ys=raw.map(r=>year(val(r,'date'))).filter(Boolean);let min=Math.min(...ys,2014),max=Math.max(...ys,new Date().getFullYear());let vals=[];for(let y=min;y<=max;y++)vals.push(String(y));fill('fromYear',vals,$('fromYear').value);fill('toYear',vals,$('toYear').value);if(!$('fromYear').value)$('fromYear').value=String(Math.max(min,max-12));if(!$('toYear').value)$('toYear').value=String(max)}
-function apply(){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});let fy=+$('fromYear').value,ty=+$('toYear').value;if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);filtered=f;page=1;render();if(aiHasResult)aiSetBody('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.',true)}
+function apply(){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});let fy=+$('fromYear').value,ty=+$('toYear').value;if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);filtered=f;page=1;render();if(aiHasResult)aiRenderPlaceholder('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.')}
 function makeChart(id,title,unit,keys,colors){
 let el=$(id);
 let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
