@@ -276,6 +276,7 @@ const TRIGGER_MASTER = {
   "Capacitor":[]
 };
 const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor"];
+const TRIGGER_MASTER_LIST=Object.values(TRIGGER_MASTER).flat().sort((x,y)=>y.length-x.length).map(master=>({master,normMaster:norm(master)}));
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
 const TRIGGER_COLORS=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#00a6a6","#64748b","#d14d72","#8c6b43","#5b8def","#2e9d5b"];
 
@@ -288,6 +289,7 @@ function fmt(n){return Number(n||0).toLocaleString("id-ID")}
 function pct(n,t){return t?((n/t)*100).toFixed(1).replace(".",",")+"%":"0,0%"}
 function canonical(v){let n=norm(v);return TYPES.find(x=>norm(x)===n)||""}
 function valAge(r){let y=Number(String(r["Tahun Buat"]||"").match(/\d{4}/)?.[0]);return y?Math.max(0,new Date().getFullYear()-y):null}
+function precomputeDerived(rows){rows.forEach(r=>{r.__type=canonical(r["Jenis Aset"]);r.__ahi=norm(r["AHI"]);r.__age=valAge(r)})}
 
 function parseCSV(t){
  t=t.replace(/^\uFEFF/,"");
@@ -312,7 +314,7 @@ function parseCSV(t){
 
 function group(r,g){
  if(!g)return true;
- let t=canonical(r["Jenis Aset"]);
+ let t=r.__type??canonical(r["Jenis Aset"]);
  if(!t)return false;
  if(["Reactor","Capacitor"].includes(t))return true;
  let v=norm(r["Tegangan"]).replace(/\s/g,"");
@@ -378,13 +380,13 @@ function apply(){
    group(r,f.g)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&
    (!f.ultg||r["Ultg"]===f.ultg)&&(!f.gi||r["Gardu Induk"]===f.gi)&&
    (!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&
-   (!f.type||canonical(r["Jenis Aset"])===f.type)&&(!f.ahi||norm(r["AHI"])===norm(f.ahi))
+   (!f.type||(r.__type??canonical(r["Jenis Aset"]))===f.type)&&(!f.ahi||(r.__ahi??norm(r["AHI"]))===norm(f.ahi))
  );
  render();
 }
 
 function renderKpi(){
- let vals=AHI.map(([n])=>filtered.filter(r=>norm(r["AHI"])===norm(n)).length),total=filtered.length;
+ let vals=AHI.map(([n])=>{const nn=norm(n);return filtered.filter(r=>(r.__ahi??norm(r["AHI"]))===nn).length}),total=filtered.length;
  let names=["TOTAL ASET",...AHI.map(x=>x[0])],nums=[total,...vals],cls=["","vg","good","fair","poor","critical"];
  document.getElementById("kpis").innerHTML=names.map((n,i)=>`<div class="kpi"><small>${n}</small><div class="num">${fmt(nums[i])}</div><div class="pct ${cls[i]}">${i===0?"100%":pct(nums[i],total)}</div></div>`).join("");
 }
@@ -392,8 +394,8 @@ function renderKpi(){
 function renderCharts(){
  const icons={"Power Transformer":"▥","Current Transformer":"⌁","Potential Transformer":"♙","Circuit Breaker":"▣","Disconnecting Switch":"◇","Lightning Arrester":"ϟ","Neutral Grounding Resistance":"⌁","Reactor":"◫","Capacitor":"▤"};
  document.getElementById("ahiCharts").innerHTML=TYPES.map(t=>{
-   const a=filtered.filter(r=>canonical(r["Jenis Aset"])===t),total=a.length;
-   const counts=AHI.map(([n])=>a.filter(r=>norm(r["AHI"])===norm(n)).length);
+   const a=filtered.filter(r=>(r.__type??canonical(r["Jenis Aset"]))===t),total=a.length;
+   const counts=AHI.map(([n])=>{const nn=norm(n);return a.filter(r=>(r.__ahi??norm(r["AHI"]))===nn).length});
    const max=Math.max(1,...counts);
    return `<div class="ahi-chart-card">
     <div class="ahi-chart-head"><div class="ahi-icon">${icons[t]||"•"}</div><div class="ahi-chart-title">${html(t)}</div><div class="ahi-chart-total">${fmt(total)} aset</div></div>
@@ -409,8 +411,8 @@ function renderCharts(){
 
 function renderAges(){
  document.getElementById("ageBars").innerHTML=TYPES.map(t=>{
-  let a=filtered.filter(r=>canonical(r["Jenis Aset"])===t),n=a.length;
-  let c=[a.filter(r=>(valAge(r)??0)<10).length,a.filter(r=>(valAge(r)??0)>=10&&(valAge(r)??0)<=20).length,a.filter(r=>(valAge(r)??0)>20).length];
+  let a=filtered.filter(r=>(r.__type??canonical(r["Jenis Aset"]))===t),n=a.length;
+  let c=[a.filter(r=>(r.__age??valAge(r)??0)<10).length,a.filter(r=>(r.__age??valAge(r)??0)>=10&&(r.__age??valAge(r)??0)<=20).length,a.filter(r=>(r.__age??valAge(r)??0)>20).length];
   return `<div class="age-row"><div class="age-name">${html(t)}</div><div class="bar"><div class="seg young" style="width:${n?c[0]/n*100:0}%">${n&&c[0]/n>.08?pct(c[0],n):""}</div><div class="seg old" style="width:${n?c[1]/n*100:0}%">${n&&c[1]/n>.08?pct(c[1],n):""}</div><div class="seg veryold" style="width:${n?c[2]/n*100:0}%">${n&&c[2]/n>.08?pct(c[2],n):""}</div></div></div>`;
  }).join("");
 }
@@ -502,10 +504,8 @@ function normalizeTriggerCategory(raw){
   // Kunci ke master kategori yang sudah disepakati.
   // Longest match mencegah "Pengujian Gas SF6 - Purity/SO2/Dew Point"
   // tergabung menjadi satu kategori.
-  const allMaster=Object.values(TRIGGER_MASTER).flat().sort((x,y)=>y.length-x.length);
   const ns=norm(s);
-  for(const master of allMaster){
-    const nm=norm(master);
+  for(const {master,normMaster:nm} of TRIGGER_MASTER_LIST){
     if(ns===nm || ns.startsWith(nm+" ") || ns.startsWith(nm+" -") || ns.startsWith(nm+"(")){
       return master;
     }
@@ -541,7 +541,7 @@ function renderTriggers(){
   const palette=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#00a6a6","#795548","#5b8def","#d14d72","#2e9d5b","#8c6b43"];
 
   box.innerHTML=TYPES.map(t=>{
-    const rows=filtered.filter(r=>canonical(r["Jenis Aset"])===t);
+    const rows=filtered.filter(r=>(r.__type??canonical(r["Jenis Aset"]))===t);
     const groups={poor:new Map(),critical:new Map()};
 
     rows.forEach(r=>{
@@ -622,7 +622,7 @@ function renderTable(){
  const shown=pageRows.length;
  document.getElementById("count").textContent=`Menampilkan ${shown.toLocaleString("id-ID")} data • halaman ${currentPage} dari ${totalPages} • total ${arr.length.toLocaleString("id-ID")} data`;
  document.getElementById("thead").innerHTML="<tr>"+cols.map(c=>`<th>${c}</th>`).join("")+"</tr>";
- document.getElementById("tbody").innerHTML=pageRows.map(r=>"<tr>"+cols.map(c=>`<td>${c==="Usia Aset"?(valAge(r)??"—"):html(r[c])}</td>`).join("")+"</tr>").join("")||'<tr><td colspan="19">Tidak ada data.</td></tr>';
+ document.getElementById("tbody").innerHTML=pageRows.map(r=>"<tr>"+cols.map(c=>`<td>${c==="Usia Aset"?((r.__age??valAge(r))??"—"):html(r[c])}</td>`).join("")+"</tr>").join("")||'<tr><td colspan="19">Tidak ada data.</td></tr>';
  renderPagination(totalPages);
 }
 
@@ -660,14 +660,55 @@ document.getElementById("search").addEventListener("input",()=>{currentPage=1;re
 
 document.getElementById("exportBtn").onclick=()=>{
  const q=norm(document.getElementById("search").value),arr=filtered.filter(r=>!q||cols.some(c=>norm(r[c]).includes(q)));
- const out=cols.join(";")+"\n"+arr.map(r=>cols.map(c=>`"${String(c==="Usia Aset"?(valAge(r)??""):r[c]??"").replaceAll('"','""')}"`).join(";")).join("\n");
+ const out=cols.join(";")+"\n"+arr.map(r=>cols.map(c=>`"${String(c==="Usia Aset"?((r.__age??valAge(r))??""):r[c]??"").replaceAll('"','""')}"`).join(";")).join("\n");
  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+out],{type:"text/csv"}));a.download="Monitoring-AHI-Export.csv";a.click();
 };
 
+const CSV_CACHE_TTL_MS=10*60*1000;
+const CSV_CACHE_DB="dashboardCsvCache",CSV_CACHE_STORE="csvCache";
+function csvCacheDb(){
+ return new Promise((resolve,reject)=>{
+  if(!window.indexedDB){reject(Error("no indexedDB"));return}
+  const req=indexedDB.open(CSV_CACHE_DB,1);
+  req.onupgradeneeded=()=>{req.result.createObjectStore(CSV_CACHE_STORE)};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
+ });
+}
+async function getCachedCsv(key){
+ try{
+  const db=await csvCacheDb();
+  return await new Promise(resolve=>{
+   const req=db.transaction(CSV_CACHE_STORE,"readonly").objectStore(CSV_CACHE_STORE).get(key);
+   req.onsuccess=()=>{const rec=req.result;resolve((rec&&(Date.now()-rec.cachedAt)<=CSV_CACHE_TTL_MS)?rec.text:null)};
+   req.onerror=()=>resolve(null);
+  });
+ }catch(e){return null}
+}
+async function setCachedCsv(key,text){
+ try{
+  const db=await csvCacheDb();
+  db.transaction(CSV_CACHE_STORE,"readwrite").objectStore(CSV_CACHE_STORE).put({text,cachedAt:Date.now()},key);
+ }catch(e){}
+}
 async function load(){
  const status=document.getElementById("status");
  status.className="status info";status.textContent="Memuat Monitoring-AHI.csv...";
  let lastError="";
+ const cached=await getCachedCsv("monitoring-ahi");
+ if(cached){
+   raw=parseCSV(cached);
+   if(raw.length){
+     precomputeDerived(raw);
+     buildFilters();apply();
+     const stamp=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});
+     document.getElementById("lastDate").textContent=stamp;
+     document.getElementById("sideDate").textContent=stamp;
+     status.className="status ok";
+     status.textContent=`Monitoring-AHI.csv berhasil dimuat • ${fmt(raw.length)} baris (dari cache sesi)`;
+     return;
+   }
+ }
  for(const url of DATA_URLS){
    try{
      const r=await fetch(url+"?v="+Date.now(),{cache:"no-store"});
@@ -676,6 +717,8 @@ async function load(){
      if(text.trim().length<20){lastError="CSV kosong • "+url;continue}
      raw=parseCSV(text);
      if(!raw.length){lastError="CSV tidak memiliki baris data • "+url;continue}
+     setCachedCsv("monitoring-ahi",text);
+     precomputeDerived(raw);
      buildFilters();apply();
      const stamp=new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});
      document.getElementById("lastDate").textContent=stamp;

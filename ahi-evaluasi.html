@@ -198,6 +198,11 @@ function getMonthValue(r,month,kind){
   });
   return k?r[k]:"";
 }
+function ahiNumberForMonth(r,month){
+  r.__ahiCache=r.__ahiCache||{};
+  if(!(month in r.__ahiCache))r.__ahiCache[month]=ahiNumber(getMonthValue(r,month,"ahi"));
+  return r.__ahiCache[month];
+}
 function parseCSV(t){
   t=t.replace(/^\uFEFF/,"");
   let first=t.split(/\r?\n/).find(x=>x.trim())||"";
@@ -220,6 +225,33 @@ function parseCSV(t){
   const h=rows.shift().map(x=>String(x).trim());
   return rows.map(r=>Object.fromEntries(h.map((x,i)=>[x,String(r[i]??"").trim()])));
 }
+const CSV_CACHE_TTL_MS=10*60*1000;
+const CSV_CACHE_DB="dashboardCsvCache",CSV_CACHE_STORE="csvCache";
+function csvCacheDb(){
+ return new Promise((resolve,reject)=>{
+  if(!window.indexedDB){reject(Error("no indexedDB"));return}
+  const req=indexedDB.open(CSV_CACHE_DB,1);
+  req.onupgradeneeded=()=>{req.result.createObjectStore(CSV_CACHE_STORE)};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
+ });
+}
+async function getCachedCsv(key){
+ try{
+  const db=await csvCacheDb();
+  return await new Promise(resolve=>{
+   const req=db.transaction(CSV_CACHE_STORE,"readonly").objectStore(CSV_CACHE_STORE).get(key);
+   req.onsuccess=()=>{const rec=req.result;resolve((rec&&(Date.now()-rec.cachedAt)<=CSV_CACHE_TTL_MS)?rec.text:null)};
+   req.onerror=()=>resolve(null);
+  });
+ }catch(e){return null}
+}
+async function setCachedCsv(key,text){
+ try{
+  const db=await csvCacheDb();
+  db.transaction(CSV_CACHE_STORE,"readwrite").objectStore(CSV_CACHE_STORE).put({text,cachedAt:Date.now()},key);
+ }catch(e){}
+}
 async function fetchText(url){
   const r=await fetch(url,{cache:"no-store"});
   if(!r.ok)throw new Error("HTTP "+r.status);
@@ -227,6 +259,12 @@ async function fetchText(url){
 }
 async function fetchMonth(month){
   const file=MONTH_FILES[month];if(!file)return null;
+  const cacheKey="evaluasi-"+file;
+  const cached=await getCachedCsv(cacheKey);
+  if(cached){
+    const rows=parseCSV(cached);
+    if(rows.length){rows.forEach(r=>{r.__type=typeOf(r)});return {rows,file,fromCache:true}}
+  }
   const urls=[
     BASE_RAW+file,
     "data/evaluasi/"+file,
@@ -236,7 +274,7 @@ async function fetchMonth(month){
     try{
       const text=await fetchText(u);
       const rows=parseCSV(text);
-      if(rows.length)return {rows,file};
+      if(rows.length){setCachedCsv(cacheKey,text);rows.forEach(r=>{r.__type=typeOf(r)});return {rows,file}}
     }catch(e){console.warn("Gagal",month,u,e)}
   }
   return null;
@@ -251,7 +289,7 @@ function baseRowsForFilters(month){
 }
 function voltageOK(r,v){
   if(!v)return true;
-  const t=typeOf(r);
+  const t=r.__type??typeOf(r);
   if(["Reactor","Capacitor","PMT INC","CT INC","PT INC"].includes(t))return true;
   const n=norm(r["Teg Operasi"]||r["Tegangan"]).replace(/\s/g,"");
   const high=n.includes("500")||n.includes("150")||n.includes("70");
@@ -265,8 +303,8 @@ function matches(r,f,exclude=""){
   if(!voltageOK(r,f.teg))return false;
   const map=[["unit","Unit Induk"],["upt","Unit Pelaksana"],["ultg","Ultg"],["gi","Gardu Induk"],["bay","Bay"],["phasa","Phasa"]];
   for(const [id,col] of map)if(id!==exclude&&f[id]&&String(r[col]??"")!==f[id])return false;
-  if(exclude!=="type"&&f.type&&typeOf(r)!==f.type)return false;
-  if(exclude!=="ahi"&&f.ahi&&ahiNumber(getMonthValue(r,f.period,"ahi"))!==Number(f.ahi.charAt(0)))return false;
+  if(exclude!=="type"&&f.type&&(r.__type??typeOf(r))!==f.type)return false;
+  if(exclude!=="ahi"&&f.ahi&&ahiNumberForMonth(r,f.period)!==Number(f.ahi.charAt(0)))return false;
   return true;
 }
 function uniqRows(rows,col){return [...new Set(rows.map(r=>String(r[col]??"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id"))}
@@ -285,8 +323,8 @@ function refreshCascading(){
     f[id]=s[["unit","upt","ultg","gi","bay"].indexOf(id)+1].value;
   }
   setSelect(s[6],uniqRows(all.filter(r=>matches(r,f,"phasa")),"Phasa"),f.phasa);
-  setSelect(s[7],TYPES.filter(t=>all.some(r=>matches(r,f,"type")&&typeOf(r)===t)),f.type);
-  setSelect(s[8],AHI.map(x=>x[0]).filter(a=>all.some(r=>matches(r,f,"ahi")&&ahiNumber(getMonthValue(r,f.period,"ahi"))===Number(a.charAt(0)))),f.ahi);
+  setSelect(s[7],TYPES.filter(t=>all.some(r=>matches(r,f,"type")&&(r.__type??typeOf(r))===t)),f.type);
+  setSelect(s[8],AHI.map(x=>x[0]).filter(a=>all.some(r=>matches(r,f,"ahi")&&ahiNumberForMonth(r,f.period)===Number(a.charAt(0)))),f.ahi);
 }
 function buildFilters(){
   const box=document.getElementById("filters");
@@ -329,9 +367,9 @@ function countForMonth(month,type,categoryIndex){
     rows=rows.filter(r=>{
       const ff={...f,period:month};
       return matches(r,ff);
-    }).filter(r=>typeOf(r)===type);
-    if(f.ahi) return rows.filter(r=>ahiNumber(getMonthValue(r,month,"ahi"))===Number(f.ahi.charAt(0))).length;
-    return rows.filter(r=>ahiNumber(getMonthValue(r,month,"ahi"))===categoryIndex+1).length;
+    }).filter(r=>(r.__type??typeOf(r))===type);
+    if(f.ahi) return rows.filter(r=>ahiNumberForMonth(r,month)===Number(f.ahi.charAt(0))).length;
+    return rows.filter(r=>ahiNumberForMonth(r,month)===categoryIndex+1).length;
   }
   const mock=mockCounts(month,type);
   if(!mock)return null;
@@ -345,9 +383,9 @@ function seriesForType(type,idx){
     if(!hasData)return null;
     if(LIVE[m]){
       const f=getFilters();
-      const rows=LIVE[m].rows.filter(r=>matches(r,{...f,period:m})).filter(r=>typeOf(r)===type);
+      const rows=LIVE[m].rows.filter(r=>matches(r,{...f,period:m})).filter(r=>(r.__type??typeOf(r))===type);
       if(!rows.length)return null;
-      const hasAnyAhi=rows.some(r=>ahiNumber(getMonthValue(r,m,"ahi"))>0);
+      const hasAnyAhi=rows.some(r=>ahiNumberForMonth(r,m)>0);
       if(!hasAnyAhi)return null;
     }
     return countForMonth(m,type,idx);
@@ -401,7 +439,7 @@ function renderCharts(){
 function renderKpis(){
   const rows=filteredRows();
   const cats=[0,0,0,0,0];
-  rows.forEach(r=>{const n=ahiNumber(getMonthValue(r,period,"ahi"));if(n)cats[n-1]++});
+  rows.forEach(r=>{const n=ahiNumberForMonth(r,period);if(n)cats[n-1]++});
   const total=rows.length;
   const vals=[total,...cats],names=["TOTAL ASET",...AHI.map(a=>a[0])];
   const cls=["","vg","good","fair","poor","critical"];
@@ -409,7 +447,7 @@ function renderKpis(){
 }
 const detailCols=["Jenis Aset","Unit Induk","Unit Pelaksana","Ultg","Gardu Induk","Bay","Phasa","Teg Operasi","Merek","Tipe","USIA","STATUS USIA","TINGKAT RESIKO","AHI FINAL","Parameter Pemicu","P0/P1","Rencana","Target Tanggal Penyelesaian"];
 function field(r,c){
-  if(c==="Jenis Aset")return typeOf(r)||"—";
+  if(c==="Jenis Aset")return (r.__type??typeOf(r))||"—";
   if(c==="Unit Induk")return r["Unit Induk"]||"—";
   if(c==="Unit Pelaksana")return r["Unit Pelaksana"]||"—";
   if(c==="Ultg")return r["Ultg"]||"—";
@@ -490,7 +528,7 @@ async function load(){
     document.getElementById("sideDate").textContent="24 Agustus 2026";
     buildFilters();
     apply();
-    status.className="status ok";status.textContent=`CSV AGUSTUS berhasil dimuat • ${fmt(raw.length)} baris`;
+    status.className="status ok";status.textContent=`CSV AGUSTUS berhasil dimuat • ${fmt(raw.length)} baris${aug.fromCache?" (dari cache sesi)":""}`;
     // Historical/current months load in the background. Missing future files are simply ignored.
     Promise.all(["Juni","Juli"].map(async m=>{
       try{const d=await fetchMonth(m);if(d)LIVE[m]=d;}catch(e){}
