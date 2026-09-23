@@ -800,6 +800,86 @@ yang dapat membantu Officer Assessment untuk:
 Setiap jawaban harus dapat ditelusuri kembali ke
 parameter dan batas yang terdapat dalam Dokumen
 Panduan Perhitungan Skor AHI 2024.`;
+const AI_SYSTEM_PROMPT_CT=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
+PERALATAN CT (Current Transformer) dan PERHITUNGAN ASSET HEALTH INDEX (AHI)
+berdasarkan "Dokumen Panduan Perhitungan Skor AHI – CT" (kutipan sebagian
+yang tersedia saat ini: parameter Tahanan Isolasi dan Tan Delta).
+
+==================================================
+A. SISTEM SKOR AHI
+==================================================
+Critical    = Skor 100 = Kategori 5
+Poor        = Skor 30  = Kategori 4
+Fair        = Skor 10  = Kategori 3
+Good        = Skor 3   = Kategori 2
+Very Good   = Skor 1   = Kategori 1
+
+Jangan mengubah nilai skor tersebut kecuali ada instruksi resmi baru.
+
+==================================================
+B. TAHANAN ISOLASI
+==================================================
+Parameter: Hasil Uji Isolasi/Tegangan.
+
+Pada dashboard ini, parameter "Tahanan Isolasi" berlaku untuk DUA
+kolom data CT: "Primer - Ground (Mega Ohm)" DAN "Primer - Sekunder
+(Mega Ohm)" — keduanya dinilai dengan klasifikasi yang sama di bawah
+ini, dan dievaluasi secara terpisah (jangan digabung jadi satu angka).
+
+Klasifikasi:
+< 1        → Critical
+≥ 1 – 5    → Poor
+> 5 – 10   → Fair
+> 10       → Good
+
+Catatan: dokumen yang tersedia untuk parameter ini TIDAK mencantumkan
+batas eksplisit untuk kategori "Very Good". Jangan mengarang batas
+tersebut — jika hasil uji berada di atas 10 dan tidak ada instruksi
+tambahan, kategorikan sebagai "Good" saja, jangan menaikkan ke
+"Very Good" tanpa dasar dari dokumen.
+
+==================================================
+C. TAN DELTA (Parameter 5)
+==================================================
+Berlaku berbeda tergantung kelas tegangan CT — JANGAN menyamakan
+batas antar kelas tegangan.
+
+CT tegangan 70 kV & 150 kV:
+> 1%             → Critical
+0,7% – 1%        → Poor
+> 0,5% – < 0,7%  → Fair
+≤ 0,5%           → Good
+
+CT tegangan 275 kV & 500 kV:
+> 0,5%           → Critical
+0,3% – 0,5%      → Poor
+< 0,3%           → Good
+
+Catatan: dokumen untuk kelas 275 kV & 500 kV TIDAK mencantumkan
+kategori "Fair" secara eksplisit (hanya Critical/Poor/Good). Jangan
+mengarang batas Fair untuk kelas tegangan ini.
+
+Jika kelas tegangan CT yang dianalisis tidak diketahui/tidak
+tercantum dalam data yang diberikan, JANGAN mengasumsikan salah satu
+kelas — nyatakan bahwa kelas tegangan perlu dikonfirmasi terlebih
+dahulu sebelum menentukan kategori Tan Delta secara pasti.
+
+==================================================
+D. ATURAN PENTING
+==================================================
+1. Dokumen ini sumber utama untuk parameter Tahanan Isolasi dan Tan
+   Delta CT. Untuk parameter CT lain (mis. Primer-Ground, Primer-
+   Sekunder, atau parameter lain yang mungkin muncul dalam data
+   dashboard) yang batas kategorinya BELUM tersedia di sini, jangan
+   mengarang nilai batasnya — nyatakan "data tidak cukup" untuk
+   parameter tersebut.
+2. Jangan mengubah satuan (% untuk Tan Delta).
+3. Jangan mengubah definisi kategori atau interval yang sudah ada.
+4. Bedakan hasil pengujian (fakta) dari interpretasi (kategori AHI).
+5. Jika data tidak cukup untuk menentukan kategori suatu parameter,
+   katakan "data tidak cukup" — jangan menebak.
+6. Setiap kesimpulan kategori harus bisa ditelusuri kembali ke
+   parameter dan batas yang tercantum di atas.`;
 const TABS={
  pmt:{key:'pmt',label:'PMT',aiSystemPrompt:AI_SYSTEM_PROMPT_PMT,sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
   columns:{unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay']},
@@ -807,8 +887,8 @@ const TABS={
   chartSpecs:[['irAB','IR Atas-Bawah','Mega Ohm',[{key:'irAB',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irAG','IR Atas-Ground','Mega Ohm',[{key:'irAG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irBG','IR Bawah-Ground','Mega Ohm',[{key:'irBG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['contact','Tahanan Kontak','mikro Ohm (µΩ)',[{key:'contactR',label:'R'},{key:'contactS',label:'S'},{key:'contactT',label:'T'}],['#e53935','#f29a00','#1688f0']],['closing','Closing Time','ms',[{key:'closingR',label:'R'},{key:'closingS',label:'S'},{key:'closingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['opening','Opening Time','ms',[{key:'openingR',label:'R'},{key:'openingS',label:'S'},{key:'openingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['purity','SF6 Purity','%',[{key:'purity',label:'Purity'}],['#e53935','#f29a00','#1688f0']],['dew','SF6 Dew Point','°C',[{key:'dew',label:'Dew Point'}],['#e53935','#f29a00','#1688f0']],['so2','SF6 SO2','ppmV',[{key:'so2',label:'SO2'}],['#e53935','#f29a00','#1688f0']]],
   detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TAHUN','date'],['IR ATAS-BAWAH','irAB'],['IR ATAS-GROUND','irAG'],['IR BAWAH-GROUND','irBG'],['KONTAK R','contactR'],['KONTAK S','contactS'],['KONTAK T','contactT'],['CLOSING R','closingR'],['CLOSING S','closingS'],['CLOSING T','closingT'],['OPENING R','openingR'],['OPENING S','openingS'],['OPENING T','openingT'],['SF6 PURITY','purity'],['SF6 DEW POINT','dew'],['SF6 SO2','so2'],['TANGGAL UJI','date']]
  },
- ct:{key:'ct',label:'CT',sheetCsv:'https://docs.google.com/spreadsheets/d/1BFlYecP0qpbC14wadP_UGC7Y3lSBEjByN2oIwKhIOcw/export?format=csv&gid=790904160',sourceLabel:'Google Sheet • NORM AHI CT',docTitle:'Trend Inspection CT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – CT',detailTitle:'Detail Pengujian CT',exportFile:'Trend_Inspection_CT_Filtered.csv',
-  columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],primerGround:['primer - ground (mega ohm)','primer - ground','primer ground'],primerSekunder:['primer - sekunder (mega ohm)','primer - sekunder(mega ohm)','primer - sekunder','primer sekunder'],tanDelta:['tan delta (%)','tan delta']},
+ ct:{key:'ct',label:'CT',aiSystemPrompt:AI_SYSTEM_PROMPT_CT,sheetCsv:'https://docs.google.com/spreadsheets/d/1BFlYecP0qpbC14wadP_UGC7Y3lSBEjByN2oIwKhIOcw/export?format=csv&gid=790904160',sourceLabel:'Google Sheet • NORM AHI CT',docTitle:'Trend Inspection CT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – CT',detailTitle:'Detail Pengujian CT',exportFile:'Trend_Inspection_CT_Filtered.csv',
+  columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],tegangan:['teg','tegangan'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],primerGround:['primer - ground (mega ohm)','primer - ground','primer ground'],primerSekunder:['primer - sekunder (mega ohm)','primer - sekunder(mega ohm)','primer - sekunder','primer sekunder'],tanDelta:['tan delta (%)','tan delta']},
   phaseChartIds:['primerGround','primerSekunder','tanDelta'],
   chartSpecs:[['primerGround','Primer - Ground','Mega Ohm',[{key:'primerGround',label:'Primer-Ground'}],['#e53935','#f29a00','#1688f0']],['primerSekunder','Primer - Sekunder','Mega Ohm',[{key:'primerSekunder',label:'Primer-Sekunder'}],['#e53935','#f29a00','#1688f0']],['tanDelta','Tan Delta','%',[{key:'tanDelta',label:'Tan Delta'}],['#e53935','#f29a00','#1688f0']]],
   detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TAHUN','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta'],['TANGGAL UJI','date']]
@@ -862,7 +942,7 @@ const AI_KEY_STORAGE='trendAiGroqKey';
 const AI_KEY_EXPIRY_STORAGE='trendAiGroqKeyExpiry';
 const AI_MODEL_STORAGE='trendAiGroqModel';
 const AI_MODEL_DEFAULT='qwen/qwen3.8-27b';
-const AI_KEY_TTL_MS=8*60*60*1000;
+const AI_KEY_TTL_MS=24*60*60*1000;
 function aiFormatDuration(ms){
  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
  return h>0?`${h} jam ${m} menit`:`${m} menit`;
@@ -952,7 +1032,19 @@ function aiBuildSummary(){
    const count=filtered.filter(r=>{const v=num(val(r,id));if(v==null)return false;return th.mode==='min'?v<th.value:v>th.value}).length;
    breach={label:th.label,count};
   }
-  return {title,unit,years:labels,series,breach};
+  let voltageBreakdown=null;
+  if(TAB.key==='ct'&&id==='tanDelta'&&COL.tegangan){
+   const classify=v=>{const s=norm(v).replace(/\s+/g,'').replace(/kv$/,'');return (s==='70'||s==='150')?'70/150 kV':((s==='275'||s==='500')?'275/500 kV':'')};
+   const groups={};
+   filtered.forEach(r=>{
+    const cls=classify(val(r,'tegangan'));
+    const v=num(val(r,'tanDelta'));
+    if(!cls||v==null)return;
+    (groups[cls]=groups[cls]||[]).push(v);
+   });
+   voltageBreakdown=Object.entries(groups).map(([kelasTegangan,vals])=>({kelasTegangan,rataRataTanDeltaPersen:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(3),jumlahData:vals.length}));
+  }
+  return {title,unit,years:labels,series,breach,voltageBreakdown};
  }).filter(Boolean);
  return {tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
 }
