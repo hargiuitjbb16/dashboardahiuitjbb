@@ -87,6 +87,53 @@ th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-inde
  .chart-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
  .actions{display:none}.search{width:240px}
 }
+.ai-panel{background:linear-gradient(180deg,#fbfdff,#fff);border:1px solid #dce6f0;border-radius:10px;padding:12px;margin:10px 0;position:relative;overflow:hidden}
+.ai-panel:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#0877d1,#7b61a8)}
+.ai-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ai-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:#17324f}
+.ai-badge{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#0877d1,#7b61a8);color:#fff;display:grid;place-items:center;font-size:11px;flex:0 0 22px;box-shadow:0 2px 6px rgba(11,97,197,.25)}
+.ai-title .sub{font-weight:500;color:#8a99aa;font-size:10px}
+.ai-actions{display:flex;gap:7px;align-items:center}
+.ai-actions button{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:7px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:11px}
+.ai-actions button.primary{background:linear-gradient(135deg,#0877d1,#5f8fe0);color:#fff;border-color:transparent}
+.ai-actions button:disabled{opacity:.55;cursor:wait}
+.ai-actions .gear{width:32px;padding:0;border-radius:7px;font-size:14px}
+.ai-settings{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #e3eaf2;gap:8px;grid-template-columns:1fr 1fr auto}
+.ai-settings.open{display:grid}
+.ai-settings label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase}
+.ai-settings input{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;padding:0 9px;font-size:11px}
+.ai-settings .save-row{display:flex;align-items:end;gap:6px}
+.ai-key-status{font-size:9.5px;color:#5b7796;margin-top:2px;grid-column:1/-1}
+.ai-key-status.warn{color:#c62828}
+.ai-body{margin-top:11px}
+.ai-placeholder{color:#8a99aa;font-size:11.5px}
+.ai-error{color:#c62828;font-size:11.5px}
+.ai-loading{display:flex;align-items:center;gap:8px;color:#5b7796;font-size:11.5px;padding:2px 0}
+.ai-loading .dots{display:inline-flex;gap:3px}
+.ai-loading .dots span{width:5px;height:5px;border-radius:50%;background:#0877d1;display:inline-block;animation:aiPulse 1.1s infinite ease-in-out}
+.ai-loading .dots span:nth-child(2){animation-delay:.15s}
+.ai-loading .dots span:nth-child(3){animation-delay:.3s}
+@keyframes aiPulse{0%,80%,100%{opacity:.25;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+.ai-result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.ai-card{border-radius:9px;padding:9px 10px;min-width:0;border:1px solid}
+.ai-card.trend{border-color:#bfe8d3;background:#f4fbf7}
+.ai-card.warn{border-color:#f5d0c2;background:#fff8f5}
+.ai-card.reco{border-color:#c9dff5;background:#f5f9ff}
+.ai-card-head{display:flex;align-items:center;gap:6px;font-weight:800;font-size:9.5px;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.ai-card.trend .ai-card-head{color:#178a56}
+.ai-card.warn .ai-card-head{color:#d1550f}
+.ai-card.reco .ai-card-head{color:#0d68b5}
+.ai-card-icon{width:17px;height:17px;border-radius:5px;display:grid;place-items:center;font-size:10px;flex:0 0 17px;color:#fff}
+.ai-card.trend .ai-card-icon{background:#20a46b}
+.ai-card.warn .ai-card-icon{background:#e5622a}
+.ai-card.reco .ai-card-icon{background:#0877d1}
+.ai-card ul{margin:0;padding-left:14px;font-size:10.5px;line-height:1.55;color:#33475f}
+.ai-card ul li{margin:3px 0}
+.ai-card .ai-empty{font-size:10px;color:#9aa8b8;font-style:italic}
+.ai-fallback{font-size:12px;line-height:1.65;color:#2c435f;white-space:pre-wrap}
+.ai-meta{margin-top:8px;font-size:9px;color:#95a3b3}
+.ai-note{font-size:9px;color:#8a99aa;margin-top:8px}
+@media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -99,6 +146,7 @@ th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-inde
   <nav class="nav">
     <a href="index.html">Dashboard</a>
     <a href="index.html">AHI Power Inspect</a>
+    <a href="trend-inspection.html" class="trend-link">Trend Inspection</a>
     <a class="active" href="ahi-evaluasi.html">AHI Evaluasi</a>
     <a href="#">Data Aset</a>
     <a href="#">Laporan</a>
@@ -118,6 +166,24 @@ th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-inde
 <div id="status" class="status"></div>
 <section class="filters" id="filters"></section>
 <section class="kpis" id="kpis"></section>
+
+<section class="panel ai-panel">
+ <div class="ai-head">
+  <div class="ai-title"><span class="ai-badge">✦</span>AI Insight <span class="sub">Ringkasan otomatis dari data yang sedang difilter</span></div>
+  <div class="ai-actions">
+   <button class="gear" id="aiSettingsBtn" type="button" title="Pengaturan API Key">⚙</button>
+   <button class="primary" id="aiGenerateBtn" type="button">✨ Generate Insight</button>
+  </div>
+ </div>
+ <div class="ai-settings" id="aiSettings">
+  <div><label>Groq API Key</label><input type="password" id="aiKeyInput" placeholder="gsk_..." autocomplete="off"></div>
+  <div><label>Model ID</label><input type="text" id="aiModelInput" placeholder="qwen/qwen3.8-27b" autocomplete="off"></div>
+  <div class="save-row"><button class="btn primary" id="aiSaveBtn" type="button">Simpan</button><button class="btn" id="aiClearBtn" type="button">Hapus</button></div>
+  <div class="ai-key-status" id="aiKeyExpiryNote"></div>
+ </div>
+ <div class="ai-body" id="aiBody"><div class="ai-placeholder">Klik "Generate Insight" untuk analisis otomatis dari data yang sedang ditampilkan.</div></div>
+ <div class="ai-note">Key hanya disimpan di browser ini (localStorage), tidak dikirim ke repository/GitHub. Key yang sama juga dipakai di halaman Trend Inspection &amp; AHI Power Inspect.</div>
+</section>
 
 <section class="panel trend-panel">
   <div class="panel-title">TREND DISTRIBUSI AHI PER JENIS ASET</div>
@@ -509,6 +575,7 @@ function render(){
 }
 function apply(){
   currentPage=1;filtered=filteredRows();render();
+  if(typeof aiHasResult!=='undefined'&&aiHasResult)aiRenderPlaceholder('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.');
 }
 document.getElementById("search").addEventListener("input",e=>{search=e.target.value;currentPage=1;renderTable()});
 document.getElementById("exportBtn").addEventListener("click",()=>{
@@ -545,6 +612,135 @@ async function load(){
   }
 }
 window.addEventListener("resize",()=>{clearTimeout(window.__rt);window.__rt=setTimeout(renderCharts,120)});
+
+const $=id=>document.getElementById(id);
+const AI_KEY_STORAGE='trendAiGroqKey';
+const AI_KEY_EXPIRY_STORAGE='trendAiGroqKeyExpiry';
+const AI_MODEL_STORAGE='trendAiGroqModel';
+const AI_MODEL_DEFAULT='qwen/qwen3.8-27b';
+const AI_KEY_TTL_MS=24*60*60*1000;
+let aiHasResult=false;
+function aiFormatDuration(ms){const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);return h>0?`${h} jam ${m} menit`:`${m} menit`}
+function aiKeyStatus(){
+ const k=localStorage.getItem(AI_KEY_STORAGE);
+ const exp=+localStorage.getItem(AI_KEY_EXPIRY_STORAGE)||0;
+ if(!k)return {key:'',expired:false};
+ if(Date.now()>exp){localStorage.removeItem(AI_KEY_STORAGE);localStorage.removeItem(AI_KEY_EXPIRY_STORAGE);return {key:'',expired:true}}
+ return {key:k,expired:false,remainingMs:exp-Date.now()};
+}
+function aiGetKey(){return aiKeyStatus().key}
+function aiGetModel(){return localStorage.getItem(AI_MODEL_STORAGE)||AI_MODEL_DEFAULT}
+function aiRenderPlaceholder(text){$("aiBody").innerHTML=`<div class="ai-placeholder">${esc(text)}</div>`;aiHasResult=false}
+function aiRenderError(text){$("aiBody").innerHTML=`<div class="ai-error">${esc(text)}</div>`;aiHasResult=false}
+function aiRenderLoading(){$("aiBody").innerHTML='<div class="ai-loading">AI sedang menganalisis data<span class="dots"><span></span><span></span><span></span></span></div>';aiHasResult=false}
+function aiRenderFallback(text){$("aiBody").innerHTML=`<div class="ai-fallback">${esc(text)}</div>`;aiHasResult=true}
+function aiCardHtml(cls,icon,label,items){
+ const body=items&&items.length?('<ul>'+items.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>'):'<div class="ai-empty">Tidak ada catatan.</div>';
+ return `<div class="ai-card ${cls}"><div class="ai-card-head"><span class="ai-card-icon">${icon}</span>${label}</div>${body}</div>`;
+}
+function aiRenderStructured(obj){
+ const grid=aiCardHtml('trend','▲','Tren Positif',obj.tren)+aiCardHtml('warn','⚠','Perlu Perhatian',obj.perhatian)+aiCardHtml('reco','➔','Rekomendasi',obj.rekomendasi);
+ const time=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+ $("aiBody").innerHTML=`<div class="ai-result-grid">${grid}</div><div class="ai-meta">Dibuat pukul ${time} • model ${esc(aiGetModel())}</div>`;
+ aiHasResult=true;
+}
+function aiRefreshKeyStatusNote(){
+ const el=$("aiKeyExpiryNote");if(!el)return;
+ const status=aiKeyStatus();
+ if(status.key){el.textContent='Key aktif, berlaku lagi selama '+aiFormatDuration(status.remainingMs)+' (otomatis hilang setelahnya).';el.classList.remove('warn')}
+ else if(status.expired){el.textContent='Key sebelumnya sudah kedaluwarsa dan telah dihapus otomatis. Masukkan key baru untuk melanjutkan.';el.classList.add('warn')}
+ else{el.textContent='Belum ada key tersimpan. Key akan otomatis kedaluwarsa '+aiFormatDuration(AI_KEY_TTL_MS)+' setelah disimpan.';el.classList.remove('warn')}
+}
+$("aiSettingsBtn").onclick=()=>{
+ const box=$("aiSettings");
+ box.classList.toggle('open');
+ if(box.classList.contains('open')){$("aiKeyInput").value=aiGetKey();$("aiModelInput").value=aiGetModel();aiRefreshKeyStatusNote()}
+};
+$("aiSaveBtn").onclick=()=>{
+ const k=$("aiKeyInput").value.trim(),m=$("aiModelInput").value.trim();
+ if(k){localStorage.setItem(AI_KEY_STORAGE,k);localStorage.setItem(AI_KEY_EXPIRY_STORAGE,String(Date.now()+AI_KEY_TTL_MS))}
+ localStorage.setItem(AI_MODEL_STORAGE,m||AI_MODEL_DEFAULT);
+ $("aiSettings").classList.remove('open');
+ aiRenderPlaceholder(k?('Pengaturan disimpan. Key berlaku '+aiFormatDuration(AI_KEY_TTL_MS)+' sejak sekarang. Klik "Generate Insight" untuk membuat analisis.'):'Pengaturan disimpan. Klik "Generate Insight" untuk membuat analisis.');
+};
+$("aiClearBtn").onclick=()=>{
+ localStorage.removeItem(AI_KEY_STORAGE);localStorage.removeItem(AI_KEY_EXPIRY_STORAGE);localStorage.removeItem(AI_MODEL_STORAGE);
+ $("aiKeyInput").value='';$("aiModelInput").value='';
+ aiRefreshKeyStatusNote();
+ aiRenderPlaceholder('API key dihapus dari browser ini.');
+};
+function aiBuildSummary(){
+ const f=getFilters();
+ const filterLabels={teg:'Kelompok Tegangan',unit:'Unit Induk',upt:'UPT',ultg:'ULTG',gi:'GI',bay:'Bay',phasa:'Phasa',type:'Jenis Aset',ahi:'Kategori AHI'};
+ const activeFilters=Object.entries(filterLabels).map(([k,label])=>({label,value:f[k]})).filter(x=>x.value);
+ const total=filtered.length;
+ const kpi=AHI.map(([n])=>({kategori:n,jumlah:filtered.filter(r=>ahiNumberForMonth(r,period)===Number(n.charAt(0))).length}));
+ const perJenisAset=TYPES.map(t=>{
+  const a=filtered.filter(r=>typeOf(r)===t);
+  if(!a.length)return null;
+  const counts=AHI.map(([n])=>a.filter(r=>ahiNumberForMonth(r,period)===Number(n.charAt(0))).length);
+  return {jenis:t,total:a.length,kategoriAHI:Object.fromEntries(AHI.map(([n],i)=>[n,counts[i]]))};
+ }).filter(Boolean);
+ return {periode:period+' 2026',totalAset:total,kpi,perJenisAset,filterAktif:activeFilters};
+}
+async function generateInsight(){
+ const status=aiKeyStatus();
+ const key=status.key;
+ if(!key){
+  aiRenderPlaceholder(status.expired?('API key Groq sudah kedaluwarsa (berlaku '+aiFormatDuration(AI_KEY_TTL_MS)+') dan otomatis dihapus. Klik ikon ⚙ untuk memasukkan API key lagi.'):'Belum ada API key Groq. Klik ikon ⚙ untuk memasukkan API key terlebih dahulu.');
+  $("aiSettings").classList.add('open');
+  aiRefreshKeyStatusNote();
+  $("aiKeyInput").focus();
+  return;
+ }
+ const btn=$("aiGenerateBtn");
+ btn.disabled=true;btn.textContent='⏳ Menganalisis...';
+ aiRenderLoading();
+ try{
+  const summary=aiBuildSummary();
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+   body:JSON.stringify({
+    model:aiGetModel(),
+    temperature:0.3,
+    messages:[
+     {role:'system',content:'Anda adalah asisten analisis untuk Dashboard AHI Evaluasi (Asset Health Index bulanan) Peralatan Utama Gardu Induk PLN. Data yang diberikan sudah memiliki kategori AHI final per aset untuk periode/bulan yang dipilih (1-Very Good, 2-Good, 3-Fair, 4-Poor, 5-Critical), dirinci per jenis peralatan. Balas HANYA dengan JSON valid, tanpa markdown dan tanpa teks lain di luar JSON, persis bentuk ini: {"tren":["poin singkat"],"perhatian":["poin singkat"],"rekomendasi":["poin singkat"]}. Maksimal 4 poin per array, masing-masing satu kalimat pendek dan padat dalam Bahasa Indonesia. "tren" = jenis peralatan/kondisi yang mayoritas Very Good/Good pada periode ini; "perhatian" = jenis peralatan dengan proporsi Poor/Critical tinggi (array kosong jika tidak ada); "rekomendasi" = saran tindak lanjut evaluasi/pemeliharaan berdasarkan temuan tersebut. Jangan mengarang parameter atau angka yang tidak ada di data yang diberikan. Tulis sebagai teks polos tanpa markdown.'},
+     {role:'user',content:'Berikut ringkasan data AHI Evaluasi yang sedang difilter pada dashboard:\n\n'+JSON.stringify(summary,null,2)+'\n\nBuatkan ringkasan insight teknisnya sebagai JSON sesuai instruksi.'}
+    ]
+   })
+  });
+  if(!res.ok){
+   const errText=await res.text().catch(()=>'');
+   throw new Error('HTTP '+res.status+(errText?(' • '+errText.slice(0,200)):''));
+  }
+  const data=await res.json();
+  let text=data.choices?.[0]?.message?.content?.trim();
+  if(!text)throw new Error('Respons AI kosong');
+  let parsed=null;
+  try{
+   const s=text.indexOf('{'),e=text.lastIndexOf('}');
+   const jsonStr=(s>=0&&e>s)?text.slice(s,e+1):text;
+   const obj=JSON.parse(jsonStr);
+   if(obj&&(Array.isArray(obj.tren)||Array.isArray(obj.perhatian)||Array.isArray(obj.rekomendasi))){
+    parsed={tren:obj.tren||[],perhatian:obj.perhatian||[],rekomendasi:obj.rekomendasi||[]};
+   }
+  }catch(_e){}
+  if(parsed){
+   aiRenderStructured(parsed);
+  }else{
+   const clean=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s*/gm,'');
+   aiRenderFallback(clean);
+  }
+ }catch(e){
+  console.error('AI insight error:',e);
+  aiRenderError('Gagal membuat insight: '+String(e.message||e)+'. Periksa API key/model, atau koneksi ke Groq.');
+ }finally{
+  btn.disabled=false;btn.textContent='✨ Generate Insight';
+ }
+}
+$("aiGenerateBtn").onclick=generateInsight;
+
 load();
 </script>
 </body>
