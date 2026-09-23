@@ -125,22 +125,6 @@
  <div class="ai-body" id="aiBody"><div class="ai-placeholder">Klik "Generate Insight" untuk analisis otomatis dari data yang sedang ditampilkan pada tab ini.</div></div>
  <div class="ai-note">Key hanya disimpan di browser ini (localStorage), tidak dikirim ke repository/GitHub.</div>
 </section>
-<section class="panel ai-panel ai-chat-panel">
- <div class="ai-head">
-  <div class="ai-title"><span class="ai-badge">?</span>Tanya AI <span class="sub">GI / Bay / Phasa mana yang perlu perhatian, membaik, atau anomali</span></div>
- </div>
- <div class="ai-chat-quick" id="aiChatQuick">
-  <button type="button" data-q="GI, Bay, dan Phasa mana yang paling perlu perhatian saat ini?">⚠ Perlu Perhatian</button>
-  <button type="button" data-q="Aset mana yang kondisinya paling membaik?">▲ Paling Membaik</button>
-  <button type="button" data-q="Ada anomali atau lonjakan hasil uji yang mencolok di aset mana?">✦ Anomali</button>
- </div>
- <div class="ai-chat-log" id="aiChatLog"></div>
- <div class="ai-chat-input-row">
-  <input type="text" id="aiChatInput" placeholder="Tanya sesuatu, mis. GI mana yang paling banyak aset Critical?">
-  <button class="primary" id="aiChatSendBtn" type="button">Kirim</button>
- </div>
- <div class="ai-note">Jawaban dihitung dari data asli yang sedang difilter (bukan tebakan AI) — AI hanya membantu menjelaskan.</div>
-</section>
 <div class="subtab-bar" id="subtabBar">
  <button class="subtab-btn active" data-subtab="trend" type="button">Grafik Trending Pengujian</button>
  <button class="subtab-btn" data-subtab="condition" type="button">Radar Kondisi AHI</button>
@@ -1114,7 +1098,7 @@ const TABS={
 };
 const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
 const SHEET_CSV=TAB.sheetCsv;
-const PAGE_SIZE=10;let raw=[],filtered=[],deviationFlags=new Map(),page=1,charts=[];
+const PAGE_SIZE=10;let raw=[],filtered=[],deviationFlags=new Map(),improvementFlags=new Map(),page=1,charts=[];
 const $=id=>document.getElementById(id);
 document.title=TAB.docTitle;
 $('docTitle').textContent=TAB.docTitle;
@@ -1307,6 +1291,110 @@ async function generateInsight(){
 }
 $('aiGenerateBtn').onclick=generateInsight;
 
+function aiRowLabel(r){
+ let gi=val(r,'gi')||'-';const bay=val(r,'bay')||'-',ph=val(r,'phasa')||'-',y=year(val(r,'date'))||'-';
+ gi=gi.replace(/^gi\s*/i,'');
+ return `GI ${gi} / Bay ${bay} / Fasa ${ph} [${y}]`;
+}
+function aiBuildChatDigest(){
+ const CAP=10;
+ const filteredSet=new Set(filtered);
+ let perhatian=[],totalPerhatian=0;
+ filtered.forEach(r=>{
+  const info=rowCategoryInfo(r);
+  if(info.cat>=4){
+   totalPerhatian++;
+   if(perhatian.length<CAP)perhatian.push(aiRowLabel(r)+' — '+AHI_CAT[info.cat].n+': '+info.params.join(', '));
+  }
+ });
+ let membaik=[],totalMembaik=0;
+ improvementFlags.forEach((params,r)=>{
+  if(!filteredSet.has(r))return;
+  totalMembaik++;
+  if(membaik.length<CAP)membaik.push(aiRowLabel(r)+' — membaik pada: '+params.join(', '));
+ });
+ let anomali=[],totalAnomali=0;
+ deviationFlags.forEach((params,r)=>{
+  if(!filteredSet.has(r))return;
+  totalAnomali++;
+  if(anomali.length<CAP)anomali.push(aiRowLabel(r)+' — memburuk pada: '+params.join(', '));
+ });
+ return {
+  tab:TAB.label,
+  totalRecordsTerfilter:filtered.length,
+  filterAktif:['unit','upt','ultg','gi','bay','phasa','merk','type'].map(id=>({label:$(id).previousElementSibling?.textContent||id,value:$(id).value})).filter(x=>x.value),
+  catatan:'Tiap kategori di bawah dibatasi maksimal '+CAP+' contoh (field total = jumlah sebenarnya, bukan panjang list contoh). Hanya sebut nama GI/Bay/Fasa yang tercantum di sini, jangan mengarang.',
+  perluPerhatian:{total:totalPerhatian,contoh:perhatian},
+  membaikSignifikan:{total:totalMembaik,contoh:membaik},
+  anomaliDeviasi:{total:totalAnomali,contoh:anomali}
+ };
+}
+const AI_CHAT_INSTRUCTION='Anda sedang menjawab pertanyaan bebas dari pengguna dashboard trend inspection secara interaktif (mode chat, BUKAN mode ringkasan JSON terstruktur seperti pada panel "AI Insight"). Jawab dalam Bahasa Indonesia, singkat dan langsung ke inti (boleh pakai bullet list singkat bila menyebut banyak aset). WAJIB hanya menyebutkan nama GI, Bay, Fasa, Merk, atau Type yang benar-benar tercantum pada JSON "DATA TERKINI" di bawah — JANGAN pernah mengarang atau menebak nama yang tidak ada di data tersebut. Bagian "contoh" pada tiap kategori dibatasi jumlahnya (lihat "catatan"); jika pengguna bertanya jumlah/total aset, gunakan field "total" yang disediakan, jangan menghitung panjang array contoh. Jika pertanyaan pengguna butuh data yang tidak tersedia pada JSON ini, katakan terus terang bahwa datanya tidak tersedia pada tampilan/filter saat ini, jangan mengarang jawaban.';
+let aiChatMessages=[];
+function aiChatRenderLog(){
+ const log=$('aiChatLog');if(!log)return;
+ if(!aiChatMessages.length){
+  log.innerHTML='';
+  return;
+ }
+ log.innerHTML=aiChatMessages.map(m=>`<div class="ai-chat-msg ${m.role}"><div class="ai-chat-bubble">${escapeHtml(m.content)}</div></div>`).join('');
+ log.scrollTop=log.scrollHeight;
+}
+function aiChatShowLoading(){
+ const log=$('aiChatLog');if(!log)return;
+ log.insertAdjacentHTML('beforeend','<div class="ai-chat-msg assistant" id="aiChatLoadingMsg"><div class="ai-chat-bubble ai-chat-loading">Menganalisis data<span class="dots"><span></span><span></span><span></span></span></div></div>');
+ log.scrollTop=log.scrollHeight;
+}
+async function aiChatSend(question){
+ question=(question||'').trim();
+ if(!question)return;
+ const status=aiKeyStatus();
+ const key=status.key;
+ if(!key){
+  aiChatMessages.push({role:'error',content:status.expired?('API key Groq sudah kedaluwarsa dan otomatis dihapus. Klik ikon ⚙ pada panel "AI Insight" di atas untuk memasukkan API key lagi.'):'Belum ada API key Groq. Klik ikon ⚙ pada panel "AI Insight" di atas untuk memasukkan API key terlebih dahulu.'});
+  aiChatRenderLog();
+  $('aiSettings').classList.add('open');
+  aiRefreshKeyStatusNote();
+  return;
+ }
+ aiChatMessages.push({role:'user',content:question});
+ $('aiChatInput').value='';
+ aiChatRenderLog();
+ aiChatShowLoading();
+ const sendBtn=$('aiChatSendBtn');sendBtn.disabled=true;
+ try{
+  const digest=aiBuildChatDigest();
+  const history=aiChatMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-12).map(m=>({role:m.role,content:m.content}));
+  const systemPrompt=(TAB.aiSystemPrompt||AI_SYSTEM_PROMPT_DEFAULT)+'\n\n'+AI_CHAT_INSTRUCTION+'\n\nDATA TERKINI (JSON, hasil filter dashboard saat ini pada tab "'+TAB.label+'"):\n'+JSON.stringify(digest);
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+   body:JSON.stringify({model:aiGetModel(),temperature:0.3,messages:[{role:'system',content:systemPrompt},...history]})
+  });
+  if(!res.ok){
+   const errText=await res.text().catch(()=>'');
+   throw new Error('HTTP '+res.status+(errText?(' • '+errText.slice(0,200)):''));
+  }
+  const data=await res.json();
+  const text=data.choices?.[0]?.message?.content?.trim();
+  if(!text)throw new Error('Respons AI kosong');
+  document.getElementById('aiChatLoadingMsg')?.remove();
+  aiChatMessages.push({role:'assistant',content:text});
+  aiChatRenderLog();
+ }catch(e){
+  console.error('AI chat error:',e);
+  document.getElementById('aiChatLoadingMsg')?.remove();
+  aiChatMessages.push({role:'error',content:'Gagal mendapat jawaban: '+String(e.message||e)+'. Periksa API key/model, atau koneksi ke Groq.'});
+  aiChatRenderLog();
+ }finally{
+  sendBtn.disabled=false;
+ }
+}
+$('aiChatSendBtn').onclick=()=>aiChatSend($('aiChatInput').value);
+$('aiChatInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();aiChatSend($('aiChatInput').value)}});
+document.querySelectorAll('#aiChatQuick button[data-q]').forEach(btn=>{btn.onclick=()=>aiChatSend(btn.getAttribute('data-q'))});
+aiChatRenderLog();
+
 function norm(s){return String(s??'').normalize('NFKC').replace(/\u00a0/g,' ').replace(/[–—−]/g,'-').replace(/\s+/g,' ').trim().toLowerCase()}
 function parseCSV(t){t=t.replace(/^\uFEFF/,'');let rows=[],row=[],cell='',q=false,delim=(t.split(/\r?\n/).find(Boolean)||'').split(';').length>(t.split(/\r?\n/).find(Boolean)||'').split(',').length?';':',';for(let i=0;i<t.length;i++){let c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===delim&&!q){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell=''}else cell+=c}if(cell||row.length){row.push(cell);if(row.some(x=>x.trim()))rows.push(row)}if(!rows.length)return[];let headers=rows.shift().map(x=>x.trim());return rows.map(a=>Object.fromEntries(headers.map((h,i)=>[h,(a[i]??'').trim()])))}
 function headers(){return Object.keys(raw[0]||{})}
@@ -1389,6 +1477,35 @@ function computeSignedChange(prev,curr,direction){
  if(direction==='down')return pct;
  if(direction==='away-from-zero')return (Math.abs(prev)-Math.abs(curr))/Math.abs(prev);
  return null;
+}
+function computeImprovementFlags(rows){
+ const flags=new Map();
+ (TAB.chartSpecs||[]).forEach(spec=>{
+  const [id,title,,,,phaseFilter]=spec;
+  if(SKIP_DEVIATION.includes(id))return;
+  const direction=BAD_DIRECTION[id];
+  if(!direction)return;
+  const groups={};
+  rows.forEach(r=>{
+   if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
+   const y=year(val(r,'date'));if(!y)return;
+   const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
+   const gk=deviationAssetKey(r);
+   (groups[gk]=groups[gk]||[]).push({y,v,row:r});
+  });
+  Object.values(groups).forEach(arr=>{
+   arr.sort((a,b)=>a.y-b.y);
+   for(let i=1;i<arr.length;i++){
+    if(arr[i].y===arr[i-1].y)continue;
+    const change=computeSignedChange(arr[i-1].v,arr[i].v,direction);
+    if(change!=null&&change>=0.5){
+     if(!flags.has(arr[i].row))flags.set(arr[i].row,[]);
+     flags.get(arr[i].row).push(title);
+    }
+   }
+  });
+ });
+ return flags;
 }
 function computeAssetTrendSummary(rows){
  const perAssetParam={};
@@ -1514,6 +1631,7 @@ function apply(){
  if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);
  // f = hasil filter standar (konteks riwayat penuh, dipakai untuk pasangan tahun-ke-tahun deviasi)
  deviationFlags=computeDeviationFlags(f);
+ improvementFlags=computeImprovementFlags(f);
  const ahiVal=$('ahiCondition')?.value,devVal=$('deviationFilter')?.value;
  filtered=f.filter(r=>{
   if(ahiVal){const info=rowCategoryInfo(r);if(String(info.cat)!==ahiVal)return false}
