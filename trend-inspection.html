@@ -67,7 +67,7 @@
     <a>AHI Power Inspect</a>
     <a class="trend">Trend Inspection</a>
     <a class="sub active-sub" href="trend-inspection.html" data-tab-link="pmt">PMT</a>
-    <a class="sub">TRAFO</a><a class="sub" href="trend-inspection.html?tab=ct" data-tab-link="ct">CT</a><a class="sub">CVT/PT</a><a class="sub">PMS</a><a class="sub">LA</a><a class="sub">NGR</a>
+    <a class="sub">TRAFO</a><a class="sub" href="trend-inspection.html?tab=ct" data-tab-link="ct">CT</a><a class="sub" href="trend-inspection.html?tab=pt" data-tab-link="pt">CVT/PT</a><a class="sub">PMS</a><a class="sub">LA</a><a class="sub">NGR</a>
     <a href="ahi-evaluasi.html">AHI Evaluasi</a><a>Data Aset</a><a>Laporan</a>
   </nav>
   <div class="side-date"><small>Sumber Data</small><b id="sourceLabel">Google Sheet • NORM AHI PMT</b></div>
@@ -880,21 +880,172 @@ D. ATURAN PENTING
    katakan "data tidak cukup" — jangan menebak.
 6. Setiap kesimpulan kategori harus bisa ditelusuri kembali ke
    parameter dan batas yang tercantum di atas.`;
+const AI_SYSTEM_PROMPT_PT=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
+PERALATAN CVT/PT (Capacitive Voltage Transformer / Potential Transformer)
+dan PERHITUNGAN ASSET HEALTH INDEX (AHI) berdasarkan "Dokumen Panduan
+Perhitungan Skor AHI – CVT/PT" (kutipan yang tersedia saat ini).
+
+==================================================
+A. SISTEM SKOR AHI
+==================================================
+Critical    = Skor 100 = Kategori 5
+Poor        = Skor 30  = Kategori 4
+Fair        = Skor 10  = Kategori 3
+Good        = Skor 3   = Kategori 2
+Very Good   = Skor 1   = Kategori 1
+
+Jangan mengubah nilai skor ini kecuali ada instruksi resmi baru.
+
+==================================================
+B. REMBESAN / KEBOCORAN (VISUAL)
+==================================================
+- Oil level indicator kosong → Critical
+- Low level indikator minyak → Poor
+- Normal indikator minyak → Good
+- Ada tetesan/spot bekas minyak di area base PT → Poor
+- Ada rembesan → Fair
+- Tidak ada rembesan → Good
+
+Parameter ini berbasis inspeksi visual, BUKAN kolom angka yang tersedia
+di data dashboard saat ini. Jika user bertanya tentang parameter ini
+tanpa memberi data visual eksplisit, nyatakan "data tidak tersedia di
+dashboard" — jangan mengarang kondisinya.
+
+==================================================
+C. KONDISI ISOLATOR (VISUAL)
+==================================================
+- Cacat Mayor (pecah / bekas flashover) → Critical
+- Cacat Minor (retak, kotor/polutan, warna pudar) → Poor
+- Tidak ada cacat / Normal → Very Good
+
+Sama seperti di atas: berbasis visual, tidak tersedia sebagai kolom
+numerik di dashboard saat ini — jangan mengarang.
+
+==================================================
+D. TAHANAN ISOLASI
+==================================================
+Tegangan uji: 5000 VDC.
+Satuan: MΩ/kV (BUKAN MΩ mentah).
+
+Klasifikasi:
+≤ 2       → Critical
+> 2 – 5   → Poor
+> 5 – 10  → Fair
+> 10      → Good
+
+PEMETAAN KE DATA DASHBOARD (sudah dikonfirmasi user):
+Parameter ini berlaku untuk DUA kolom: "Primer - Ground (Mega Ohm)" dan
+"Primer - Sekunder (Mega Ohm)". Karena satuan dokumen adalah MΩ/kV
+sedangkan kolom dashboard berisi MΩ mentah, nilai WAJIB dibagi dengan
+tegangan operasi aset (kV) sebelum dicocokkan ke batas kategori di atas.
+Jika ringkasan data yang diberikan sudah menyertakan nilai ternormalisasi
+(MΩ/kV, biasanya berlabel sejenis "perKv"), GUNAKAN nilai tersebut
+langsung — jangan menghitung ulang dengan asumsi lain atau membagi nilai
+MΩ mentah begitu saja. Jika data tegangan operasi tidak tersedia untuk
+suatu baris/ringkasan, nyatakan "data tidak cukup", jangan menebak kelas
+tegangan.
+
+==================================================
+E. TERMINAL SEKUNDER
+==================================================
+- Abnormal (kotor, lembab, bocor/basah, longgar) → Critical
+- Normal (bersih dan kencang) → Good
+
+Berbasis inspeksi visual/fisik, tidak tersedia sebagai kolom numerik di
+dashboard saat ini — jangan mengarang.
+
+==================================================
+F. TAN DELTA – PT/CVT
+==================================================
+Satuan: %
+
+≥ 1%            → Critical
+> 0,5% – < 1%   → Poor
+≤ 0,5%          → Good
+
+Parameter ini sesuai dengan kolom "Tan Delta (%)" yang sudah ada di
+dashboard.
+
+==================================================
+G. HOTSPOT BODY (THERMOVISI)
+==================================================
+Dua kondisi pembanding — pilih sesuai konteks pengukuran, jangan
+mencampur keduanya:
+A. Perbandingan antar sisi body/antar fasa pada loading yang sama:
+   > 3°C → Critical
+   ≤ 3°C → Good
+B. Perbandingan dengan suhu ambient:
+   > 10°C → Critical
+   ≤ 10°C → Good
+
+Parameter ini tidak tersedia sebagai kolom numerik di dashboard saat
+ini — jangan mengarang nilai jika user tidak memberikan data suhu
+eksplisit.
+
+==================================================
+H. RASIO BELITAN – VOLTAGE DIVIDER
+==================================================
+Kelas Metering:
+≥ 0,1% → Critical
+< 0,1% → Good
+
+Kelas Proteksi:
+≥ 1,2% → Poor
+< 1,2% → Good
+
+Bedakan kelas Metering dan kelas Proteksi — jangan menyamakan batasnya.
+Parameter ini tidak tersedia sebagai kolom di dashboard saat ini —
+jangan mengarang nilai.
+
+==================================================
+I. KAPASITANSI BELITAN (KHUSUS CVT)
+==================================================
+Satuan: %
+
+> 10% atau < -5%  → Critical
+-5% s.d. 10%      → Good
+
+PEMETAAN KE DATA DASHBOARD (sudah dikonfirmasi user):
+Parameter ini sesuai dengan kolom "Deviasi Hasil Uji Kapasitansi (%)"
+yang sudah ada di dashboard.
+
+==================================================
+J. ATURAN PENTING
+==================================================
+1. Dokumen ini sumber utama untuk parameter yang tercantum di atas.
+2. Jangan mengarang nilai batas yang tidak ada di sini.
+3. Jangan mengubah satuan atau definisi kategori.
+4. Bedakan hasil pengujian (fakta) dari interpretasi (kategori AHI).
+5. Untuk parameter berbasis visual (Rembesan, Kondisi Isolator, Terminal
+   Sekunder, Hotspot Body) dan Rasio Belitan, data numeriknya BELUM
+   tersedia di dashboard saat ini — nyatakan "data tidak cukup" alih-alih
+   menebak kondisinya dari data lain.
+6. Untuk Tahanan Isolasi, WAJIB menggunakan satuan MΩ/kV (bukan MΩ
+   mentah) — gunakan nilai ternormalisasi yang sudah disediakan di
+   ringkasan data, jangan menghitung ulang dengan cara lain.
+7. Setiap kesimpulan kategori harus bisa ditelusuri kembali ke parameter
+   dan batas yang tercantum di atas.`;
 const TABS={
  pmt:{key:'pmt',label:'PMT',aiSystemPrompt:AI_SYSTEM_PROMPT_PMT,sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
   columns:{unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay']},
   phaseChartIds:['irAB','irAG','irBG','purity','dew','so2'],
   chartSpecs:[['irAB','IR Atas-Bawah','Mega Ohm',[{key:'irAB',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irAG','IR Atas-Ground','Mega Ohm',[{key:'irAG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['irBG','IR Bawah-Ground','Mega Ohm',[{key:'irBG',label:'IR'}],['#e53935','#f29a00','#1688f0']],['contact','Tahanan Kontak','mikro Ohm (µΩ)',[{key:'contactR',label:'R'},{key:'contactS',label:'S'},{key:'contactT',label:'T'}],['#e53935','#f29a00','#1688f0']],['closing','Closing Time','ms',[{key:'closingR',label:'R'},{key:'closingS',label:'S'},{key:'closingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['opening','Opening Time','ms',[{key:'openingR',label:'R'},{key:'openingS',label:'S'},{key:'openingT',label:'T'}],['#e53935','#f29a00','#1688f0']],['purity','SF6 Purity','%',[{key:'purity',label:'Purity'}],['#e53935','#f29a00','#1688f0']],['dew','SF6 Dew Point','°C',[{key:'dew',label:'Dew Point'}],['#e53935','#f29a00','#1688f0']],['so2','SF6 SO2','ppmV',[{key:'so2',label:'SO2'}],['#e53935','#f29a00','#1688f0']]],
-  detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TAHUN','date'],['IR ATAS-BAWAH','irAB'],['IR ATAS-GROUND','irAG'],['IR BAWAH-GROUND','irBG'],['KONTAK R','contactR'],['KONTAK S','contactS'],['KONTAK T','contactT'],['CLOSING R','closingR'],['CLOSING S','closingS'],['CLOSING T','closingT'],['OPENING R','openingR'],['OPENING S','openingS'],['OPENING T','openingT'],['SF6 PURITY','purity'],['SF6 DEW POINT','dew'],['SF6 SO2','so2'],['TANGGAL UJI','date']]
+  detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['IR ATAS-BAWAH','irAB'],['IR ATAS-GROUND','irAG'],['IR BAWAH-GROUND','irBG'],['KONTAK R','contactR'],['KONTAK S','contactS'],['KONTAK T','contactT'],['CLOSING R','closingR'],['CLOSING S','closingS'],['CLOSING T','closingT'],['OPENING R','openingR'],['OPENING S','openingS'],['OPENING T','openingT'],['SF6 PURITY','purity'],['SF6 DEW POINT','dew'],['SF6 SO2','so2']]
  },
  ct:{key:'ct',label:'CT',aiSystemPrompt:AI_SYSTEM_PROMPT_CT,sheetCsv:'https://docs.google.com/spreadsheets/d/1BFlYecP0qpbC14wadP_UGC7Y3lSBEjByN2oIwKhIOcw/export?format=csv&gid=790904160',sourceLabel:'Google Sheet • NORM AHI CT',docTitle:'Trend Inspection CT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – CT',detailTitle:'Detail Pengujian CT',exportFile:'Trend_Inspection_CT_Filtered.csv',
   columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],tegangan:['teg','tegangan'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],primerGround:['primer - ground (mega ohm)','primer - ground','primer ground'],primerSekunder:['primer - sekunder (mega ohm)','primer - sekunder(mega ohm)','primer - sekunder','primer sekunder'],tanDelta:['tan delta (%)','tan delta']},
   phaseChartIds:['primerGround','primerSekunder','tanDelta'],
   chartSpecs:[['primerGround','Primer - Ground','Mega Ohm',[{key:'primerGround',label:'Primer-Ground'}],['#e53935','#f29a00','#1688f0']],['primerSekunder','Primer - Sekunder','Mega Ohm',[{key:'primerSekunder',label:'Primer-Sekunder'}],['#e53935','#f29a00','#1688f0']],['tanDelta','Tan Delta','%',[{key:'tanDelta',label:'Tan Delta'}],['#e53935','#f29a00','#1688f0']]],
-  detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TAHUN','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta'],['TANGGAL UJI','date']]
+  detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta']]
+ },
+ pt:{key:'pt',label:'CVT/PT',aiSystemPrompt:AI_SYSTEM_PROMPT_PT,sheetCsv:'https://docs.google.com/spreadsheets/d/1bRAHSBiEj3pGEX6toISCD_kSH9rkSLPdQTxS3HWG5L0/gviz/tq?tqx=out:csv&sheet=PT',sourceLabel:'Google Sheet • NORM AHI PT',docTitle:'Trend Inspection CVT/PT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – CVT/PT',detailTitle:'Detail Pengujian CVT/PT',exportFile:'Trend_Inspection_CVTPT_Filtered.csv',
+  columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],tegangan:['tegangan operasi (kv)','tegangan operasi','tegangan'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],serial:['nomor seri','serial'],primerGround:['uji tahanan isolasi - hasil ukur primer-ground (mega ohm)','primer-ground (mega ohm)','primer ground'],primerSekunder:['uji tahanan isolasi - hasil ukur primer-sekunder (mega ohm)','primer-sekunder (mega ohm)','primer sekunder'],tanDelta:['hasil uji tan delta (%)','tan delta (%)','tan delta'],kapasitansiNameplate:['kapasitansi nameplate'],kapasitansiUji:['hasil uji kapasitansi'],deviasiKapasitansi:['deviasi hasil uji kapasitansi (%)','deviasi hasil uji kapasitansi']},
+  phaseChartIds:['primerGround','primerSekunder','tanDelta','deviasiKapasitansi'],
+  chartSpecs:[['primerGround','Primer - Ground','Mega Ohm',[{key:'primerGround',label:'Primer-Ground'}],['#e53935','#f29a00','#1688f0']],['primerSekunder','Primer - Sekunder','Mega Ohm',[{key:'primerSekunder',label:'Primer-Sekunder'}],['#e53935','#f29a00','#1688f0']],['tanDelta','Tan Delta','%',[{key:'tanDelta',label:'Tan Delta'}],['#e53935','#f29a00','#1688f0']],['kapR','Kapasitansi Nameplate vs Uji – Fasa R','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'r'],['kapS','Kapasitansi Nameplate vs Uji – Fasa S','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'s'],['kapT','Kapasitansi Nameplate vs Uji – Fasa T','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'t'],['deviasiKapasitansi','Deviasi Hasil Uji Kapasitansi','%',[{key:'deviasiKapasitansi',label:'Deviasi'}],['#e53935','#f29a00','#1688f0']]],
+  detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta'],['KAPASITANSI NAMEPLATE','kapasitansiNameplate'],['HASIL UJI KAPASITANSI','kapasitansiUji'],['DEVIASI KAPASITANSI (%)','deviasiKapasitansi']]
  }
 };
-const TAB=TABS[new URLSearchParams(location.search).get('tab')==='ct'?'ct':'pmt'];
+const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
 const SHEET_CSV=TAB.sheetCsv;
 const PAGE_SIZE=10;let raw=[],filtered=[],page=1,charts=[];
 const $=id=>document.getElementById(id);
@@ -1044,7 +1195,18 @@ function aiBuildSummary(){
    });
    voltageBreakdown=Object.entries(groups).map(([kelasTegangan,vals])=>({kelasTegangan,rataRataTanDeltaPersen:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(3),jumlahData:vals.length}));
   }
-  return {title,unit,years:labels,series,breach,voltageBreakdown};
+  let perKv=null;
+  if(TAB.key==='pt'&&(id==='primerGround'||id==='primerSekunder')&&COL.tegangan){
+   const vals=[];
+   filtered.forEach(r=>{
+    const mo=num(val(r,id));
+    const kv=num(val(r,'tegangan'));
+    if(mo==null||mo===-1000||!kv)return;
+    vals.push(mo/kv);
+   });
+   if(vals.length)perKv={satuan:'MΩ/kV',rataRata:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2),jumlahData:vals.length};
+  }
+  return {title,unit,years:labels,series,breach,voltageBreakdown,perKv};
  }).filter(Boolean);
  return {tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
 }
@@ -1115,7 +1277,7 @@ const C=TAB.columns;
 let COL={};
 function resolveCols(){for(const k in C)COL[k]=findCol(C[k]);}
 function val(r,k){let h=COL[k];return h?r[h]:''}
-function num(v){let s=String(v??'').trim();if(!s)return null;s=s.replace(/\s/g,'');if(s.includes('.')&&s.includes(',')){s=s.replace(/\./g,'').replace(',','.')}else if(s.includes(',')&&!s.includes('.')){s=s.replace(',','.')}else if((s.match(/\./g)||[]).length>1){s=s.replace(/\./g,'')}let m=s.match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):null}
+function num(v){let s=String(v??'').trim();if(!s)return null;s=s.replace(/\s/g,'').replace(/,/g,'');let m=s.match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):null}
 function year(v){let s=String(v||'');let m=s.match(/(20\d{2})/);return m?+m[1]:null}
 function uniqueBy(rows,k){return [...new Set(rows.map(r=>val(r,k)).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'id'))}
 function fill(id,values,keep){let s=$(id),old=keep??s.value;s.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option>${escapeHtml(v)}</option>`).join('');if(values.includes(old))s.value=old}
@@ -1124,7 +1286,7 @@ function baseFiltered(stop){let f=raw.slice();const ids=['unit','upt','ultg','gi
 function refreshFilters(changed){let order=['unit','upt','ultg','gi','bay','phasa','merk','type'];let current={};order.forEach(id=>current[id]=$(id).value);for(let i=0;i<order.length;i++){let id=order[i],f=raw.slice();for(let j=0;j<i;j++){let v=current[order[j]];if(v)f=f.filter(r=>val(r,order[j])===v)}fill(id,uniqueBy(f,id),current[id])}updateYears();}
 function updateYears(){let ys=raw.map(r=>year(val(r,'date'))).filter(Boolean);let min=Math.min(...ys,2014),max=Math.max(...ys,new Date().getFullYear());let vals=[];for(let y=min;y<=max;y++)vals.push(String(y));fill('fromYear',vals,$('fromYear').value);fill('toYear',vals,$('toYear').value);if(!$('fromYear').value)$('fromYear').value=String(Math.max(min,max-12));if(!$('toYear').value)$('toYear').value=String(max)}
 function apply(){let f=raw.slice();const ids=['unit','upt','ultg','gi','bay','phasa','merk','type'];ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});let fy=+$('fromYear').value,ty=+$('toYear').value;if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);filtered=f;page=1;render();if(aiHasResult)aiRenderPlaceholder('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.')}
-function makeChart(id,title,unit,keys,colors){
+function makeChart(id,title,unit,keys,colors,phaseFilter){
 let el=$(id);
 let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
 if(labels.length>5)labels=labels.slice(-5);
@@ -1136,7 +1298,7 @@ if(phaseCharts.includes(id)){
   label:ph,
   data:labels.map(y=>{
    let rows=filtered.filter(r=>year(val(r,'date'))===y && norm(val(r,'phasa'))===ph.toLowerCase());
-   let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null);
+   let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null&&v!==-1000);
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
   borderColor:colors[i],backgroundColor:colors[i],pointRadius:3,borderWidth:2,tension:.25,spanGaps:true
@@ -1145,8 +1307,8 @@ if(phaseCharts.includes(id)){
  datasets=keys.map((k,i)=>({
   label:k.label,
   data:labels.map(y=>{
-   let rows=filtered.filter(r=>year(val(r,'date'))===y);
-   let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null);
+   let rows=filtered.filter(r=>year(val(r,'date'))===y && (!phaseFilter||norm(val(r,'phasa'))===phaseFilter));
+   let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null&&v!==-1000);
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
   borderColor:colors[i],backgroundColor:colors[i],pointRadius:3,borderWidth:2,tension:.25,spanGaps:true
@@ -1154,14 +1316,14 @@ if(phaseCharts.includes(id)){
 }
 let ctx=$(id).getContext('2d');
 charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('id-ID',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{
- min:id==='purity'?96.5:undefined,
- max:id==='dew'?-4:(id==='so2'?13:undefined),
+ min:id==='purity'?96.5:(id==='tanDelta'?0:undefined),
+ max:id==='dew'?-4:(id==='so2'?13:(id==='tanDelta'?1:undefined)),
  grid:{color:'#e7edf4'},
  ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('id-ID')}
 }}}}));
 $(id).parentElement.parentElement.querySelector('.chart-years').textContent=labels.length?`${labels.length} tahun`:'Tidak ada data'
 }function chartCard(id,title,unit,keys,colors){return `<div class="chart-card"><div class="chart-head"><div><div class="chart-title">${title}</div><div class="chart-unit">${unit}</div></div><div class="chart-years">5 tahun</div></div><div class="chart-box"><canvas id="${id}"></canvas></div></div>`}
-function renderCharts(){charts.forEach(c=>c.destroy());charts=[];let specs=TAB.chartSpecs;$('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');specs.forEach(s=>makeChart(s[0],s[1],s[2],s[3],s[4]))}
+function renderCharts(){charts.forEach(c=>c.destroy());charts=[];let specs=TAB.chartSpecs;$('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');specs.forEach(s=>makeChart(s[0],s[1],s[2],s[3],s[4],s[5]))}
 const detailCols=TAB.detailCols;
 function detailRows(){let q=norm($('search').value);let rows=filtered.filter(r=>!q||detailCols.some(([_,k])=>norm(val(r,k)).includes(q)));let pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(page>pages)page=pages;let view=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);$('count').textContent=`Menampilkan ${rows.length.toLocaleString('id-ID')} data`;$('pageInfo').textContent=`Halaman ${page} / ${pages}`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;$('thead').innerHTML='<tr>'+detailCols.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';$('tbody').innerHTML=view.length?view.map(r=>'<tr>'+detailCols.map(([_,k])=>`<td>${escapeHtml(k==='date'?val(r,k):val(r,k))}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="${detailCols.length}" class="empty">Tidak ada data sesuai filter.</td></tr>`;}
 function render(){renderCharts();detailRows();$('lastDate').textContent=new Date().toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}
