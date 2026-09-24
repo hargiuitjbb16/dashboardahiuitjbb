@@ -105,7 +105,7 @@
  <div class="filter"><label>From Year</label><select id="fromYear"></select></div>
  <div class="filter"><label>To Year</label><select id="toYear"></select></div>
  <div class="filter"><label>Kondisi AHI</label><select id="ahiCondition"><option value="">Semua</option><option value="1">1 - Very Good</option><option value="2">2 - Good</option><option value="3">3 - Fair</option><option value="4">4 - Poor</option><option value="5">5 - Critical</option></select></div>
- <div class="filter"><label>Deviasi ≥50%</label><select id="deviationFilter"><option value="">Semua</option><option value="ya">Ya, ada deviasi ≥50%</option></select></div>
+ <div class="filter"><label>Kondisi Trend</label><select id="deviationFilter"><option value="">Semua</option><option value="improve50">Membaik Signifikan (≥50%)</option><option value="improve10">Membaik (≥10%)</option><option value="worsen50">Memburuk Signifikan (≥50%)</option><option value="worsen10">Memburuk (≥10%)</option><option value="worsen2x">Memburuk Beruntun 2x (≥10%)</option></select></div>
 </section>
 <section class="trend-summary" id="trendSummary"></section>
 <section class="panel ai-panel">
@@ -128,7 +128,8 @@
 <div class="subtab-bar" id="subtabBar">
  <button class="subtab-btn active" data-subtab="trend" type="button">Grafik Trending Pengujian</button>
  <button class="subtab-btn" data-subtab="condition" type="button">Radar Kondisi AHI</button>
- <button class="subtab-btn" data-subtab="deviation" type="button">Lonjakan Deviasi ≥50%</button>
+ <button class="subtab-btn" data-subtab="improveChart" type="button">Grafik Membaik</button>
+ <button class="subtab-btn" data-subtab="worsenChart" type="button">Grafik Memburuk</button>
 </div>
 <section class="chart-grid" id="charts"><div class="loading" style="grid-column:1/-1">Memuat data...</div></section>
 <section class="detail">
@@ -1098,7 +1099,9 @@ const TABS={
 };
 const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
 const SHEET_CSV=TAB.sheetCsv;
-const PAGE_SIZE=10;let raw=[],filtered=[],deviationFlags=new Map(),improvementFlags=new Map(),page=1,charts=[];
+const PAGE_SIZE=10;let raw=[],filtered=[],wideFiltered=[],deviationFlags=new Map(),improvementFlags=new Map(),improve10Flags=new Map(),worsen10Flags=new Map(),worsen2xFlags=new Map(),page=1,charts=[];
+const TREND_CONDITION_LABELS={improve50:'Membaik Signifikan (≥50%)',improve10:'Membaik (≥10%)',worsen50:'Memburuk Signifikan (≥50%)',worsen10:'Memburuk (≥10%)',worsen2x:'Memburuk Beruntun 2x (≥10%)'};
+function trendConditionFlagMaps(){return {improve50:improvementFlags,improve10:improve10Flags,worsen50:deviationFlags,worsen10:worsen10Flags,worsen2x:worsen2xFlags}}
 const $=id=>document.getElementById(id);
 document.title=TAB.docTitle;
 $('docTitle').textContent=TAB.docTitle;
@@ -1374,7 +1377,8 @@ function computeSignedChange(prev,curr,direction){
  if(direction==='away-from-zero')return (Math.abs(prev)-Math.abs(curr))/Math.abs(prev);
  return null;
 }
-function computeImprovementFlags(rows){
+function computeImprovementFlags(rows,threshold){
+ threshold=threshold==null?0.5:threshold;
  const flags=new Map();
  (TAB.chartSpecs||[]).forEach(spec=>{
   const [id,title,,,,phaseFilter]=spec;
@@ -1394,7 +1398,7 @@ function computeImprovementFlags(rows){
    for(let i=1;i<arr.length;i++){
     if(arr[i].y===arr[i-1].y)continue;
     const change=computeSignedChange(arr[i-1].v,arr[i].v,direction);
-    if(change!=null&&change>=0.5){
+    if(change!=null&&change>=threshold){
      if(!flags.has(arr[i].row))flags.set(arr[i].row,[]);
      flags.get(arr[i].row).push(title);
     }
@@ -1402,6 +1406,41 @@ function computeImprovementFlags(rows){
   });
  });
  return flags;
+}
+function computeWorsenStreakFlags(rows){
+ const worsen10=new Map(),worsen2x=new Map();
+ const addFlag=(map,row,title)=>{if(!map.has(row))map.set(row,[]);map.get(row).push(title)};
+ (TAB.chartSpecs||[]).forEach(spec=>{
+  const [id,title,,,,phaseFilter]=spec;
+  if(SKIP_DEVIATION.includes(id))return;
+  const direction=BAD_DIRECTION[id];
+  if(!direction)return;
+  const groups={};
+  rows.forEach(r=>{
+   if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
+   const y=year(val(r,'date'));if(!y)return;
+   const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
+   const gk=deviationAssetKey(r);
+   (groups[gk]=groups[gk]||[]).push({y,v,row:r});
+  });
+  Object.values(groups).forEach(arr=>{
+   arr.sort((a,b)=>a.y-b.y);
+   let run=[];
+   const flushRun=()=>{
+    if(run.length===1)addFlag(worsen10,run[0],title);
+    else if(run.length>=2)run.forEach(row=>addFlag(worsen2x,row,title));
+    run=[];
+   };
+   for(let i=1;i<arr.length;i++){
+    if(arr[i].y===arr[i-1].y)continue;
+    const change=computeSignedChange(arr[i-1].v,arr[i].v,direction);
+    if(change!=null&&change<=-0.1)run.push(arr[i].row);
+    else flushRun();
+   }
+   flushRun();
+  });
+ });
+ return {worsen10,worsen2x};
 }
 function computeAssetTrendSummary(rows){
  const perAssetParam={};
@@ -1493,7 +1532,7 @@ function trendSummaryBox(cls,label,num,denom){
 function renderTrendSummary(){
  const box=$('trendSummary');if(!box)return;
  ensureEvalTotalCount();
- const summary=computeAssetTrendSummary(filtered);
+ const summary=computeAssetTrendSummary(wideFiltered);
  let improve50=0,improve10=0,worsen50=0,worsen1x=0,worsen2x=0;
  summary.forEach(s=>{
   if(s.improve50)improve50++;
@@ -1510,7 +1549,7 @@ function renderTrendSummary(){
   trendSummaryBox('good','Membaik Signifikan (≥50%)',improve50,denom)+
   trendSummaryBox('good','Membaik (≥10%)',improve10,denom)+
   trendSummaryBox('bad','Memburuk Signifikan (≥50%)',worsen50,denom)+
-  trendSummaryBox('bad','Memburuk Beruntun 1x (≥10%)',worsen1x,denom)+
+  trendSummaryBox('bad','Memburuk (≥10%)',worsen1x,denom)+
   trendSummaryBox('bad','Memburuk Beruntun 2x (≥10%)',worsen2x,denom);
 }
 function uniqueBy(rows,k){return [...new Set(rows.map(r=>val(r,k)).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'id'))}
@@ -1526,12 +1565,18 @@ function apply(){
  if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);
  if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);
  // f = hasil filter standar (konteks riwayat penuh, dipakai untuk pasangan tahun-ke-tahun deviasi)
+ wideFiltered=f;
  deviationFlags=computeDeviationFlags(f);
  improvementFlags=computeImprovementFlags(f);
- const ahiVal=$('ahiCondition')?.value,devVal=$('deviationFilter')?.value;
+ improve10Flags=computeImprovementFlags(f,0.1);
+ const streakFlags=computeWorsenStreakFlags(f);
+ worsen10Flags=streakFlags.worsen10;
+ worsen2xFlags=streakFlags.worsen2x;
+ const ahiVal=$('ahiCondition')?.value,trendVal=$('deviationFilter')?.value;
+ const trendMaps=trendConditionFlagMaps();
  filtered=f.filter(r=>{
   if(ahiVal){const info=rowCategoryInfo(r);if(String(info.cat)!==ahiVal)return false}
-  if(devVal==='ya'&&!deviationFlags.has(r))return false;
+  if(trendVal&&!(trendMaps[trendVal]||new Map()).has(r))return false;
   return true;
  });
  page=1;render();
@@ -1580,7 +1625,8 @@ let subTab='trend';
 function renderCharts(){
  charts.forEach(c=>c.destroy());charts=[];
  if(subTab==='condition')renderConditionCharts();
- else if(subTab==='deviation')renderDeviationCharts();
+ else if(subTab==='improveChart')renderImproveCharts();
+ else if(subTab==='worsenChart')renderWorsenCharts();
  else renderTrendCharts();
 }
 function renderTrendCharts(){let specs=TAB.chartSpecs;$('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');specs.forEach(s=>makeChart(s[0],s[1],s[2],s[3],s[4],s[5]))}
@@ -1611,40 +1657,62 @@ function renderConditionCharts(){
   $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
  });
 }
-function renderDeviationCharts(){
+const IMPROVE_TREND_CATEGORIES=[
+ {key:'improve50',label:'Membaik Signifikan (≥50%)',color:'#20a46b'},
+ {key:'improve10',label:'Membaik (≥10%)',color:'#7bcf9e'}
+];
+const WORSEN_TREND_CATEGORIES=[
+ {key:'worsen50',label:'Memburuk Signifikan (≥50%)',color:'#e53935'},
+ {key:'worsen10',label:'Memburuk (≥10%)',color:'#f07800'},
+ {key:'worsen2x',label:'Memburuk Beruntun 2x (≥10%)',color:'#111'}
+];
+function renderTrendCategoryCharts(categories){
  let specs=TAB.chartSpecs;
  $('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');
  let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
  if(labels.length>5)labels=labels.slice(-5);
+ const trendMaps=trendConditionFlagMaps();
+ // Kalau filter Kondisi Trend aktif dan kategorinya termasuk tab grafik ini, tampilkan hanya kategori itu saja.
+ const trendVal=$('deviationFilter')?.value;
+ const activeCats=(trendVal&&categories.some(c=>c.key===trendVal))?categories.filter(c=>c.key===trendVal):categories;
  specs.forEach(spec=>{
   const [id,title]=spec;
   if(SKIP_DEVIATION.includes(id)){setChartEmpty(id,'Gunakan grafik "Deviasi Hasil Uji Kapasitansi" untuk analisis deviasi parameter ini.');return}
-  if(!BAD_DIRECTION[id]){setChartEmpty(id,'Arah "memburuk" belum ditentukan untuk parameter ini.');return}
+  if(!BAD_DIRECTION[id]){setChartEmpty(id,'Arah "membaik/memburuk" belum ditentukan untuk parameter ini.');return}
   if(!labels.length){setChartEmpty(id,'Tidak ada data pada rentang tahun/filter ini.');return}
-  // deviationFlags sudah dihitung dari konteks riwayat penuh (apply()); di sini tinggal hitung berapa
-  // baris pada set filtered saat ini (termasuk filter Kondisi AHI/Deviasi) yang tertandai untuk parameter ini.
-  const yearCounts={};labels.forEach(y=>yearCounts[y]=0);
-  filtered.forEach(r=>{
-   const y=year(val(r,'date'));if(!labels.includes(y))return;
-   const params=deviationFlags.get(r);
-   if(params&&params.includes(title))yearCounts[y]++;
+  // Peta kondisi trend sudah dihitung dari konteks riwayat penuh (apply()); di sini tinggal hitung berapa
+  // baris pada set filtered saat ini (termasuk filter Kondisi AHI/Trend) yang tertandai untuk parameter ini.
+  const datasets=activeCats.map(cat=>{
+   const map=trendMaps[cat.key];
+   const yearCounts={};labels.forEach(y=>yearCounts[y]=0);
+   filtered.forEach(r=>{
+    const y=year(val(r,'date'));if(!labels.includes(y))return;
+    const params=map.get(r);
+    if(params&&params.includes(title))yearCounts[y]++;
+   });
+   return{label:cat.label,data:labels.map(y=>yearCounts[y]),backgroundColor:cat.color,borderColor:cat.color};
   });
-  const data=labels.map(y=>yearCounts[y]);
-  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Jumlah deviasi ≥50%',data,backgroundColor:'#e53935'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y} aset mengalami perubahan ≥50% ke arah buruk`}}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
   $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
  });
 }
+function renderImproveCharts(){renderTrendCategoryCharts(IMPROVE_TREND_CATEGORIES)}
+function renderWorsenCharts(){renderTrendCategoryCharts(WORSEN_TREND_CATEGORIES)}
 const CATEGORY_DETAIL_COLS=Object.keys(TAB.categoryOf||{}).map(id=>['AHI '+chartTitleById(id).toUpperCase(),'__cat_'+id]);
-const detailCols=[...TAB.detailCols,...CATEGORY_DETAIL_COLS,['DEVIASI ≥50%','__deviationInfo']];
+const detailCols=[...TAB.detailCols,...CATEGORY_DETAIL_COLS,['KONDISI TREND','__trendCondition']];
 function detailCellValue(r,k){
  if(k.startsWith('__cat_')){
   const id=k.slice(6);
   const cat=(TAB.categoryOf||{})[id]?.(r);
   return cat?`${cat} - ${AHI_CAT[cat].n}`:'—';
  }
- if(k==='__deviationInfo'){
-  const dev=deviationFlags.get(r)||[];
-  return dev.length?dev.join(', '):'—';
+ if(k==='__trendCondition'){
+  const trendMaps=trendConditionFlagMaps();
+  const parts=Object.keys(TREND_CONDITION_LABELS).map(key=>{
+   const params=trendMaps[key].get(r);
+   return params&&params.length?TREND_CONDITION_LABELS[key]+' ('+params.join(', ')+')':null;
+  }).filter(Boolean);
+  return parts.length?parts.join(' | '):'—';
  }
  return val(r,k);
 }
