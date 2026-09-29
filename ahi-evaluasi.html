@@ -214,7 +214,10 @@ const TYPE_SHORT={"Power Transformer":"Power Transformer","Current Transformer":
 const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
 const HIST={"Januari": {"Power Transformer": [42, 99, 254, 71, 7], "Current Transformer": [33, 168, 52, 3083, 6315], "Potential Transformer": [132, 9, 2, 3893, 0], "Circuit Breaker": [138, 479, 334, 1095, 758], "Disconnecting Switch": [24, 117, 21, 7615, 0], "Lightning Arrester": [7, 157, 126, 2139, 385], "Neutral Grounding Resistance": [10, 0, 14, 344, 6], "Reactor": [0, 0, 0, 11, 0], "Capacitor": [0, 0, 0, 6, 5]}, "Februari": {"Power Transformer": [43, 105, 252, 67, 6], "Current Transformer": [33, 299, 59, 3115, 10999], "Potential Transformer": [125, 18, 2, 3906, 0], "Circuit Breaker": [130, 898, 326, 1141, 1442], "Disconnecting Switch": [19, 175, 21, 7665, 0], "Lightning Arrester": [4, 235, 123, 2174, 702], "Neutral Grounding Resistance": [10, 0, 14, 345, 8], "Reactor": [0, 0, 0, 11, 0], "Capacitor": [0, 0, 0, 17, 10]}, "Maret": {"Power Transformer": [43, 106, 253, 63, 6], "Current Transformer": [30, 164, 56, 3283, 6128], "Potential Transformer": [123, 9, 2, 3908, 0], "Circuit Breaker": [112, 474, 327, 1169, 711], "Disconnecting Switch": [19, 87, 21, 7671, 0], "Lightning Arrester": [1, 157, 123, 2178, 376], "Neutral Grounding Resistance": [9, 0, 14, 346, 6], "Reactor": [0, 0, 0, 11, 0], "Capacitor": [0, 0, 0, 17, 5]}, "April": {"Power Transformer": [38, 107, 251, 67, 6], "Current Transformer": [27, 148, 46, 2984, 4891], "Potential Transformer": [67, 9, 2, 3107, 0], "Circuit Breaker": [85, 613, 454, 864, 1435], "Disconnecting Switch": [5, 91, 22, 7687, 243], "Lightning Arrester": [13, 176, 123, 2163, 366], "Neutral Grounding Resistance": [10, 0, 14, 348, 8], "Reactor": [0, 0, 0, 23, 0], "Capacitor": [0, 0, 0, 17, 5]}, "Mei": {"Power Transformer": [35, 106, 255, 67, 6], "Current Transformer": [26, 145, 36, 3025, 4844], "Potential Transformer": [63, 9, 2, 3111, 0], "Circuit Breaker": [73, 562, 994, 899, 917], "Disconnecting Switch": [4, 91, 22, 7686, 243], "Lightning Arrester": [13, 168, 123, 2179, 358], "Neutral Grounding Resistance": [10, 0, 12, 352, 7], "Reactor": [0, 0, 0, 24, 0], "Capacitor": [0, 0, 0, 25, 4]}};
 const LIVE={};
-let raw=[],filtered=[],period="Agustus",search="",trendFilter=true,currentPage=1;const PAGE_SIZE=50;
+// Bulan terbaru yang dimuat pertama; bulan historis dimuat di background.
+const CURRENT_MONTH="September",CURRENT_DATE_LABEL="September 2026";
+const HISTORY_MONTHS=["Juni","Juli","Agustus"];
+let raw=[],filtered=[],period=CURRENT_MONTH,search="",trendFilter=true,currentPage=1;const PAGE_SIZE=50;
 
 function norm(v){return String(v??"").normalize("NFKC").replace(/^\uFEFF/,"").replace(/\u00a0/g," ").trim().replace(/\s+/g," ").toLowerCase()}
 function fmt(n){return Number(n||0).toLocaleString("id-ID")}
@@ -363,7 +366,7 @@ function voltageOK(r,v){
 }
 function getFilters(){
   const s=[...document.querySelectorAll("#filters select")];
-  return {teg:s[0]?.value||"",unit:s[1]?.value||"",upt:s[2]?.value||"",ultg:s[3]?.value||"",gi:s[4]?.value||"",bay:s[5]?.value||"",phasa:s[6]?.value||"",type:s[7]?.value||"",ahi:s[8]?.value||"",period:s[9]?.value||"Agustus"};
+  return {teg:s[0]?.value||"",unit:s[1]?.value||"",upt:s[2]?.value||"",ultg:s[3]?.value||"",gi:s[4]?.value||"",bay:s[5]?.value||"",phasa:s[6]?.value||"",type:s[7]?.value||"",ahi:s[8]?.value||"",period:s[9]?.value||CURRENT_MONTH};
 }
 function matches(r,f,exclude=""){
   if(!voltageOK(r,f.teg))return false;
@@ -416,8 +419,8 @@ function buildFilters(){
   document.getElementById("applyBtn").onclick=apply;
   document.getElementById("resetBtn").onclick=()=>{
     const s=[...box.querySelectorAll("select")];
-    s.forEach((x,i)=>x.value=i===9?"Agustus":"");
-    period="Agustus";refreshCascading();apply();
+    s.forEach((x,i)=>x.value=i===9?CURRENT_MONTH:"");
+    period=CURRENT_MONTH;refreshCascading();apply();
   };
   refreshCascading();
 }
@@ -528,7 +531,7 @@ function field(r,c){
   if(c==="TINGKAT RESIKO")return r["TINGKAT RESIKO"]||"—";
   if(c==="AHI FINAL"){const v=getMonthValue(r,period,"ahi");return v||r["AHI FINAL"]||r["AHI FINAL "+period.toUpperCase()]||"—";}
   if(c==="Parameter Pemicu")return getMonthValue(r,period,"param")||"—";
-  if(c==="P0/P1")return r["P0/P1"]||"—";
+  if(c==="P0/P1")return r["P0/P1"]||getMonthValue(r,period,"p01")||"—";
   if(c==="Rencana")return r["Rencana"]||"—";
   if(c==="Target Tanggal Penyelesaian")return r["Target Tanggal Penyelesaian"]||"—";
   return "—";
@@ -584,26 +587,26 @@ document.getElementById("exportBtn").addEventListener("click",()=>{
 });
 async function load(){
   const status=document.getElementById("status");
-  status.className="status info";status.textContent="Memuat data Agustus...";
+  status.className="status info";status.textContent=`Memuat data ${CURRENT_MONTH}...`;
   try{
     // Load the current month first. The exact GitHub raw path is the primary source.
-    const aug=await fetchMonth("Agustus");
-    if(!aug)throw new Error("AHI_EVAL_AGUSTUS.csv tidak dapat diambil dari GitHub.");
-    LIVE.Agustus=aug;raw=aug.rows;
-    period="Agustus";
-    document.getElementById("lastDate").textContent="24 Agustus 2026";
-    document.getElementById("sideDate").textContent="24 Agustus 2026";
+    const cur=await fetchMonth(CURRENT_MONTH);
+    if(!cur)throw new Error(`${MONTH_FILES[CURRENT_MONTH]} tidak dapat diambil dari GitHub.`);
+    LIVE[CURRENT_MONTH]=cur;raw=cur.rows;
+    period=CURRENT_MONTH;
+    document.getElementById("lastDate").textContent=CURRENT_DATE_LABEL;
+    document.getElementById("sideDate").textContent=CURRENT_DATE_LABEL;
     buildFilters();
     apply();
-    status.className="status ok";status.textContent=`CSV AGUSTUS berhasil dimuat • ${fmt(raw.length)} baris${aug.fromCache?" (dari cache sesi)":""}`;
-    // Historical/current months load in the background. Missing future files are simply ignored.
-    Promise.all(["Juni","Juli"].map(async m=>{
+    status.className="status ok";status.textContent=`CSV ${CURRENT_MONTH.toUpperCase()} berhasil dimuat • ${fmt(raw.length)} baris${cur.fromCache?" (dari cache sesi)":""}`;
+    // Historical months load in the background. Missing files are simply ignored.
+    Promise.all(HISTORY_MONTHS.map(async m=>{
       try{const d=await fetchMonth(m);if(d)LIVE[m]=d;}catch(e){}
-    })).then(()=>renderCharts());
+    })).then(()=>{renderCharts();if(period!==CURRENT_MONTH&&LIVE[period])apply()});
   }catch(e){
     console.error(e);
     status.className="status error";
-    status.textContent="Gagal memuat CSV Agustus. Cek koneksi atau pastikan file AHI_EVAL_AGUSTUS.csv ada di data/evaluasi.";
+    status.textContent=`Gagal memuat CSV ${CURRENT_MONTH}. Cek koneksi atau pastikan file ${MONTH_FILES[CURRENT_MONTH]} ada di data/evaluasi.`;
     document.getElementById("lastDate").textContent="CSV belum terbaca";
     document.getElementById("sideDate").textContent="CSV belum terbaca";
     // Still show the permanent Jan–Jul mock trend so the page is never blank.
