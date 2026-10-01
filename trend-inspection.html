@@ -26,6 +26,8 @@
 .ai-settings input{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;padding:0 9px;font-size:11px}
 .ai-settings .save-row{display:flex;align-items:end;gap:6px}
 .ai-body{margin-top:11px}
+.ai-viewtag{display:inline-block;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:#0d68b5;background:#eaf3ff;border:1px solid #c9dff5;border-radius:20px;padding:4px 10px;margin-bottom:8px}
+.ai-ringkasan{font-size:12px;line-height:1.6;color:#22364e;background:#f7f9fc;border:1px solid #e6ebf2;border-radius:8px;padding:9px 11px;margin-bottom:10px}
 .ai-placeholder{color:#8a99aa;font-size:11.5px}
 .ai-error{color:#c62828;font-size:11.5px}
 .ai-loading{display:flex;align-items:center;gap:8px;color:#5b7796;font-size:11.5px;padding:2px 0}
@@ -1136,7 +1138,7 @@ function aiKeyStatus(){
  return {key:k,expired:false,remainingMs:exp-Date.now()};
 }
 const AI_SYSTEM_PROMPT_DEFAULT='Anda adalah asisten analisis untuk dashboard pemantauan Asset Health Index (AHI) gardu induk PLN.';
-const AI_OUTPUT_FORMAT_INSTRUCTION='Untuk kebutuhan panel "AI Insight" pada dashboard ini (mode ringkasan otomatis, bukan sesi chat interaktif satu-per-satu), balas HANYA dengan JSON valid, tanpa markdown dan tanpa teks lain di luar JSON, persis bentuk ini: {"tren":["poin singkat"],"perhatian":["poin singkat"],"rekomendasi":["poin singkat"]}. Maksimal 3 poin per array, masing-masing satu kalimat pendek dan padat dalam Bahasa Indonesia, sebutkan nama parameter dan kategori AHI (Critical/Poor/Fair/Good/Very Good) bila relevan berdasarkan aturan di atas. "tren" = parameter dengan kategori Good/Very Good atau kondisi membaik; "perhatian" = parameter berkategori Poor/Critical atau mendekati batas tersebut (array kosong jika tidak ada); "rekomendasi" = saran tindak lanjut untuk parameter pada "perhatian", mengacu pada failure mode/aturan di atas bila tersedia — jangan langsung merekomendasikan penggantian aset hanya karena satu parameter buruk. Jika ringkasan data yang diberikan tidak mencakup parameter yang dibutuhkan untuk menentukan kategori, jangan mengarang, cukup lewati parameter tersebut.';
+const AI_OUTPUT_FORMAT_INSTRUCTION='Untuk kebutuhan panel "AI Insight" pada dashboard ini (mode ringkasan otomatis, bukan sesi chat interaktif satu-per-satu), balas HANYA dengan JSON valid, tanpa markdown dan tanpa teks lain di luar JSON, persis bentuk ini: {"ringkasan":"1-3 kalimat","tren":["poin singkat"],"perhatian":["poin singkat"],"rekomendasi":["poin singkat"]}. "ringkasan" WAJIB diisi: jelaskan LANGSUNG isi data pada field "charts" yang diberikan sesuai "viewMode" saat ini — sebutkan angka, tahun, dan nama parameter yang konkret dari data tersebut (bukan kalimat umum), misalnya tahun mana yang paling banyak kejadian, parameter mana yang paling menonjol, atau kategori mana yang paling dominan, PERSIS mengikuti struktur data pada "viewMode" yang diberikan (baik itu Grafik Trending Pengujian, Radar Kondisi AHI, Grafik Membaik, atau Grafik Memburuk). Maksimal 3 poin per array pada tren/perhatian/rekomendasi, masing-masing satu kalimat pendek dan padat dalam Bahasa Indonesia, sebutkan nama parameter dan kategori/angka konkret dari data bila relevan. "tren" = parameter/tahun dengan kondisi membaik atau kategori Good/Very Good; "perhatian" = parameter/tahun dengan kondisi memburuk atau kategori Poor/Critical (array kosong jika tidak ada pada data ini); "rekomendasi" = saran tindak lanjut untuk isi "perhatian", mengacu pada failure mode/aturan di atas bila tersedia — jangan langsung merekomendasikan penggantian aset hanya karena satu parameter buruk. Semua bagian HARUS hanya membahas data pada "viewMode" yang diberikan, jangan membahas tampilan grafik lain. Jika ringkasan data yang diberikan tidak mencakup parameter yang dibutuhkan, jangan mengarang, cukup lewati parameter tersebut.';
 let aiHasResult=false;
 function aiGetKey(){return aiKeyStatus().key}
 function aiGetModel(){return localStorage.getItem(AI_MODEL_STORAGE)||AI_MODEL_DEFAULT}
@@ -1148,10 +1150,12 @@ function aiCardHtml(cls,icon,label,items){
  const body=items&&items.length?('<ul>'+items.map(x=>`<li>${escapeHtml(x)}</li>`).join('')+'</ul>'):'<div class="ai-empty">Tidak ada catatan.</div>';
  return `<div class="ai-card ${cls}"><div class="ai-card-head"><span class="ai-card-icon">${icon}</span>${label}</div>${body}</div>`;
 }
-function aiRenderStructured(obj){
+function aiRenderStructured(obj,viewMode){
+ const ringkasan=obj.ringkasan?`<div class="ai-ringkasan">${escapeHtml(obj.ringkasan)}</div>`:'';
  const grid=aiCardHtml('trend','▲','Tren Positif',obj.tren)+aiCardHtml('warn','⚠','Perlu Perhatian',obj.perhatian)+aiCardHtml('reco','➔','Rekomendasi',obj.rekomendasi);
  const time=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
- $('aiBody').innerHTML=`<div class="ai-result-grid">${grid}</div><div class="ai-meta">Dibuat pukul ${time} • model ${escapeHtml(aiGetModel())}</div>`;
+ const viewTag=viewMode?`<div class="ai-viewtag">Analisis untuk tampilan: ${escapeHtml(viewMode)}</div>`:'';
+ $('aiBody').innerHTML=`${viewTag}${ringkasan}<div class="ai-result-grid">${grid}</div><div class="ai-meta">Dibuat pukul ${time} • model ${escapeHtml(aiGetModel())}</div>`;
  aiHasResult=true;
 }
 function aiRefreshKeyStatusNote(){
@@ -1191,8 +1195,66 @@ $('aiClearBtn').onclick=()=>{
  aiRefreshKeyStatusNote();
  aiRenderPlaceholder('API key dihapus dari browser ini.');
 };
+function aiActiveFilters(){return ['unit','upt','ultg','gi','bay','phasa','merk','type'].map(id=>({label:$(id).previousElementSibling?.textContent||id,value:$(id).value})).filter(x=>x.value)}
 function aiBuildSummary(){
- const activeFilters=['unit','upt','ultg','gi','bay','phasa','merk','type'].map(id=>({label:$(id).previousElementSibling?.textContent||id,value:$(id).value})).filter(x=>x.value);
+ if(subTab==='condition')return aiBuildConditionSummary();
+ if(subTab==='improveChart')return aiBuildCategorySummary(IMPROVE_TREND_CATEGORIES,'Grafik Membaik');
+ if(subTab==='worsenChart')return aiBuildCategorySummary(WORSEN_TREND_CATEGORIES,'Grafik Memburuk');
+ return aiBuildTrendSummary();
+}
+function aiBuildConditionSummary(){
+ const activeFilters=aiActiveFilters();
+ const ahiVal=$('ahiCondition')?.value;
+ const catIndexes=ahiVal?[Number(ahiVal)-1]:[0,1,2,3,4];
+ let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
+ if(labels.length>5)labels=labels.slice(-5);
+ const chartsSummary=TAB.chartSpecs.map(spec=>{
+  const [id,title,,,,phaseFilter]=spec;
+  const catFn=(TAB.categoryOf||{})[id];
+  if(!catFn)return null;
+  const rows=phaseFilter?filtered.filter(r=>norm(val(r,'phasa'))===phaseFilter):filtered;
+  const perYearCat={};labels.forEach(y=>perYearCat[y]=[0,0,0,0,0]);
+  rows.forEach(r=>{
+   const y=year(val(r,'date'));if(!labels.includes(y))return;
+   const cat=catFn(r);if(!cat)return;
+   perYearCat[y][cat-1]++;
+  });
+  const perKategori=catIndexes.map(i=>labels.map(y=>perYearCat[y][i]));
+  if(perKategori.every(arr=>arr.every(v=>v===0)))return null;
+  return {parameter:title,perKategori};
+ }).filter(Boolean);
+ return {viewMode:'Radar Kondisi AHI',tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,tahun:labels,kategori:catIndexes.map(i=>AHI_CAT[i+1].n),catatan:'Setiap "perKategori" adalah array angka jumlah kejadian, urutan baris = urutan array "kategori", urutan kolom = urutan array "tahun". Parameter dengan seluruh angka 0 pada rentang ini tidak disertakan.',charts:chartsSummary};
+}
+function aiBuildCategorySummary(categories,viewLabel){
+ const activeFilters=aiActiveFilters();
+ const trendMaps=trendConditionFlagMaps();
+ const trendVal=$('deviationFilter')?.value;
+ const activeCats=(trendVal&&categories.some(c=>c.key===trendVal))?categories.filter(c=>c.key===trendVal):categories;
+ let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
+ if(labels.length>5)labels=labels.slice(-5);
+ const chartsSummary=TAB.chartSpecs.map(spec=>{
+  const [id,title]=spec;
+  if(SKIP_DEVIATION.includes(id))return null;
+  if(!BAD_DIRECTION[id])return null;
+  const perKategori=activeCats.map(cat=>{
+   const map=trendMaps[cat.key];
+   return labels.map(y=>{
+    let count=0;
+    filtered.forEach(r=>{
+     if(year(val(r,'date'))!==y)return;
+     const params=map.get(r);
+     if(params&&params.includes(title))count++;
+    });
+    return count;
+   });
+  });
+  if(perKategori.every(arr=>arr.every(v=>v===0)))return null;
+  return {parameter:title,perKategori};
+ }).filter(Boolean);
+ return {viewMode:viewLabel,tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,tahun:labels,kategori:activeCats.map(c=>c.label),catatan:'Setiap "perKategori" adalah array angka jumlah kejadian, urutan baris = urutan array "kategori", urutan kolom = urutan array "tahun". Parameter dengan seluruh angka 0 pada rentang ini tidak disertakan.',charts:chartsSummary};
+}
+function aiBuildTrendSummary(){
+ const activeFilters=aiActiveFilters();
  const chartsSummary=TAB.chartSpecs.map((spec,i)=>{
   const c=charts[i];if(!c)return null;
   const [id,title,unit]=spec;
@@ -1234,7 +1296,7 @@ function aiBuildSummary(){
   }
   return {title,unit,years:labels,series,breach,voltageBreakdown,perKv};
  }).filter(Boolean);
- return {tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
+ return {viewMode:'Grafik Trending Pengujian',tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
 }
 async function generateInsight(){
  const status=aiKeyStatus();
@@ -1259,7 +1321,7 @@ async function generateInsight(){
     temperature:0.3,
     messages:[
      {role:'system',content:(TAB.aiSystemPrompt||AI_SYSTEM_PROMPT_DEFAULT)+'\n\n'+AI_OUTPUT_FORMAT_INSTRUCTION},
-     {role:'user',content:'Berikut data hasil pengujian tab "'+summary.tab+'" yang sedang difilter pada dashboard trend inspection:\n\n'+JSON.stringify(summary,null,2)+'\n\nBuatkan ringkasan insight teknisnya sebagai JSON sesuai instruksi.'}
+     {role:'user',content:'Berikut data hasil pengujian tab "'+summary.tab+'" yang sedang difilter pada dashboard trend inspection, khusus untuk tampilan grafik "'+summary.viewMode+'" yang SEDANG DIBUKA pengguna saat ini. Fokuskan seluruh analisis HANYA pada data tampilan "'+summary.viewMode+'" ini, jangan membahas tampilan grafik lain yang sedang tidak dibuka:\n\n'+JSON.stringify(summary,null,2)+'\n\nBuatkan ringkasan insight teknisnya sebagai JSON sesuai instruksi.'}
     ]
    })
   });
@@ -1275,12 +1337,12 @@ async function generateInsight(){
    const s=text.indexOf('{'),e=text.lastIndexOf('}');
    const jsonStr=(s>=0&&e>s)?text.slice(s,e+1):text;
    const obj=JSON.parse(jsonStr);
-   if(obj&&(Array.isArray(obj.tren)||Array.isArray(obj.perhatian)||Array.isArray(obj.rekomendasi))){
-    parsed={tren:obj.tren||[],perhatian:obj.perhatian||[],rekomendasi:obj.rekomendasi||[]};
+   if(obj&&(obj.ringkasan||Array.isArray(obj.tren)||Array.isArray(obj.perhatian)||Array.isArray(obj.rekomendasi))){
+    parsed={ringkasan:obj.ringkasan||'',tren:obj.tren||[],perhatian:obj.perhatian||[],rekomendasi:obj.rekomendasi||[]};
    }
   }catch(_e){}
   if(parsed){
-   aiRenderStructured(parsed);
+   aiRenderStructured(parsed,summary.viewMode);
   }else{
    const clean=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s*/gm,'');
    aiRenderFallback(clean);
@@ -1497,7 +1559,7 @@ function evalTypeOf(r){
  return r["Jenis Aset"]||r["Jenis Asset"]||"";
 }
 const EVAL_BASE_RAW="https://raw.githubusercontent.com/hargiuitjbb16/dashboardahiuitjbb/refs/heads/main/data/evaluasi/";
-const EVAL_FILE="AHI_EVAL_AGUSTUS.csv";
+const EVAL_FILE="AHI_EVAL_SEPTEMBER.csv";
 async function fetchEvaluasiTotalCount(typeMatch){
  const cacheKey='evaluasi-total-'+EVAL_FILE;
  let text=await getCachedCsv(cacheKey);
@@ -1716,7 +1778,7 @@ function detailCellValue(r,k){
  }
  return val(r,k);
 }
-function detailRows(){let q=norm($('search').value);let rows=filtered.filter(r=>!q||detailCols.some(([_,k])=>norm(detailCellValue(r,k)).includes(q)));let pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(page>pages)page=pages;let view=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);$('count').textContent=`Menampilkan ${rows.length.toLocaleString('id-ID')} data`;$('pageInfo').textContent=`Halaman ${page} / ${pages}`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;$('thead').innerHTML='<tr>'+detailCols.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';$('tbody').innerHTML=view.length?view.map(r=>'<tr>'+detailCols.map(([_,k])=>`<td>${escapeHtml(detailCellValue(r,k))}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="${detailCols.length}" class="empty">Tidak ada data sesuai filter.</td></tr>`;}
+function detailRows(){let q=norm($('search').value);let rows=filtered.filter(r=>!q||detailCols.some(([_,k])=>norm(detailCellValue(r,k)).includes(q)));let pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));if(page>pages)page=pages;let start=(page-1)*PAGE_SIZE;let view=rows.slice(start,start+PAGE_SIZE);$('count').textContent=`Menampilkan ${rows.length.toLocaleString('id-ID')} data`;$('pageInfo').textContent=`Halaman ${page} / ${pages}`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;$('thead').innerHTML='<tr><th>No.</th>'+detailCols.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';$('tbody').innerHTML=view.length?view.map((r,i)=>`<tr><td>${start+i+1}</td>`+detailCols.map(([_,k])=>`<td>${escapeHtml(detailCellValue(r,k))}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="${detailCols.length+1}" class="empty">Tidak ada data sesuai filter.</td></tr>`;}
 function render(){renderCharts();detailRows();renderTrendSummary();$('lastDate').textContent=new Date().toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}
 function exportCSV(){let head=detailCols.map(x=>x[0]).join(';');let body=filtered.map(r=>detailCols.map(([_,k])=>`"${String(detailCellValue(r,k)||'').replaceAll('"','""')}"`).join(';')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+head+'\n'+body],{type:'text/csv'}));a.download=TAB.exportFile;a.click()}
 const TAB_CACHE_TTL_MS=10*60*1000;
@@ -1749,14 +1811,25 @@ async function setCachedCsv(key,text){
   db.transaction(TAB_CACHE_STORE,'readwrite').objectStore(TAB_CACHE_STORE).put({text,cachedAt:Date.now()},key);
  }catch(e){}
 }
+async function fetchSheetCsv(){let r=await fetch(SHEET_CSV+'&_update='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return await r.text()}
+// Cache dipakai supaya halaman cepat tampil, lalu Google Sheet tetap dicek di background;
+// kalau isinya berubah, data & tampilan diperbarui otomatis (filter yang dipilih tetap dipertahankan).
+function revalidateInBackground(cachedText){
+ fetchSheetCsv().then(t=>{
+  if(!t||t===cachedText){$('status').textContent=`Data ${TAB.label} berhasil dimuat • ${raw.length.toLocaleString('id-ID')} baris (sudah terbaru)`;return}
+  const rows=parseCSV(t);if(!rows.length)return;
+  setCachedCsv(TAB.key,t);raw=rows;resolveCols();populateAll();apply();
+  $('status').className='status ok';$('status').textContent=`Data ${TAB.label} diperbarui dari Google Sheet NORM AHI ${TAB.label} • ${raw.length.toLocaleString('id-ID')} baris`;
+ }).catch(e=>console.warn('Revalidasi Google Sheet gagal:',e));
+}
 async function load(manual=false){try{if(manual){$('updateBtn').disabled=true;$('updateBtn').textContent='↻ Mengambil...';$('status').className='status ok';$('status').textContent=`Sedang mengambil data terbaru dari Google Sheet NORM AHI ${TAB.label}...`;}
 let t=null,fromCache=false;
 if(!manual){t=await getCachedCsv(TAB.key);if(t)fromCache=true;}
-if(!t){let r=await fetch(SHEET_CSV+'&_update='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);t=await r.text();setCachedCsv(TAB.key,t);}
-raw=parseCSV(t);if(!raw.length)throw Error('CSV kosong');resolveCols();populateAll();$('status').className='status ok';$('status').textContent=`Data ${TAB.label} berhasil dimuat • ${raw.length.toLocaleString('id-ID')} baris ${fromCache?'(dari cache sesi, tanpa fetch ulang)':'dari Google Sheet NORM AHI '+TAB.label}`;apply();if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}}catch(e){console.error(e);if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}$('status').className='status error';$('status').textContent='Google Sheet belum dapat dibaca. Pastikan spreadsheet dapat diakses publik atau dipublikasikan sebagai CSV.';$('charts').innerHTML='<div class="empty" style="grid-column:1/-1">Data belum tersedia.</div>';}}
+if(!t){t=await fetchSheetCsv();setCachedCsv(TAB.key,t);}
+raw=parseCSV(t);if(!raw.length)throw Error('CSV kosong');resolveCols();populateAll();$('status').className='status ok';$('status').textContent=`Data ${TAB.label} berhasil dimuat • ${raw.length.toLocaleString('id-ID')} baris ${fromCache?'(dari cache sesi, mengecek pembaruan...)':'dari Google Sheet NORM AHI '+TAB.label}`;apply();if(fromCache)revalidateInBackground(t);if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}}catch(e){console.error(e);if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}$('status').className='status error';$('status').textContent='Google Sheet belum dapat dibaca. Pastikan spreadsheet dapat diakses publik atau dipublikasikan sebagai CSV.';$('charts').innerHTML='<div class="empty" style="grid-column:1/-1">Data belum tersedia.</div>';}}
 function populateAll(){refreshFilters();updateYears();}
 ['unit','upt','ultg','gi','bay','phasa','merk','type'].forEach(id=>$(id).addEventListener('change',()=>{refreshFilters(id);apply()}));['fromYear','toYear','ahiCondition','deviationFilter'].forEach(id=>$(id).addEventListener('change',apply));$('search').addEventListener('input',()=>{page=1;detailRows()});$('prev').onclick=()=>{if(page>1){page--;detailRows()}};$('next').onclick=()=>{page++;detailRows()};$('resetBtn').onclick=()=>{['unit','upt','ultg','gi','bay','phasa','merk','type','ahiCondition','deviationFilter'].forEach(id=>$(id).value='');updateYears();apply()};$('exportBtn').onclick=exportCSV;$('updateBtn').onclick=()=>load(true);
-document.querySelectorAll('.subtab-btn').forEach(b=>{b.onclick=()=>{subTab=b.dataset.subtab;document.querySelectorAll('.subtab-btn').forEach(x=>x.classList.toggle('active',x===b));renderCharts()}});
+document.querySelectorAll('.subtab-btn').forEach(b=>{b.onclick=()=>{subTab=b.dataset.subtab;document.querySelectorAll('.subtab-btn').forEach(x=>x.classList.toggle('active',x===b));renderCharts();if(aiHasResult)aiRenderPlaceholder('Tampilan grafik berubah ke "'+b.textContent.trim()+'". Klik "Generate Insight" untuk analisis sesuai tampilan ini.')}});
 load();
 </script>
 </body></html>
