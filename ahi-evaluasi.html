@@ -135,6 +135,8 @@ th{background:#eef4f9;color:#29415e;font-weight:800;position:sticky;top:0;z-inde
 .ai-note{font-size:9px;color:#8a99aa;margin-top:8px}
 @media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="app">
@@ -469,14 +471,15 @@ function drawChart(canvas,type){
   const vals=series.flat().filter(v=>v!=null);
   if(!vals.length){canvas.parentElement.innerHTML='<h3>'+esc(type)+'</h3><div class="empty-chart">Belum ada data</div>';return}
   const max=Math.max(1,...vals), nice=max<=100?Math.max(4,Math.ceil(max/4)*4):Math.max(100,Math.ceil(max/4/100)*100*4);
-  c.font="9px Arial";c.textBaseline="middle";c.strokeStyle="#dbe5ef";c.fillStyle="#71839b";c.lineWidth=1;
+  const dark=Theme.isDark();
+  c.font="9px Arial";c.textBaseline="middle";c.strokeStyle=dark?"#2a3a4f":"#dbe5ef";c.fillStyle=dark?"#8899ad":"#71839b";c.lineWidth=1;
   for(let j=0;j<=4;j++){const y=pad.t+H*j/4;c.beginPath();c.setLineDash([2,3]);c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke();c.setLineDash([]);c.fillText(fmt(Math.round(nice*(1-j/4))),2,y)}
-  c.textBaseline="alphabetic";c.fillStyle="#61778f";
+  c.textBaseline="alphabetic";c.fillStyle=dark?"#9fb0c4":"#61778f";
   MONTHS.forEach((m,i)=>{const x=pad.l+i*W/11;c.fillText(m.slice(0,3).toUpperCase(),x-9,h-7)});
   series.forEach((arr,k)=>{
-    c.strokeStyle=AHI[k][1];c.lineWidth=2.2;c.lineJoin="round";c.lineCap="round";let active=false;
+    c.strokeStyle=Theme.c(AHI[k][1]);c.lineWidth=2.2;c.lineJoin="round";c.lineCap="round";let active=false;
     arr.forEach((v,i)=>{if(v==null){active=false;return}const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);if(!active)c.beginPath(),c.moveTo(x,y),active=true;else c.lineTo(x,y);if(i===arr.length-1||arr[i+1]==null){c.stroke();active=false}});
-    c.fillStyle=AHI[k][1];arr.forEach((v,i)=>{if(v==null)return;const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);c.beginPath();c.arc(x,y,3.2,0,Math.PI*2);c.fill()});
+    c.fillStyle=Theme.c(AHI[k][1]);arr.forEach((v,i)=>{if(v==null)return;const x=pad.l+i*W/11,y=pad.t+H*(1-v/nice);c.beginPath();c.arc(x,y,3.2,0,Math.PI*2);c.fill()});
   });
   let tip=document.getElementById("chartTooltip");
   if(!tip){tip=document.createElement("div");tip.id="chartTooltip";tip.className="chart-tooltip";document.body.append(tip)}
@@ -486,7 +489,7 @@ function drawChart(canvas,type){
     const r=canvas.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
     if(mx<pad.l||mx>w-pad.r||my<pad.t||my>h-pad.b){tip.style.display="none";cross.style.display="none";return}
     const idx=Math.max(0,Math.min(11,Math.round((mx-pad.l)/W*11))),month=MONTHS[idx],x=pad.l+idx*W/11;
-    const items=series.map((arr,k)=>arr[idx]==null?null:`<span style="color:${AHI[k][1]}">●</span> ${AHI[k][0]}: <b>${fmt(arr[idx])}</b>`).filter(Boolean);
+    const items=series.map((arr,k)=>arr[idx]==null?null:`<span style="color:${AHI[k][1]==="#111"?"#cfd6df":AHI[k][1]}">●</span> ${AHI[k][0]}: <b>${fmt(arr[idx])}</b>`).filter(Boolean);
     if(!items.length){tip.style.display="none";cross.style.display="none";return}
     tip.innerHTML=`<b>${esc(type)} — ${month}</b><br>${items.join("<br>")}`;
     tip.style.display="block";
@@ -615,6 +618,7 @@ async function load(){
   }
 }
 window.addEventListener("resize",()=>{clearTimeout(window.__rt);window.__rt=setTimeout(renderCharts,120)});
+window.addEventListener("themechange",()=>renderCharts());
 
 const $=id=>document.getElementById(id);
 const AI_KEY_STORAGE='trendAiGroqKey';

@@ -74,6 +74,8 @@
 @media(max-width:600px){.trend-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="app">
@@ -1679,10 +1681,10 @@ if(phaseCharts.includes(id)){
  }));
 }
 let ctx=$(id).getContext('2d');
-charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('en-US',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{
+charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('en-US',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{
  min:id==='purity'?96.5:(id==='tanDelta'?0:(id==='deviasiKapasitansi'?-10:undefined)),
  max:id==='dew'?-4:(id==='so2'?13:(id==='tanDelta'?1:(id==='deviasiKapasitansi'?20:undefined))),
- grid:{color:'#e7edf4'},
+ grid:{color:Theme.grid()},
  ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('en-US')}
 }}}}));
 $(id).parentElement.parentElement.querySelector('.chart-years').textContent=labels.length?`${labels.length} tahun`:'Tidak ada data'
@@ -1718,8 +1720,8 @@ function renderConditionCharts(){
    const cat=catFn(r);if(!cat)return;
    perYearCat[y][cat-1]++;
   });
-  const datasets=catIndexes.map(i=>{const meta=AHI_CAT[i+1];return{label:meta.n,data:labels.map(y=>perYearCat[y][i]),backgroundColor:meta.c,borderColor:meta.c}});
-  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
+  const datasets=catIndexes.map(i=>{const meta=AHI_CAT[i+1];const col=Theme.c(meta.c);return{label:meta.n,data:labels.map(y=>perYearCat[y][i]),backgroundColor:col,borderColor:col}});
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:Theme.grid()},ticks:{font:{size:9},precision:0}}}}}));
   $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
  });
 }
@@ -1756,9 +1758,10 @@ function renderTrendCategoryCharts(categories){
     const params=map.get(r);
     if(params&&params.includes(title))yearCounts[y]++;
    });
-   return{label:cat.label,data:labels.map(y=>yearCounts[y]),backgroundColor:cat.color,borderColor:cat.color};
+   const col=Theme.c(cat.color);
+   return{label:cat.label,data:labels.map(y=>yearCounts[y]),backgroundColor:col,borderColor:col};
   });
-  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{color:'#e7edf4'},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:'#e7edf4'},ticks:{font:{size:9},precision:0}}}}}));
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:Theme.grid()},ticks:{font:{size:9},precision:0}}}}}));
   $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
  });
 }
@@ -1834,6 +1837,7 @@ raw=parseCSV(t);if(!raw.length)throw Error('CSV kosong');resolveCols();populateA
 function populateAll(){refreshFilters();updateYears();}
 FILTER_IDS.forEach(id=>$(id).addEventListener('change',()=>{refreshFilters(id);apply()}));['fromYear','toYear','ahiCondition','deviationFilter'].forEach(id=>$(id).addEventListener('change',apply));$('search').addEventListener('input',()=>{page=1;detailRows()});$('prev').onclick=()=>{if(page>1){page--;detailRows()}};$('next').onclick=()=>{page++;detailRows()};$('resetBtn').onclick=()=>{[...FILTER_IDS,'ahiCondition','deviationFilter'].forEach(id=>$(id).value='');updateYears();apply()};$('exportBtn').onclick=exportCSV;$('updateBtn').onclick=()=>load(true);
 document.querySelectorAll('.subtab-btn').forEach(b=>{b.onclick=()=>{subTab=b.dataset.subtab;document.querySelectorAll('.subtab-btn').forEach(x=>x.classList.toggle('active',x===b));renderCharts();if(aiHasResult)aiRenderPlaceholder('Tampilan grafik berubah ke "'+b.textContent.trim()+'". Klik "Generate Insight" untuk analisis sesuai tampilan ini.')}});
+window.addEventListener('themechange',()=>{if(raw.length)renderCharts()});
 load();
 </script>
 </body></html>

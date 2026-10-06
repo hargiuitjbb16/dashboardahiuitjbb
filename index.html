@@ -225,6 +225,8 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}
 .ai-note{font-size:9px;color:#8a99aa;margin-top:8px}
 @media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="app">
@@ -342,7 +344,7 @@ const TRIGGER_MASTER = {
 };
 const TYPES=["Power Transformer","Current Transformer","Potential Transformer","Circuit Breaker","Disconnecting Switch","Lightning Arrester","Neutral Grounding Resistance","Reactor","Capacitor"];
 const TRIGGER_MASTER_LIST=Object.values(TRIGGER_MASTER).flat().sort((x,y)=>y.length-x.length).map(master=>({master,normMaster:norm(master)}));
-const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","#111"]];
+const AHI=[["1 - Very Good","#20a46b"],["2 - Good","#f2b400"],["3 - Fair","#f07800"],["4 - Poor","#e53935"],["5 - Critical","var(--critical)"]];
 const TRIGGER_COLORS=["#0877d1","#20a46b","#f2b400","#f07800","#e53935","#7b61a8","#00a6a6","#64748b","#d14d72","#8c6b43","#5b8def","#2e9d5b"];
 
 let raw=[],filtered=[],search="",currentPage=1;
@@ -517,7 +519,7 @@ function renderTriggerLevel(level, rows, title, cardClass){
   }
   const palette=level===4
     ? ["#e53935","#f07800","#d14d72","#c62828","#8c6b43","#ef6c00","#ad1457","#7b61a8","#64748b","#5b8def"]
-    : ["#111","#263238","#455a64","#37474f","#5d4037","#6d4c41","#546e7a","#795548","#212121","#607d8b"];
+    : ["var(--critical)","#263238","#455a64","#37474f","#5d4037","#6d4c41","#546e7a","#795548","#212121","#607d8b"];
   let start=0;
   const stops=items.map((it,i)=>{
     const end=start+(it[1]/total*100);
@@ -669,7 +671,7 @@ function renderTriggers(){
       </div>
       <div class="trigger-levels">
         ${donut("poor","4 - Poor","#e53935")}
-        ${donut("critical","5 - Critical","#111")}
+        ${donut("critical","5 - Critical","var(--critical)")}
       </div>
     </article>`;
   }).join("");

@@ -1,0 +1,107 @@
+/* ===== Toggle Dark/Light (pojok kiri bawah sidebar) ===== */
+.theme-toggle{position:absolute;left:8px;right:8px;bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:3px;border:1px solid #dfe7ef;background:#f1f5f9;border-radius:9px}
+.theme-toggle button{border:0;background:transparent;color:#5b6f86;border-radius:6px;padding:7px 4px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.theme-toggle button:hover{color:#0873d1}
+.theme-toggle button.active{background:#fff;color:#0873d1;box-shadow:0 1px 3px rgba(20,45,70,.12)}
+.sidebar .side-date{bottom:60px}
+@media(max-width:700px){.theme-toggle{position:static;margin-top:10px}}
+
+/* ===== Dark mode ===== */
+html[data-theme="dark"]{
+  --bg:#0e1620;--surface:#162130;--surface-2:#1c2a3b;--border:#2a3a4f;--border-soft:#223142;
+  --text:#e2eaf3;--text-2:#b6c4d4;--muted:#8899ad;--accent:#4ea3f0;--accent-bg:#183553;--critical:#cfd6df;
+  color-scheme:dark;
+}
+html:not([data-theme="dark"]){--critical:#111}
+
+html[data-theme="dark"] body{background:var(--bg);color:var(--text)}
+html[data-theme="dark"] .theme-toggle{background:var(--surface-2);border-color:var(--border)}
+html[data-theme="dark"] .theme-toggle button{color:var(--muted)}
+html[data-theme="dark"] .theme-toggle button.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+
+/* Sidebar & header */
+html[data-theme="dark"] .sidebar{background:var(--surface);border-color:var(--border)}
+html[data-theme="dark"] .logo{border-color:var(--border);background:#f5f8fc;border-radius:8px;padding-left:6px;padding-right:6px}
+html[data-theme="dark"] .nav a{color:var(--text-2)}
+html[data-theme="dark"] .nav a:hover{background:var(--surface-2)}
+html[data-theme="dark"] .nav a.active,html[data-theme="dark"] .nav .trend,html[data-theme="dark"] .nav .sub.active-sub{background:var(--accent-bg);color:var(--accent)}
+html[data-theme="dark"] .side-date{background:var(--surface-2);border-color:var(--border)}
+html[data-theme="dark"] .side-date small{color:var(--muted)}
+html[data-theme="dark"] .header{border-color:var(--border)}
+html[data-theme="dark"] .brand h1{color:var(--text)}
+html[data-theme="dark"] .brand p{color:var(--muted)}
+html[data-theme="dark"] .date{background:var(--surface);border-color:var(--border);color:var(--text-2)}
+
+/* Tombol & input */
+html[data-theme="dark"] .btn,html[data-theme="dark"] .ai-actions button{background:var(--surface);color:var(--accent);border-color:#2f6eaa}
+html[data-theme="dark"] .btn.primary{background:#0877d1;color:#fff;border-color:#0877d1}
+html[data-theme="dark"] .ai-actions button.primary{background:linear-gradient(135deg,#0877d1,#5f8fe0);color:#fff;border-color:transparent}
+html[data-theme="dark"] .filters{background:var(--surface);border-color:var(--border)}
+html[data-theme="dark"] .filter label,html[data-theme="dark"] .filter-actions .check{color:var(--muted)}
+html[data-theme="dark"] select,html[data-theme="dark"] input[type="text"],html[data-theme="dark"] input[type="password"],html[data-theme="dark"] input[type="search"],html[data-theme="dark"] .search,html[data-theme="dark"] .ai-settings input{background:var(--surface-2);color:var(--text);border-color:var(--border)}
+html[data-theme="dark"] input::placeholder{color:var(--muted)}
+
+/* Kartu, panel, KPI */
+html[data-theme="dark"] .kpi,html[data-theme="dark"] .panel,html[data-theme="dark"] .chart-card,html[data-theme="dark"] .detail,
+html[data-theme="dark"] .trend-summary-box,html[data-theme="dark"] .asset-chart,html[data-theme="dark"] .ahi-chart-card,
+html[data-theme="dark"] .trigger-card,html[data-theme="dark"] .trigger-asset-card,html[data-theme="dark"] .trigger-level-card{background:var(--surface);border-color:var(--border);box-shadow:none}
+html[data-theme="dark"] .trigger-level-card.critical-card{border-top-color:var(--critical)}
+html[data-theme="dark"] .kpi small,html[data-theme="dark"] .trend-summary-box small{color:var(--muted)}
+html[data-theme="dark"] .kpi .num,html[data-theme="dark"] .trend-summary-box .num{color:var(--text)}
+html[data-theme="dark"] .kpi .pct{color:var(--text-2)}
+html[data-theme="dark"] .trend-summary-box.total .num{color:var(--accent)}
+html[data-theme="dark"] .trend-summary-box.good .num{color:#2fc184}
+html[data-theme="dark"] .trend-summary-box.bad .num{color:#ff5d5a}
+html[data-theme="dark"] .critical,html[data-theme="dark"] .critical-card .trigger-level-title{color:var(--critical)!important}
+html[data-theme="dark"] .c5{background:#3a4555;color:#fff}
+html[data-theme="dark"] .panel-title,html[data-theme="dark"] .chart-title,html[data-theme="dark"] .trigger-asset-title,
+html[data-theme="dark"] .detail-head h3,html[data-theme="dark"] .ai-title{color:var(--text)}
+html[data-theme="dark"] .panel-title span,html[data-theme="dark"] .panel-sub,html[data-theme="dark"] .chart-unit,html[data-theme="dark"] .chart-years,
+html[data-theme="dark"] .detail-head small,html[data-theme="dark"] .muted,html[data-theme="dark"] .legend-note,html[data-theme="dark"] .page-info,
+html[data-theme="dark"] .loading,html[data-theme="dark"] .empty,html[data-theme="dark"] .empty-chart,html[data-theme="dark"] .chart-empty-note{color:var(--muted)}
+html[data-theme="dark"] .asset-chart h3{color:var(--accent)}
+html[data-theme="dark"] .legend{color:var(--text-2)}
+
+/* Grafik bar/donut HTML (index) */
+html[data-theme="dark"] .ahi-icon{border-color:var(--border);color:var(--accent)}
+html[data-theme="dark"] .ahi-chart-total,html[data-theme="dark"] .ahi-bar-label,html[data-theme="dark"] .ahi-legend,html[data-theme="dark"] .age-legend,
+html[data-theme="dark"] .age-name,html[data-theme="dark"] .ahi-scale,html[data-theme="dark"] .trigger-total,html[data-theme="dark"] .trigger-level-total,
+html[data-theme="dark"] .trigger-item,html[data-theme="dark"] .trigger-pct,html[data-theme="dark"] .trigger-center span,html[data-theme="dark"] .trigger-empty{color:var(--muted)}
+html[data-theme="dark"] .ahi-bar-value,html[data-theme="dark"] .trigger-center b,html[data-theme="dark"] .trigger-value,html[data-theme="dark"] .ahi-chart-title,html[data-theme="dark"] .trigger-title{color:var(--text)}
+html[data-theme="dark"] .ahi-bars{border-color:var(--border);background:repeating-linear-gradient(to bottom,transparent 0,transparent 30px,var(--border-soft) 31px)}
+html[data-theme="dark"] .bar{background:var(--surface-2)}
+html[data-theme="dark"] .trigger-donut:after{background:var(--surface)}
+html[data-theme="dark"] .trigger-legend{border-color:var(--border-soft)}
+
+/* Tabel */
+html[data-theme="dark"] .table-wrap{border-color:var(--border)}
+html[data-theme="dark"] th,html[data-theme="dark"] .table th,html[data-theme="dark"] .table-wrap th{background:var(--surface-2);color:var(--text-2);border-color:var(--border)}
+html[data-theme="dark"] td,html[data-theme="dark"] .table td,html[data-theme="dark"] .table-wrap td{background:var(--surface);color:var(--text-2);border-color:var(--border-soft)}
+
+/* Paginasi & sub-tab */
+html[data-theme="dark"] .page-btn,html[data-theme="dark"] .pagination button,html[data-theme="dark"] .pager button,html[data-theme="dark"] .subtab-btn{background:var(--surface);color:var(--text-2);border-color:var(--border)}
+html[data-theme="dark"] .page-btn:hover,html[data-theme="dark"] .subtab-btn:hover{background:var(--surface-2);border-color:#2f6eaa}
+html[data-theme="dark"] .page-btn.active,html[data-theme="dark"] .pagination button.active,html[data-theme="dark"] .subtab-btn.active{background:#0877d1;color:#fff;border-color:#0877d1}
+
+/* Status */
+html[data-theme="dark"] .status.ok{background:#11291f;color:#5fd69c;border-color:#1f4d38}
+html[data-theme="dark"] .status.error{background:#2e1517;color:#ff8a80;border-color:#5c2427}
+html[data-theme="dark"] .status.info{background:#132538;color:#7dbcf3;border-color:#22476b}
+
+/* AI Insight */
+html[data-theme="dark"] .ai-panel{background:var(--surface);border-color:var(--border)}
+html[data-theme="dark"] .ai-title .sub,html[data-theme="dark"] .ai-placeholder,html[data-theme="dark"] .ai-meta,html[data-theme="dark"] .ai-note,
+html[data-theme="dark"] .ai-key-status,html[data-theme="dark"] .ai-loading,html[data-theme="dark"] .ai-settings label{color:var(--muted)}
+html[data-theme="dark"] .ai-settings{border-color:var(--border)}
+html[data-theme="dark"] .ai-card.trend{background:#11291f;border-color:#1f4d38}
+html[data-theme="dark"] .ai-card.warn{background:#2b1a13;border-color:#5a3322}
+html[data-theme="dark"] .ai-card.reco{background:#132538;border-color:#22476b}
+html[data-theme="dark"] .ai-card.trend .ai-card-head{color:#5fd69c}
+html[data-theme="dark"] .ai-card.warn .ai-card-head{color:#ff9a66}
+html[data-theme="dark"] .ai-card.reco .ai-card-head{color:#7dbcf3}
+html[data-theme="dark"] .ai-card ul,html[data-theme="dark"] .ai-fallback,html[data-theme="dark"] .ai-ringkasan{color:var(--text-2)}
+html[data-theme="dark"] .ai-ringkasan{background:var(--surface-2);border-color:var(--border)}
+html[data-theme="dark"] .ai-viewtag{background:var(--accent-bg);border-color:#22476b;color:var(--accent)}
+
+/* Tooltip canvas (ahi-evaluasi) */
+html[data-theme="dark"] .chart-tooltip{background:#24364d;box-shadow:0 4px 18px rgba(0,0,0,.5)}
