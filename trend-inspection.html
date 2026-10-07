@@ -73,6 +73,16 @@
 @media(max-width:1150px){.trend-summary{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.trend-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
+.nav{max-height:calc(100vh - 205px);overflow-y:auto}
+.nav .has-children{display:flex;justify-content:space-between;align-items:center}
+.nav .caret{font-size:10px;transition:transform .15s}
+.nav .has-children[aria-expanded="true"] .caret{transform:rotate(90deg)}
+.nav .subsub{font-size:11px;padding:6px 10px 6px 44px;margin:1px 0 1px 8px;color:#4f6580;cursor:default}
+.nav .subsub:before{content:"•";margin-right:6px;color:#9ab0c6}
+.nav a.subsub[href]{cursor:pointer}
+.nav .subsub.active-sub{background:#dcecff;color:#0873d1;font-weight:700}
+.nav .has-children.trafo-current{color:#0873d1;font-weight:700}
+@media(max-width:700px){.nav{max-height:none;overflow:visible}}
 </style>
 <link rel="stylesheet" href="theme.css">
 <script src="theme.js"></script>
@@ -86,7 +96,11 @@
     <a href="index.html">AHI Power Inspect</a>
     <a class="trend">Trend Inspection</a>
     <a class="sub active-sub" href="trend-inspection.html" data-tab-link="pmt">PMT</a>
-    <a class="sub">TRAFO</a><a class="sub" href="trend-inspection.html?tab=ct" data-tab-link="ct">CT</a><a class="sub" href="trend-inspection.html?tab=pt" data-tab-link="pt">CVT/PT</a><a class="sub">PMS</a><a class="sub">LA</a><a class="sub">NGR</a>
+    <a class="sub has-children" href="#" id="trafoToggle" aria-expanded="false" aria-controls="trafoMenu">TRAFO<span class="caret">▸</span></a>
+    <div class="subsub-group" id="trafoMenu" hidden>
+      <a class="subsub" href="trend-inspection.html?tab=trafo-ap" data-tab-link="trafo-ap">Active Part</a><a class="subsub">DGA</a><a class="subsub">Karakteristik</a><a class="subsub">Furan</a>
+    </div>
+    <a class="sub" href="trend-inspection.html?tab=ct" data-tab-link="ct">CT</a><a class="sub" href="trend-inspection.html?tab=pt" data-tab-link="pt">CVT/PT</a><a class="sub">PMS</a><a class="sub">LA</a><a class="sub">NGR</a>
     <a href="ahi-evaluasi.html">AHI Evaluasi</a><a>Data Aset</a><a>Laporan</a>
   </nav>
   <div class="side-date"><small>Sumber Data</small><b id="sourceLabel">Google Sheet • NORM AHI PMT</b></div>
@@ -1054,6 +1068,27 @@ J. ATURAN PENTING
    ringkasan data, jangan menghitung ulang dengan cara lain.
 7. Setiap kesimpulan kategori harus bisa ditelusuri kembali ke parameter
    dan batas yang tercantum di atas.`;
+const AI_SYSTEM_PROMPT_TRAFO_AP=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
+TRANSFORMATOR DAYA (Power Transformer) gardu induk PLN, khusus bagian ACTIVE PART.
+
+Parameter yang tersedia pada data:
+1. Tahanan Isolasi menit ke-10 (MΩ) per belitan: Prim-Sek, Sek-Ter, Prim-Ter, Prim-Gnd, Sek-Gnd, Ter-Gnd.
+   Nilai yang TURUN dari tahun ke tahun menandakan degradasi isolasi.
+2. Index Polarity (rasio IR 10 menit / 1 menit) per belitan. Nilai yang TURUN menandakan isolasi lembap/kotor.
+3. Kapasitan belitan (pF): CHL, CLT, CHT, CHG, CLG, CTG. Yang penting adalah PERUBAHAN terhadap pengukuran
+   sebelumnya (naik maupun turun), bukan besar nilainya — perubahan besar mengindikasikan deformasi belitan.
+4. Tan Delta Belitan (%) per belitan. Nilai yang NAIK menandakan penurunan kualitas isolasi.
+5. Tan Delta Bushing (%) sisi HV (R, S, T, N), LV (r, s, t, n), dan Tersier (TV 1, TV 2). Nilai NAIK = memburuk.
+6. Deviasi Nilai RDC Belitan (%). Semakin jauh dari 0 semakin buruk.
+
+Aturan:
+1. Data ini BELUM memiliki batas kategori AHI resmi (kolom evaluasi di sumber data masih kosong).
+   JANGAN mengarang batas angka atau kategori Good/Fair/Poor/Critical; nilai kondisi secara kualitatif
+   dari arah tren dan besarnya perubahan antartahun saja.
+2. Data sumber mengandung outlier/kesalahan input; nilai rata-rata yang sudah disediakan sudah
+   mengecualikan nilai yang tidak wajar. Jika suatu seri datanya sedikit, nyatakan "data tidak cukup".
+3. Jangan mengubah satuan (MΩ, pF, %).`;
+const TRAFO_COLORS=['#e53935','#f29a00','#1688f0','#20a46b','#7b61a8','#00a6a6'];
 const TABS={
  pmt:{key:'pmt',label:'PMT',evaluasiTypeMatch:'Circuit Breaker',aiSystemPrompt:AI_SYSTEM_PROMPT_PMT,sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
   columns:{aisGis:['ais / gis','ais/gis'],unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay'],evalContact:['1-best tahanan kontak'],evalClosing:['1-best closing time'],evalOpening:['1-best opening time'],evalKeserempakan:['1-best keserempakan'],evalPurity:['1-best purity'],evalDew:['1-best dew point']},
@@ -1100,6 +1135,43 @@ const TABS={
   },
   chartSpecs:[['primerGround','Tahanan Isolasi - Primer-Ground','Mega Ohm',[{key:'primerGround',label:'Primer-Ground'}],['#e53935','#f29a00','#1688f0']],['primerSekunder','Tahanan Isolasi - Primer-Sekunder','Mega Ohm',[{key:'primerSekunder',label:'Primer-Sekunder'}],['#e53935','#f29a00','#1688f0']],['tanDelta','Tan Delta','%',[{key:'tanDelta',label:'Tan Delta'}],['#e53935','#f29a00','#1688f0']],['kapR','Kapasitansi Nameplate vs Uji – Fasa R','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'r'],['kapS','Kapasitansi Nameplate vs Uji – Fasa S','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'s'],['kapT','Kapasitansi Nameplate vs Uji – Fasa T','pF',[{key:'kapasitansiNameplate',label:'Nameplate'},{key:'kapasitansiUji',label:'Hasil Uji'}],['#1688f0','#e53935'],'t'],['deviasiKapasitansi','Deviasi Hasil Uji Kapasitansi','%',[{key:'deviasiKapasitansi',label:'Deviasi'}],['#e53935','#f29a00','#1688f0']]],
   detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TANGGAL UJI','date'],['PRIMER - GROUND (MΩ)','primerGround'],['PRIMER - SEKUNDER (MΩ)','primerSekunder'],['TAN DELTA (%)','tanDelta'],['KAPASITANSI NAMEPLATE','kapasitansiNameplate'],['HASIL UJI KAPASITANSI','kapasitansiUji'],['DEVIASI KAPASITANSI (%)','deviasiKapasitansi']]
+ },
+ 'trafo-ap':{key:'trafo-ap',label:'TRAFO – Active Part',evaluasiTypeMatch:'Power Transformer',aiSystemPrompt:AI_SYSTEM_PROMPT_TRAFO_AP,sheetCsv:'https://docs.google.com/spreadsheets/d/1efh58Xg4EsMZPM4OfMgqvANURYWCzA36eAS-qjiNX4o/export?format=csv&gid=1974034425',sourceLabel:'Google Sheet • TRAFO',docTitle:'Trend Inspection TRAFO Active Part — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – TRAFO – Active Part',detailTitle:'Detail Pengujian TRAFO – Active Part',exportFile:'Trend_Inspection_TRAFO_ActivePart_Filtered.csv',
+  columns:{unit:['unit induk'],upt:['upt'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],serial:['nomor seri','serial'],tegangan:['tegangan operasi sisi hv','teg','tegangan'],tech:['techident number','techidentno'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],
+   irPS:['tahanan isolasi menit ke 10 (mega ohm) - prim - sek'],irST:['tahanan isolasi menit ke 10 (mega ohm) - sek - ter'],irPT:['tahanan isolasi menit ke 10 (mega ohm) - prim - ter'],irPG:['tahanan isolasi menit ke 10 (mega ohm) - prim - gnd'],irSG:['tahanan isolasi menit ke 10 (mega ohm) - sek - gnd'],irTG:['tahanan isolasi menit ke 10 (mega ohm) - ter - gnd'],
+   ipPS:['index polarity - prim - sek'],ipST:['index polarity - sek - ter'],ipPT:['index polarity - prim - ter','index polarity - prim - tek'],ipPG:['index polarity - prim - gnd'],ipSG:['index polarity - sek - gnd'],ipTG:['index polarity - ter - gnd'],
+   kapCHL:['kapasitan (pf) - prim - sek (chl)'],kapCLT:['kapasitan (pf) - sek - ter (clt)'],kapCHT:['kapasitan (pf) - prim - ter (cht)'],kapCHG:['kapasitan (pf) - prim - gnd (chg)'],kapCLG:['kapasitan (pf) - sek - gnd (clg)'],kapCTG:['kapasitan (pf) - ter - gnd (ctg)'],
+   tdCHL:['tan delta belitan (%) - prim - sek (chl)'],tdCLT:['tan delta belitan (%) - sek - ter (clt)'],tdCHT:['tan delta belitan (%) - prim - ter (cht)'],tdCHG:['tan delta belitan (%) - prim - gnd (chg)'],tdCLG:['tan delta belitan (%) - sek - gnd (clg)'],tdCTG:['tan delta belitan (%) - ter - gnd (ctg)'],
+   bushR:['tan delta bushing (%) - r (hv)'],bushS:['tan delta bushing (%) - s (hv)'],bushT:['tan delta bushing (%) - t (hv)'],bushN:['tan delta bushing (%) - n (hv)'],
+   bushRlv:['tan delta bushing (%) - r (lv)'],bushSlv:['tan delta bushing (%) - s (lv)'],bushTlv:['tan delta bushing (%) - t (lv)'],bushNlv:['tan delta bushing (%) - n (lv)'],
+   bushTV1:['tan delta bushing (%) - tv 1'],bushTV2:['tan delta bushing (%) - tv 2'],
+   rdc:['deviasi nilai rdc belitan (%)']},
+  // Di sheet TRAFO, kolom "Tan Delta Belitan - Prim - Sek (CHL)" saat ini berisi angka persen deviasi kapasitansi
+  // (mis. "-33.08%"), bukan tan delta. Nilai Tan Delta Belitan asli tidak pernah memakai tanda "%", jadi nilai
+  // ber-"%" dibuang agar tidak tercampur. Begitu isi sheet diperbaiki, data otomatis ikut tampil.
+  sanitize:Object.fromEntries(['tdCHL','tdCLT','tdCHT','tdCHG','tdCLG','tdCTG'].map(k=>[k,v=>String(v).includes('%')?'':v])),
+  // Grafik multi-belitan: untuk deteksi membaik/memburuk, pakai nilai terburuk dari semua belitan (bukan yang pertama terisi).
+  deviationWorst:true,
+  phaseChartIds:[],
+  categoryOf:{},
+  chartSpecs:[
+   ['trIR','Tahanan Isolasi Menit ke-10','Mega Ohm',[{key:'irPS',label:'Prim-Sek'},{key:'irST',label:'Sek-Ter'},{key:'irPT',label:'Prim-Ter'},{key:'irPG',label:'Prim-Gnd'},{key:'irSG',label:'Sek-Gnd'},{key:'irTG',label:'Ter-Gnd'}],TRAFO_COLORS],
+   ['trIP','Index Polarity','Rasio',[{key:'ipPS',label:'Prim-Sek'},{key:'ipST',label:'Sek-Ter'},{key:'ipPT',label:'Prim-Ter'},{key:'ipPG',label:'Prim-Gnd'},{key:'ipSG',label:'Sek-Gnd'},{key:'ipTG',label:'Ter-Gnd'}],TRAFO_COLORS],
+   ['trKap','Kapasitan','pF',[{key:'kapCHL',label:'Prim-Sek (CHL)'},{key:'kapCLT',label:'Sek-Ter (CLT)'},{key:'kapCHT',label:'Prim-Ter (CHT)'},{key:'kapCHG',label:'Prim-Gnd (CHG)'},{key:'kapCLG',label:'Sek-Gnd (CLG)'},{key:'kapCTG',label:'Ter-Gnd (CTG)'}],TRAFO_COLORS],
+   ['trTDB','Tan Delta Belitan','%',[{key:'tdCHL',label:'Prim-Sek (CHL)'},{key:'tdCLT',label:'Sek-Ter (CLT)'},{key:'tdCHT',label:'Prim-Ter (CHT)'},{key:'tdCHG',label:'Prim-Gnd (CHG)'},{key:'tdCLG',label:'Sek-Gnd (CLG)'},{key:'tdCTG',label:'Ter-Gnd (CTG)'}],TRAFO_COLORS],
+   ['trBushHV','Tan Delta Bushing HV','%',[{key:'bushR',label:'R (HV)'},{key:'bushS',label:'S (HV)'},{key:'bushT',label:'T (HV)'},{key:'bushN',label:'N (HV)'}],TRAFO_COLORS],
+   ['trBushLV','Tan Delta Bushing LV','%',[{key:'bushRlv',label:'r (LV)'},{key:'bushSlv',label:'s (LV)'},{key:'bushTlv',label:'t (LV)'},{key:'bushNlv',label:'n (LV)'}],TRAFO_COLORS],
+   ['trBushTV','Tan Delta Bushing TV','%',[{key:'bushTV1',label:'TV 1'},{key:'bushTV2',label:'TV 2'}],TRAFO_COLORS],
+   ['trRDC','Deviasi Nilai RDC Belitan','%',[{key:'rdc',label:'Deviasi RDC'}],TRAFO_COLORS]
+  ],
+  detailCols:[['UNIT INDUK','unit'],['UPT','upt'],['ULTG','ultg'],['GARDU INDUK','gi'],['BAY','bay'],['PHASA','phasa'],['MERK','merk'],['TYPE','type'],['NOMOR SERI','serial'],['TEG (kV)','tegangan'],['TANGGAL PEMELIHARAAN TERAKHIR','date'],
+   ['IR PRIM-SEK (MΩ)','irPS'],['IR SEK-TER (MΩ)','irST'],['IR PRIM-TER (MΩ)','irPT'],['IR PRIM-GND (MΩ)','irPG'],['IR SEK-GND (MΩ)','irSG'],['IR TER-GND (MΩ)','irTG'],
+   ['IP PRIM-SEK','ipPS'],['IP SEK-TER','ipST'],['IP PRIM-TER','ipPT'],['IP PRIM-GND','ipPG'],['IP SEK-GND','ipSG'],['IP TER-GND','ipTG'],
+   ['KAP CHL (pF)','kapCHL'],['KAP CLT (pF)','kapCLT'],['KAP CHT (pF)','kapCHT'],['KAP CHG (pF)','kapCHG'],['KAP CLG (pF)','kapCLG'],['KAP CTG (pF)','kapCTG'],
+   ['TD BELITAN CHL (%)','tdCHL'],['TD BELITAN CLT (%)','tdCLT'],['TD BELITAN CHT (%)','tdCHT'],['TD BELITAN CHG (%)','tdCHG'],['TD BELITAN CLG (%)','tdCLG'],['TD BELITAN CTG (%)','tdCTG'],
+   ['TD BUSHING R HV (%)','bushR'],['TD BUSHING S HV (%)','bushS'],['TD BUSHING T HV (%)','bushT'],['TD BUSHING N HV (%)','bushN'],
+   ['TD BUSHING r LV (%)','bushRlv'],['TD BUSHING s LV (%)','bushSlv'],['TD BUSHING t LV (%)','bushTlv'],['TD BUSHING n LV (%)','bushNlv'],
+   ['TD BUSHING TV 1 (%)','bushTV1'],['TD BUSHING TV 2 (%)','bushTV2'],['DEVIASI RDC BELITAN (%)','rdc']]
  }
 };
 const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
@@ -1117,6 +1189,9 @@ $('viewSubtitle').textContent=TAB.subtitle;
 $('sourceLabel').textContent=TAB.sourceLabel;
 $('detailTitle').textContent=TAB.detailTitle;
 document.querySelectorAll('.nav a[data-tab-link]').forEach(a=>a.classList.toggle('active-sub',a.getAttribute('data-tab-link')===TAB.key));
+function setTrafoMenu(open){$('trafoMenu').hidden=!open;$('trafoToggle').setAttribute('aria-expanded',open)}
+$('trafoToggle').addEventListener('click',e=>{e.preventDefault();setTrafoMenu($('trafoMenu').hidden)});
+if(TAB.key.startsWith('trafo')){setTrafoMenu(true);$('trafoToggle').classList.add('trafo-current')}
 const THRESHOLDS={
  purity:{value:97,label:'MIN 97%',mode:'min'},
  dew:{value:-5,label:'MAX -5°C',mode:'max'},
@@ -1378,7 +1453,7 @@ function val(r,k){
   if(Math.abs(pct)>200)return''; // nameplate mendekati nol → rasio tidak masuk akal, bukan hasil ukur nyata
   return String(pct.toFixed(3));
  }
- let h=COL[k];return h?r[h]:''
+ let h=COL[k];const v=h?r[h]:'';const s=TAB.sanitize&&TAB.sanitize[k];return s?s(v):v
 }
 function num(v){let s=String(v??'').trim();if(!s)return null;s=s.replace(/\s/g,'').replace(/,/g,'');let m=s.match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):null}
 function year(v){let s=String(v||'');let m=s.match(/(20\d{2})/);return m?+m[1]:null}
@@ -1388,14 +1463,32 @@ function classifyIR(v){if(v==null)return null;if(v<1000)return 5;if(v<=2000)retu
 function classifyInsulationPerKv_CT(v){if(v==null)return null;if(v<1)return 5;if(v<=5)return 4;if(v<=10)return 3;return 2}
 function classifyInsulationPerKv_PT(v){if(v==null)return null;if(v<=2)return 5;if(v<=5)return 4;if(v<=10)return 3;return 2}
 function ctVoltageClass(v){const s=norm(v).replace(/\s+/g,'').replace(/kv$/,'');return(s==='70'||s==='150')?'70/150':((s==='275'||s==='500')?'275/500':'')}
-const BAD_DIRECTION={irAB:'down',irAG:'down',irBG:'down',contact:'up',closing:'up',opening:'up',purity:'down',dew:'up',so2:'up',primerGround:'down',primerSekunder:'down',tanDelta:'up',deviasiKapasitansi:'away-from-zero'};
+const BAD_DIRECTION={irAB:'down',irAG:'down',irBG:'down',contact:'up',closing:'up',opening:'up',purity:'down',dew:'up',so2:'up',primerGround:'down',primerSekunder:'down',tanDelta:'up',deviasiKapasitansi:'away-from-zero',
+ // TRAFO Active Part. Kapasitan sengaja tidak diberi arah: yang penting perubahannya (naik/turun), bukan arah.
+ trIR:'down',trIP:'down',trTDB:'up',trBushHV:'up',trBushLV:'up',trBushTV:'up',trRDC:'away-from-zero'};
 // Batas nilai wajar per parameter, untuk mengecualikan outlier kesalahan input data (bukan hasil ukur nyata)
 // dari rata-rata grafik. 99% data Primer-Ground/Sekunder PT di bawah ~1,1 juta MΩ; beberapa baris tercatat
 // sampai ratusan juta MΩ (jelas typo/kesalahan input), yang membuat skala grafik meledak.
-const MAX_SANE_VALUE={primerGround:10000000,primerSekunder:10000000};
+// TRAFO: Index Polarity tercatat sampai 9999 dan Tan Delta sampai puluhan ribu % (typo/salah kolom) → dikecualikan.
+const MAX_SANE_VALUE={primerGround:10000000,primerSekunder:10000000,trIR:10000000,trIP:20,trKap:200000,trTDB:10,trBushHV:10,trBushLV:10,trBushTV:10};
+// Batas bawah: resistansi/IP/kapasitan/tan delta negatif bukan hasil ukur nyata.
+const MIN_SANE_VALUE={trIR:0,trIP:0,trKap:0,trTDB:0,trBushHV:0,trBushLV:0,trBushTV:0};
+function isSane(id,v){const mx=MAX_SANE_VALUE[id],mn=MIN_SANE_VALUE[id];return(mx===undefined||Math.abs(v)<=mx)&&(mn===undefined||v>=mn)}
 const SKIP_DEVIATION=['kapR','kapS','kapT'];
 function deviationAssetKey(r){return(val(r,'tech')||val(r,'serial')||'')+'|'+norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'phasa'))}
-function getDeviationValue(spec,r){const id=spec[0],keys=spec[3];if(TAB.phaseChartIds.includes(id))return num(val(r,keys[0].key));for(const k of keys){const v=num(val(r,k.key));if(v!=null)return v}return null}
+function getDeviationValue(spec,r){
+ const id=spec[0],keys=spec[3];
+ if(TAB.phaseChartIds.includes(id))return num(val(r,keys[0].key));
+ if(TAB.deviationWorst){
+  const vs=keys.map(k=>num(val(r,k.key))).filter(v=>v!=null&&v!==-1000&&isSane(id,v));
+  if(!vs.length)return null;
+  const dir=BAD_DIRECTION[id];
+  if(dir==='down')return Math.min(...vs);
+  if(dir==='away-from-zero')return vs.reduce((a,b)=>Math.abs(b)>Math.abs(a)?b:a);
+  return Math.max(...vs);
+ }
+ for(const k of keys){const v=num(val(r,k.key));if(v!=null)return v}return null
+}
 function isWorseningBy50(prev,curr,direction){if(prev==null||curr==null||prev===0)return false;const pctChange=(curr-prev)/Math.abs(prev);if(direction==='up')return pctChange>=0.5;if(direction==='down')return pctChange<=-0.5;if(direction==='away-from-zero')return Math.abs(curr)>Math.abs(prev)&&Math.abs(curr)>=Math.abs(prev)*1.5;return false}
 function chartTitleById(id){const s=TAB.chartSpecs.find(x=>x[0]===id);return s?s[1]:id}
 function rowCategoryInfo(r){
@@ -1662,8 +1755,7 @@ if(phaseCharts.includes(id)){
   label:ph,
   data:labels.map(y=>{
    let rows=filtered.filter(r=>year(val(r,'date'))===y && norm(val(r,'phasa'))===ph.toLowerCase());
-   const maxSane=MAX_SANE_VALUE[id];
-   let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null&&v!==-1000&&(maxSane===undefined||Math.abs(v)<=maxSane));
+   let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null&&v!==-1000&&isSane(id,v));
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
   borderColor:colors[i],backgroundColor:colors[i],pointRadius:3,borderWidth:2,tension:.25,spanGaps:true
@@ -1673,8 +1765,7 @@ if(phaseCharts.includes(id)){
   label:k.label,
   data:labels.map(y=>{
    let rows=filtered.filter(r=>year(val(r,'date'))===y && (!phaseFilter||norm(val(r,'phasa'))===phaseFilter));
-   const maxSane=MAX_SANE_VALUE[id];
-   let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null&&v!==-1000&&(maxSane===undefined||Math.abs(v)<=maxSane));
+   let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null&&v!==-1000&&isSane(id,v));
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
   borderColor:colors[i],backgroundColor:colors[i],pointRadius:3,borderWidth:2,tension:.25,spanGaps:true

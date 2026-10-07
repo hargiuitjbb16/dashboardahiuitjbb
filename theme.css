@@ -25,6 +25,10 @@ html[data-theme="dark"] .logo{border-color:var(--border);background:#f5f8fc;bord
 html[data-theme="dark"] .nav a{color:var(--text-2)}
 html[data-theme="dark"] .nav a:hover{background:var(--surface-2)}
 html[data-theme="dark"] .nav a.active,html[data-theme="dark"] .nav .trend,html[data-theme="dark"] .nav .sub.active-sub{background:var(--accent-bg);color:var(--accent)}
+html[data-theme="dark"] .nav .subsub{color:var(--muted)}
+html[data-theme="dark"] .nav .subsub:before{color:#5d7189}
+html[data-theme="dark"] .nav .subsub.active-sub{background:var(--accent-bg);color:var(--accent)}
+html[data-theme="dark"] .nav .has-children.trafo-current{color:var(--accent)}
 html[data-theme="dark"] .side-date{background:var(--surface-2);border-color:var(--border)}
 html[data-theme="dark"] .side-date small{color:var(--muted)}
 html[data-theme="dark"] .header{border-color:var(--border)}
