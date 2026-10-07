@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title id="docTitle">Trend Inspection PMT — DASHBOARD AHI UIT JBB</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/id.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:#142b4a;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}.app{display:flex;min-height:100vh}.sidebar{width:205px;background:#fff;border-right:1px solid #e3eaf2;position:fixed;left:0;top:0;bottom:0;padding:10px 8px;z-index:20}.logo{height:57px;display:flex;align-items:center;gap:7px;border-bottom:1px solid #edf1f6;margin-bottom:7px;padding:4px 1px 10px;overflow:hidden}.logo img:first-child{width:70px;height:35px;object-fit:contain}.logo img:last-child{width:105px;height:34px;object-fit:contain}.nav a{display:block;padding:10px 12px;border-radius:8px;color:#24415f;text-decoration:none;margin:2px 0}.nav a.active{background:#e8f1fd;color:#0873d1;font-weight:700}.nav a:hover{background:#f2f7fc}.nav .trend{color:#0873d1;font-weight:700;background:#eaf3ff}.nav .sub{font-size:12px;padding-left:30px;margin-left:8px}.nav .sub.active-sub{background:#dcecff;color:#0873d1;font-weight:700}.side-date{position:absolute;bottom:18px;left:8px;right:8px;border:1px solid #dfe7ef;background:#f8fafc;border-radius:8px;padding:10px}.side-date small{display:block;color:#65758a}.side-date b{display:block;margin-top:3px}main{margin-left:205px;width:calc(100% - 205px);padding:10px 18px 28px}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #dde6ef;padding-bottom:10px}.brand h1{margin:0;font-size:25px;letter-spacing:-.5px}.brand p{margin:4px 0 0;color:#60748c}.actions{display:flex;gap:8px;align-items:center}.date{border:1px solid #dbe4ee;background:#fff;border-radius:8px;padding:8px 12px;font-size:10px}.date b{display:block;font-size:11px;margin-top:2px}.btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}.status{display:none;border-radius:9px;padding:9px 12px;margin:10px 0;font-weight:700}.status.ok{display:block;color:#137a4a;background:#f4fbf7;border:1px solid #b7e2cc}.status.error{display:block;color:#b42318;background:#fff8f7;border:1px solid #f1b8b2}.filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:10px 0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}.filter label{font-size:9px;font-weight:800;color:#53677e;display:block;margin-bottom:4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.filter select{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}.filter-actions{display:flex;gap:8px;align-items:end}.filter-actions button{height:32px}.chart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.chart-card{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;min-width:0}.chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}.chart-title{font-weight:800;font-size:12px}.chart-unit{font-size:10px;color:#73839a;margin-top:3px}.chart-years{font-size:9px;color:#6881a0}.chart-box{height:205px;position:relative}.detail{margin-top:10px;background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px}.detail-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.detail-head h3{margin:0;font-size:14px}.detail-head small{color:#73839a}.detail-actions{display:flex;gap:8px}.search{width:270px;border:1px solid #d2ddea;border-radius:7px;padding:8px 10px}.table-wrap{max-height:430px;overflow:auto;border:1px solid #e6ebf2;border-radius:7px}.table-wrap table{border-collapse:separate;border-spacing:0;min-width:2100px;width:max-content;font-size:10px}.table-wrap th,.table-wrap td{padding:7px 8px;border-bottom:1px solid #edf1f5;border-right:1px solid #edf1f5;white-space:nowrap;background:#fff}.table-wrap th{position:sticky;top:0;background:#f7f9fc;z-index:5;color:#526079}.pager{display:flex;justify-content:flex-end;align-items:center;gap:7px;padding-top:8px}.pager button{padding:5px 10px;border:1px solid #d2ddea;background:#fff;border-radius:6px}.muted{color:#7b8798}.loading{padding:35px;text-align:center;color:#73839a}.empty{padding:35px;text-align:center;color:#73839a}.legend-note{font-size:9px;color:#75849a;margin-top:6px}@media(max-width:1100px){.sidebar{width:175px}main{margin-left:175px;width:calc(100% - 175px)}.chart-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.sidebar{position:relative;width:100%;height:auto}.side-date{position:static;margin-top:10px}main{margin-left:0;width:100%}.app{display:block}.chart-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.header{gap:10px;flex-direction:column}.detail-head{align-items:stretch;flex-direction:column}.search{width:100%}}
 </style>
@@ -73,6 +76,7 @@
 @media(max-width:1150px){.trend-summary{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.trend-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.ai-settings{grid-template-columns:1fr}.ai-result-grid{grid-template-columns:1fr}}
+.date-input{width:100%;height:32px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px;font:inherit;font-size:12px;cursor:pointer}
 .nav{max-height:calc(100vh - 205px);overflow-y:auto}
 .nav .has-children{display:flex;justify-content:space-between;align-items:center}
 .nav .caret{font-size:10px;transition:transform .15s}
@@ -98,7 +102,7 @@
     <a class="sub active-sub" href="trend-inspection.html" data-tab-link="pmt">PMT</a>
     <a class="sub has-children" href="#" id="trafoToggle" aria-expanded="false" aria-controls="trafoMenu">TRAFO<span class="caret">▸</span></a>
     <div class="subsub-group" id="trafoMenu" hidden>
-      <a class="subsub" href="trend-inspection.html?tab=trafo-ap" data-tab-link="trafo-ap">Active Part</a><a class="subsub">DGA</a><a class="subsub">Karakteristik</a><a class="subsub">Furan</a>
+      <a class="subsub" href="trend-inspection.html?tab=trafo-ap" data-tab-link="trafo-ap">Active Part</a><a class="subsub" href="trend-inspection.html?tab=trafo-dga" data-tab-link="trafo-dga">DGA</a><a class="subsub">Karakteristik</a><a class="subsub">Furan</a>
     </div>
     <a class="sub" href="trend-inspection.html?tab=ct" data-tab-link="ct">CT</a><a class="sub" href="trend-inspection.html?tab=pt" data-tab-link="pt">CVT/PT</a><a class="sub">PMS</a><a class="sub">LA</a><a class="sub">NGR</a>
     <a href="ahi-evaluasi.html">AHI Evaluasi</a><a>Data Aset</a><a>Laporan</a>
@@ -121,8 +125,13 @@
  <div class="filter"><label>Phasa</label><select id="phasa"></select></div>
  <div class="filter"><label>Merk</label><select id="merk"></select></div>
  <div class="filter"><label>Type</label><select id="type"></select></div>
+ <div class="filter" style="display:none"><label>Serial No.</label><select id="serial"></select></div>
+ <div class="filter" style="display:none"><label>Tegangan</label><select id="tegangan"></select></div>
+ <div class="filter" style="display:none"><label>Sampel</label><select id="sample"></select></div>
  <div class="filter"><label>From Year</label><select id="fromYear"></select></div>
  <div class="filter"><label>To Year</label><select id="toYear"></select></div>
+ <div class="filter" style="display:none"><label>Dari Tanggal</label><input id="fromDate" class="date-input" placeholder="dd-mm-yyyy" autocomplete="off"></div>
+ <div class="filter" style="display:none"><label>Sampai Tanggal</label><input id="toDate" class="date-input" placeholder="dd-mm-yyyy" autocomplete="off"></div>
  <div class="filter"><label>Kondisi AHI</label><select id="ahiCondition"><option value="">Semua</option><option value="1">1 - Very Good</option><option value="2">2 - Good</option><option value="3">3 - Fair</option><option value="4">4 - Poor</option><option value="5">5 - Critical</option></select></div>
  <div class="filter"><label>Kondisi Trend</label><select id="deviationFilter"><option value="">Semua</option><option value="improve50">Membaik Signifikan (≥50%)</option><option value="improve10">Membaik (≥10%)</option><option value="worsen50">Memburuk Signifikan (≥50%)</option><option value="worsen10">Memburuk (≥10%)</option><option value="worsen2x">Memburuk Beruntun 2x (≥10%)</option></select></div>
 </section>
@@ -1089,6 +1098,27 @@ Aturan:
    mengecualikan nilai yang tidak wajar. Jika suatu seri datanya sedikit, nyatakan "data tidak cukup".
 3. Jangan mengubah satuan (MΩ, pF, %).`;
 const TRAFO_COLORS=['#e53935','#f29a00','#1688f0','#20a46b','#7b61a8','#00a6a6'];
+const AI_SYSTEM_PROMPT_TRAFO_DGA=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
+TRANSFORMATOR DAYA (Power Transformer) gardu induk PLN, khusus DISSOLVED GAS ANALYSIS (DGA) minyak isolasi.
+
+Data berisi konsentrasi gas terlarut (ppm) per tanggal pengujian, dipisah per lokasi sampel
+(Bottom/Top/Middle Main Tank, Tubular Phasa R/S/T, OLTC):
+H2, CH4, C2H6, C2H4, C2H2, CO, CO2, O2, N2, dan TDCG (Total Dissolved Combustible Gas).
+
+Pedoman interpretasi umum (key gas):
+- H2 dominan: partial discharge / korona.
+- CH4 & C2H6: pemanasan minyak suhu rendah; C2H4: pemanasan minyak suhu tinggi.
+- C2H2 (asetilen): busur listrik (arcing) — kenaikan sekecil apa pun patut diwaspadai.
+- CO & CO2: degradasi isolasi kertas (selulosa).
+- O2 & N2: gas atmosfer, indikator kebocoran/kekedapan, bukan gangguan termal/elektrik.
+- TDCG: indikator total aktivitas gangguan.
+
+Aturan:
+1. Data sampel OLTC TIDAK boleh dibandingkan dengan sampel main tank (OLTC normal berisi gas busur).
+2. Utamakan LAJU KENAIKAN antar tanggal uji, bukan nilai sesaat.
+3. Jangan mengarang batas kategori AHI; bila menyebut batas, sebut sebagai acuan umum IEEE C57.104
+   dan nyatakan perlu verifikasi dengan standar PLN.
+4. Jangan mengubah satuan (ppm).`;
 const TABS={
  pmt:{key:'pmt',label:'PMT',evaluasiTypeMatch:'Circuit Breaker',aiSystemPrompt:AI_SYSTEM_PROMPT_PMT,sheetCsv:'https://docs.google.com/spreadsheets/d/1P5kQZooTtNcgjEkMET-pqqmSkJQ9XWnnBxqIf3KAZXw/export?format=csv&gid=1202083824',sourceLabel:'Google Sheet • NORM AHI PMT',docTitle:'Trend Inspection PMT — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – PMT',detailTitle:'Detail Pengujian PMT',exportFile:'Trend_Inspection_PMT_Filtered.csv',
   columns:{aisGis:['ais / gis','ais/gis'],unit:['unit induk'],upt:['upt','unit pelaksana'],ultg:['ultg'],gi:['gardu induk'],bay:['bay'],phasa:['phasa'],merk:['merk','merek'],type:['type','tipe'],date:['tanggal pemeliharaan terakhir','tanggal pemeliharaan','tanggal uji'],irAB:['hasil uji tahanan isolasi atas - bawah','hasil uji tahanan isolasi atas-bawah'],irAG:['hasil uji tahanan isolasi atas - ground','hasil uji tahanan isolasi atas-ground'],irBG:['hasil uji tahanan isolasi bawah - ground','hasil uji tahanan isolasi bawah-ground'],contactR:['pengujian tahanan kontak (mikro ohm) r'],contactS:['pengujian tahanan kontak (mikro ohm) s'],contactT:['pengujian tahanan kontak (mikro ohm) t'],closingR:['pengujian closing time (ms) r'],closingS:['pengujian closing time (ms) s'],closingT:['pengujian closing time (ms) t'],openingR:['pengujian opening time (ms) r'],openingS:['pengujian opening time (ms) s'],openingT:['pengujian opening time (ms) t'],purity:['pengujian sf6 purity'],dew:['pengujian sf6 dew point'],so2:['pengujian sf6 so2'],serial:['nomor seri','serial'],tech:['techident number','techidentno'],name:['bay'],evalContact:['1-best tahanan kontak'],evalClosing:['1-best closing time'],evalOpening:['1-best opening time'],evalKeserempakan:['1-best keserempakan'],evalPurity:['1-best purity'],evalDew:['1-best dew point']},
@@ -1172,13 +1202,33 @@ const TABS={
    ['TD BUSHING R HV (%)','bushR'],['TD BUSHING S HV (%)','bushS'],['TD BUSHING T HV (%)','bushT'],['TD BUSHING N HV (%)','bushN'],
    ['TD BUSHING r LV (%)','bushRlv'],['TD BUSHING s LV (%)','bushSlv'],['TD BUSHING t LV (%)','bushTlv'],['TD BUSHING n LV (%)','bushNlv'],
    ['TD BUSHING TV 1 (%)','bushTV1'],['TD BUSHING TV 2 (%)','bushTV2'],['DEVIASI RDC BELITAN (%)','rdc']]
+ },
+ 'trafo-dga':{key:'trafo-dga',label:'TRAFO – DGA',evaluasiTypeMatch:'Power Transformer',aiSystemPrompt:AI_SYSTEM_PROMPT_TRAFO_DGA,sheetCsv:'https://docs.google.com/spreadsheets/d/1vzzwvsrkg1wfKp7O0jzyPSDn0J0E4f_BLnDU6Qwfweo/export?format=csv&gid=0',sourceLabel:'Google Sheet • DGA',docTitle:'Trend Inspection TRAFO DGA — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – TRAFO – DGA',detailTitle:'Detail Pengujian TRAFO – DGA',exportFile:'Trend_Inspection_TRAFO_DGA_Filtered.csv',
+  columns:{unit:['unit','unit induk'],upt:['upt'],ultg:['ultg'],gi:['gi','gardu induk'],bay:['bay'],merk:['merk','merek'],serial:['serial no.','serial no','nomor seri'],phasa:['phasa'],tegangan:['tegangan'],date:['tgl. pengujian','tanggal pengujian'],sample:['sample'],noReg:['no. registrasi'],alasan:['alasan pengujian'],
+   h2:['h2'],ch4:['ch4'],c2h6:['c2h6'],c2h4:['c2h4'],c2h2:['c2h2'],co:['co'],co2:['co2'],o2:['o2'],n2:['n2'],tdcg:['tdcg']},
+  filterIds:['unit','upt','ultg','gi','bay','merk','serial','phasa','tegangan','sample'],
+  dateMode:'day',
+  seriesBy:'sample',
+  seriesOrder:['TUBULAR PHASA R','TUBULAR PHASA S','TUBULAR PHASA T','BOTTOM MAINTANK','MIDDLE MAINTANK','TOP MAINTANK','OLTC'],
+  seriesColors:{'TUBULAR PHASA R':'#e53935','TUBULAR PHASA S':'#f2b400','TUBULAR PHASA T':'#1688f0','BOTTOM MAINTANK':'#7b61a8','MIDDLE MAINTANK':'#8c6b43','TOP MAINTANK':'#00a6a6','OLTC':'#64748b'},
+  // TechIdentNo di sheet DGA rusak (format ilmiah "1.13E+24") & Serial No. banyak "-", jadi identitas trafo = GI + Bay.
+  unitKey:r=>norm(val(r,'gi'))+'|'+norm(val(r,'bay')),
+  assetKey:r=>norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'sample')),
+  phaseChartIds:[],
+  categoryOf:{},
+  chartSpecs:[['dgaH2','H2 (Hidrogen)','ppm',[{key:'h2',label:'H2'}],[]],['dgaCH4','CH4 (Metana)','ppm',[{key:'ch4',label:'CH4'}],[]],['dgaC2H6','C2H6 (Etana)','ppm',[{key:'c2h6',label:'C2H6'}],[]],['dgaC2H4','C2H4 (Etilen)','ppm',[{key:'c2h4',label:'C2H4'}],[]],['dgaC2H2','C2H2 (Asetilen)','ppm',[{key:'c2h2',label:'C2H2'}],[]],['dgaCO','CO (Karbon Monoksida)','ppm',[{key:'co',label:'CO'}],[]],['dgaCO2','CO2 (Karbon Dioksida)','ppm',[{key:'co2',label:'CO2'}],[]],['dgaO2','O2 (Oksigen)','ppm',[{key:'o2',label:'O2'}],[]],['dgaN2','N2 (Nitrogen)','ppm',[{key:'n2',label:'N2'}],[]],['dgaTDCG','TDCG (Total Dissolved Combustible Gas)','ppm',[{key:'tdcg',label:'TDCG'}],[]]],
+  detailCols:[['NO. REGISTRASI','noReg'],['TGL. PENGUJIAN','date'],['UNIT','unit'],['UPT','upt'],['ULTG','ultg'],['GI','gi'],['BAY','bay'],['MERK','merk'],['SERIAL NO.','serial'],['PHASA','phasa'],['TEGANGAN','tegangan'],['SAMPLE','sample'],['ALASAN PENGUJIAN','alasan'],
+   ['H2','h2'],['CH4','ch4'],['C2H6','c2h6'],['C2H4','c2h4'],['C2H2','c2h2'],['CO','co'],['CO2','co2'],['O2','o2'],['N2','n2'],['TDCG','tdcg']]
  }
 };
 const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
+const DAY_MODE=TAB.dateMode==='day';
 const SHEET_CSV=TAB.sheetCsv;
 // Filter AIS/GIS hanya untuk tab yang punya kolom "AIS / GIS" (saat ini PMT); ditaruh paling depan agar GI/Bay ikut menyempit.
-const FILTER_IDS=(TAB.columns.aisGis?['aisGis']:[]).concat(['unit','upt','ultg','gi','bay','phasa','merk','type']);
-if(TAB.columns.aisGis)document.getElementById('aisGisFilter').style.display='';
+const FILTER_IDS=TAB.filterIds||(TAB.columns.aisGis?['aisGis']:[]).concat(['unit','upt','ultg','gi','bay','phasa','merk','type']);
+// Tampilkan hanya filter milik tab ini, dengan urutan tampil = urutan cascading FILTER_IDS.
+['aisGis','unit','upt','ultg','gi','bay','phasa','merk','type','serial','tegangan','sample'].forEach(id=>{const box=document.getElementById(id).closest('.filter');const i=FILTER_IDS.indexOf(id);box.style.display=i<0?'none':'';box.style.order=i<0?'':i});
+document.querySelectorAll('.filters .filter').forEach(box=>{if(!box.style.order)box.style.order=50});
 const PAGE_SIZE=10;let raw=[],filtered=[],wideFiltered=[],deviationFlags=new Map(),improvementFlags=new Map(),improve10Flags=new Map(),worsen10Flags=new Map(),worsen2xFlags=new Map(),page=1,charts=[];
 const TREND_CONDITION_LABELS={improve50:'Membaik Signifikan (≥50%)',improve10:'Membaik (≥10%)',worsen50:'Memburuk Signifikan (≥50%)',worsen10:'Memburuk (≥10%)',worsen2x:'Memburuk Beruntun 2x (≥10%)'};
 function trendConditionFlagMaps(){return {improve50:improvementFlags,improve10:improve10Flags,worsen50:deviationFlags,worsen10:worsen10Flags,worsen2x:worsen2xFlags}}
@@ -1192,6 +1242,7 @@ document.querySelectorAll('.nav a[data-tab-link]').forEach(a=>a.classList.toggle
 function setTrafoMenu(open){$('trafoMenu').hidden=!open;$('trafoToggle').setAttribute('aria-expanded',open)}
 $('trafoToggle').addEventListener('click',e=>{e.preventDefault();setTrafoMenu($('trafoMenu').hidden)});
 if(TAB.key.startsWith('trafo')){setTrafoMenu(true);$('trafoToggle').classList.add('trafo-current')}
+initDatePickers();
 const THRESHOLDS={
  purity:{value:97,label:'MIN 97%',mode:'min'},
  dew:{value:-5,label:'MAX -5°C',mode:'max'},
@@ -1287,16 +1338,15 @@ function aiBuildConditionSummary(){
  const activeFilters=aiActiveFilters();
  const ahiVal=$('ahiCondition')?.value;
  const catIndexes=ahiVal?[Number(ahiVal)-1]:[0,1,2,3,4];
- let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
- if(labels.length>5)labels=labels.slice(-5);
- const chartsSummary=TAB.chartSpecs.map(spec=>{
+ let labels=chartPeriods();
+  const chartsSummary=TAB.chartSpecs.map(spec=>{
   const [id,title,,,,phaseFilter]=spec;
   const catFn=(TAB.categoryOf||{})[id];
   if(!catFn)return null;
   const rows=phaseFilter?filtered.filter(r=>norm(val(r,'phasa'))===phaseFilter):filtered;
   const perYearCat={};labels.forEach(y=>perYearCat[y]=[0,0,0,0,0]);
   rows.forEach(r=>{
-   const y=year(val(r,'date'));if(!labels.includes(y))return;
+   const y=periodKey(r);if(!labels.includes(y))return;
    const cat=catFn(r);if(!cat)return;
    perYearCat[y][cat-1]++;
   });
@@ -1304,16 +1354,17 @@ function aiBuildConditionSummary(){
   if(perKategori.every(arr=>arr.every(v=>v===0)))return null;
   return {parameter:title,perKategori};
  }).filter(Boolean);
- return {viewMode:'Radar Kondisi AHI',tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,tahun:labels,kategori:catIndexes.map(i=>AHI_CAT[i+1].n),catatan:'Setiap "perKategori" adalah array angka jumlah kejadian, urutan baris = urutan array "kategori", urutan kolom = urutan array "tahun". Parameter dengan seluruh angka 0 pada rentang ini tidak disertakan.',charts:chartsSummary};
+ return {viewMode:'Radar Kondisi AHI',tab:TAB.label,totalRecords:filtered.length,yearRange:periodRangeText(),activeFilters,tahun:labels.map(periodLabel),kategori:catIndexes.map(i=>AHI_CAT[i+1].n),catatan:'Setiap "perKategori" adalah array angka jumlah kejadian, urutan baris = urutan array "kategori", urutan kolom = urutan array "tahun". Parameter dengan seluruh angka 0 pada rentang ini tidak disertakan.',charts:chartsSummary};
 }
 function aiBuildCategorySummary(categories,viewLabel){
  const activeFilters=aiActiveFilters();
  const trendMaps=trendConditionFlagMaps();
  const trendVal=$('deviationFilter')?.value;
  const activeCats=(trendVal&&categories.some(c=>c.key===trendVal))?categories.filter(c=>c.key===trendVal):categories;
- let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
- if(labels.length>5)labels=labels.slice(-5);
- const chartsSummary=TAB.chartSpecs.map(spec=>{
+ // Mode tanggal: untuk AI dirangkum per tahun agar payload tidak berisi ratusan kolom tanggal.
+ const aiKey=r=>DAY_MODE?year(val(r,'date')):periodKey(r);
+ let labels=DAY_MODE?[...new Set(filtered.map(aiKey).filter(Boolean))].sort((a,b)=>a-b):chartPeriods();
+  const chartsSummary=TAB.chartSpecs.map(spec=>{
   const [id,title]=spec;
   if(SKIP_DEVIATION.includes(id))return null;
   if(!BAD_DIRECTION[id])return null;
@@ -1322,7 +1373,7 @@ function aiBuildCategorySummary(categories,viewLabel){
    return labels.map(y=>{
     let count=0;
     filtered.forEach(r=>{
-     if(year(val(r,'date'))!==y)return;
+     if(aiKey(r)!==y)return;
      const params=map.get(r);
      if(params&&params.includes(title))count++;
     });
@@ -1332,7 +1383,7 @@ function aiBuildCategorySummary(categories,viewLabel){
   if(perKategori.every(arr=>arr.every(v=>v===0)))return null;
   return {parameter:title,perKategori};
  }).filter(Boolean);
- return {viewMode:viewLabel,tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,tahun:labels,kategori:activeCats.map(c=>c.label),catatan:'Setiap "perKategori" adalah array angka jumlah kejadian, urutan baris = urutan array "kategori", urutan kolom = urutan array "tahun". Parameter dengan seluruh angka 0 pada rentang ini tidak disertakan.',charts:chartsSummary};
+ return {viewMode:viewLabel,tab:TAB.label,totalRecords:filtered.length,yearRange:periodRangeText(),activeFilters,tahun:DAY_MODE?labels:labels.map(periodLabel),kategori:activeCats.map(c=>c.label),catatan:'Setiap "perKategori" adalah array angka jumlah kejadian, urutan baris = urutan array "kategori", urutan kolom = urutan array "tahun". Parameter dengan seluruh angka 0 pada rentang ini tidak disertakan.',charts:chartsSummary};
 }
 function aiBuildTrendSummary(){
  const activeFilters=aiActiveFilters();
@@ -1375,9 +1426,9 @@ function aiBuildTrendSummary(){
    });
    if(vals.length)perKv={satuan:'MΩ/kV',rataRata:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2),jumlahData:vals.length};
   }
-  return {title,unit,years:labels,series,breach,voltageBreakdown,perKv};
+  return {title,unit,years:DAY_MODE?{dari:labels[0],sampai:labels[labels.length-1],jumlahTanggalUji:labels.length}:labels,series,breach,voltageBreakdown,perKv};
  }).filter(Boolean);
- return {viewMode:'Grafik Trending Pengujian',tab:TAB.label,totalRecords:filtered.length,yearRange:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`,activeFilters,charts:chartsSummary};
+ return {viewMode:'Grafik Trending Pengujian',tab:TAB.label,totalRecords:filtered.length,yearRange:periodRangeText(),activeFilters,charts:chartsSummary};
 }
 async function generateInsight(){
  const status=aiKeyStatus();
@@ -1457,6 +1508,14 @@ function val(r,k){
 }
 function num(v){let s=String(v??'').trim();if(!s)return null;s=s.replace(/\s/g,'').replace(/,/g,'');let m=s.match(/-?\d+(?:\.\d+)?/);return m?Number(m[0]):null}
 function year(v){let s=String(v||'');let m=s.match(/(20\d{2})/);return m?+m[1]:null}
+// Periode sumbu-X: per tahun (default) atau per tanggal uji (TAB.dateMode==='day', mis. DGA).
+// Kunci tanggal = angka yyyymmdd agar bisa diurutkan & dibandingkan langsung.
+function dayKey(v){const m=String(v||'').match(/(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/);return m?(+m[3])*10000+(+m[2])*100+(+m[1]):null}
+function periodKey(r){return DAY_MODE?dayKey(val(r,'date')):year(val(r,'date'))}
+function periodLabel(k){if(!DAY_MODE)return k;const s=String(k);return s.slice(6,8)+'-'+s.slice(4,6)+'-'+s.slice(0,4)}
+function chartPeriods(){const l=[...new Set(filtered.map(periodKey).filter(Boolean))].sort((a,b)=>a-b);return DAY_MODE?l:l.slice(-5)}
+function periodCountText(n){return DAY_MODE?`${n} tanggal uji`:`${n} tahun`}
+function periodRangeText(){return DAY_MODE?`${$('fromDate').value||'-'} s/d ${$('toDate').value||'-'}`:`${$('fromYear').value||'-'} s/d ${$('toYear').value||'-'}`}
 const AHI_CAT=[null,{n:'Very Good',c:'#20a46b'},{n:'Good',c:'#f2b400'},{n:'Fair',c:'#f07800'},{n:'Poor',c:'#e53935'},{n:'Critical',c:'#111'}];
 function parseEvalCell(v){const s=String(v??'').trim();const m=s.match(/^([1-5])\b/);return m?Number(m[1]):null}
 function classifyIR(v){if(v==null)return null;if(v<1000)return 5;if(v<=2000)return 4;if(v<=5000)return 3;if(v<=10000)return 2;return 1}
@@ -1465,7 +1524,9 @@ function classifyInsulationPerKv_PT(v){if(v==null)return null;if(v<=2)return 5;i
 function ctVoltageClass(v){const s=norm(v).replace(/\s+/g,'').replace(/kv$/,'');return(s==='70'||s==='150')?'70/150':((s==='275'||s==='500')?'275/500':'')}
 const BAD_DIRECTION={irAB:'down',irAG:'down',irBG:'down',contact:'up',closing:'up',opening:'up',purity:'down',dew:'up',so2:'up',primerGround:'down',primerSekunder:'down',tanDelta:'up',deviasiKapasitansi:'away-from-zero',
  // TRAFO Active Part. Kapasitan sengaja tidak diberi arah: yang penting perubahannya (naik/turun), bukan arah.
- trIR:'down',trIP:'down',trTDB:'up',trBushHV:'up',trBushLV:'up',trBushTV:'up',trRDC:'away-from-zero'};
+ trIR:'down',trIP:'down',trTDB:'up',trBushHV:'up',trBushLV:'up',trBushTV:'up',trRDC:'away-from-zero',
+ // TRAFO DGA: gas kunci naik = memburuk. O2 & N2 (gas atmosfer) bukan indikator gangguan → tanpa arah.
+ dgaH2:'up',dgaCH4:'up',dgaC2H6:'up',dgaC2H4:'up',dgaC2H2:'up',dgaCO:'up',dgaCO2:'up',dgaTDCG:'up'};
 // Batas nilai wajar per parameter, untuk mengecualikan outlier kesalahan input data (bukan hasil ukur nyata)
 // dari rata-rata grafik. 99% data Primer-Ground/Sekunder PT di bawah ~1,1 juta MΩ; beberapa baris tercatat
 // sampai ratusan juta MΩ (jelas typo/kesalahan input), yang membuat skala grafik meledak.
@@ -1475,7 +1536,7 @@ const MAX_SANE_VALUE={primerGround:10000000,primerSekunder:10000000,trIR:1000000
 const MIN_SANE_VALUE={trIR:0,trIP:0,trKap:0,trTDB:0,trBushHV:0,trBushLV:0,trBushTV:0};
 function isSane(id,v){const mx=MAX_SANE_VALUE[id],mn=MIN_SANE_VALUE[id];return(mx===undefined||Math.abs(v)<=mx)&&(mn===undefined||v>=mn)}
 const SKIP_DEVIATION=['kapR','kapS','kapT'];
-function deviationAssetKey(r){return(val(r,'tech')||val(r,'serial')||'')+'|'+norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'phasa'))}
+function deviationAssetKey(r){if(TAB.assetKey)return TAB.assetKey(r);return(val(r,'tech')||val(r,'serial')||'')+'|'+norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'phasa'))}
 function getDeviationValue(spec,r){
  const id=spec[0],keys=spec[3];
  if(TAB.phaseChartIds.includes(id))return num(val(r,keys[0].key));
@@ -1512,7 +1573,7 @@ function computeDeviationFlags(rows){
   const groups={};
   rows.forEach(r=>{
    if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
-   const y=year(val(r,'date'));if(!y)return;
+   const y=periodKey(r);if(!y)return;
    const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
    const gk=deviationAssetKey(r);
    (groups[gk]=groups[gk]||[]).push({y,v,row:r});
@@ -1549,7 +1610,7 @@ function computeImprovementFlags(rows,threshold){
   const groups={};
   rows.forEach(r=>{
    if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
-   const y=year(val(r,'date'));if(!y)return;
+   const y=periodKey(r);if(!y)return;
    const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
    const gk=deviationAssetKey(r);
    (groups[gk]=groups[gk]||[]).push({y,v,row:r});
@@ -1579,7 +1640,7 @@ function computeWorsenStreakFlags(rows){
   const groups={};
   rows.forEach(r=>{
    if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
-   const y=year(val(r,'date'));if(!y)return;
+   const y=periodKey(r);if(!y)return;
    const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
    const gk=deviationAssetKey(r);
    (groups[gk]=groups[gk]||[]).push({y,v,row:r});
@@ -1612,18 +1673,20 @@ function computeAssetTrendSummary(rows){
   if(!direction)return;
   rows.forEach(r=>{
    if(phaseFilter&&norm(val(r,'phasa'))!==phaseFilter)return;
-   const y=year(val(r,'date'));if(!y)return;
+   const y=periodKey(r);if(!y)return;
    const v=getDeviationValue(spec,r);if(v==null||v===-1000)return;
-   const ak=deviationAssetKey(r);
+   // Ringkasan dihitung per unit aset (TAB.unitKey, mis. 1 trafo), tapi deret tiap Sample tetap terpisah.
+   const ak=TAB.unitKey?TAB.unitKey(r):deviationAssetKey(r);
+   const pk=TAB.seriesBy?id+'|'+norm(val(r,TAB.seriesBy)):id;
    perAssetParam[ak]=perAssetParam[ak]||{};
-   (perAssetParam[ak][id]=perAssetParam[ak][id]||[]).push({y,v});
+   (perAssetParam[ak][pk]=perAssetParam[ak][pk]||[]).push({y,v});
   });
  });
  const summary=new Map();
  Object.entries(perAssetParam).forEach(([ak,params])=>{
   let improve50=false,improve10=false,worsen50=false,maxWorsenStreak=0;
-  Object.entries(params).forEach(([id,arr])=>{
-   const direction=BAD_DIRECTION[id];
+  Object.entries(params).forEach(([pk,arr])=>{
+   const direction=BAD_DIRECTION[pk.split('|')[0]];
    arr.sort((a,b)=>a.y-b.y);
    let streak=0;
    for(let i=1;i<arr.length;i++){
@@ -1718,13 +1781,26 @@ function fill(id,values,keep){let s=$(id),old=keep??s.value;s.innerHTML='<option
 function escapeHtml(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function baseFiltered(stop){let f=raw.slice();const ids=FILTER_IDS;for(const id of ids){if(id===stop)break;let v=$(id).value;if(v)f=f.filter(r=>val(r,id=== 'type'?'type':id)===v)}return f}
 function refreshFilters(changed){let order=FILTER_IDS;let current={};order.forEach(id=>current[id]=$(id).value);for(let i=0;i<order.length;i++){let id=order[i],f=raw.slice();for(let j=0;j<i;j++){let v=current[order[j]];if(v)f=f.filter(r=>val(r,order[j])===v)}fill(id,uniqueBy(f,id),current[id])}updateYears();}
-function updateYears(){let ys=raw.map(r=>year(val(r,'date'))).filter(Boolean);let min=Math.min(...ys,2014),max=Math.max(...ys,new Date().getFullYear());let vals=[];for(let y=min;y<=max;y++)vals.push(String(y));fill('fromYear',vals,$('fromYear').value);fill('toYear',vals,$('toYear').value);if(!$('fromYear').value)$('fromYear').value=String(Math.max(min,max-12));if(!$('toYear').value)$('toYear').value=String(max)}
+function updateYears(){if(DAY_MODE)return updateDateRange();let ys=raw.map(r=>year(val(r,'date'))).filter(Boolean);let min=Math.min(...ys,2014),max=Math.max(...ys,new Date().getFullYear());let vals=[];for(let y=min;y<=max;y++)vals.push(String(y));fill('fromYear',vals,$('fromYear').value);fill('toYear',vals,$('toYear').value);if(!$('fromYear').value)$('fromYear').value=String(Math.max(min,max-12));if(!$('toYear').value)$('toYear').value=String(max)}
+// Filter periode tanggal (dd-mm-yyyy) + kalender pop-up untuk tab DAY_MODE. Tanpa flatpickr (CDN gagal),
+// input tetap bisa diketik manual dengan format dd-mm-yyyy.
+function initDatePickers(){
+ if(!DAY_MODE)return;
+ ['fromYear','toYear'].forEach(id=>$(id).closest('.filter').style.display='none');
+ ['fromDate','toDate'].forEach(id=>$(id).closest('.filter').style.display='');
+ if(window.flatpickr)['fromDate','toDate'].forEach(id=>flatpickr($(id),{dateFormat:'d-m-Y',allowInput:true,locale:(flatpickr.l10ns&&flatpickr.l10ns.id)||'default'}));
+}
+function updateDateRange(){
+ const ks=raw.map(periodKey).filter(Boolean);if(!ks.length)return;
+ const set=(id,k)=>{if($(id).value)return;const s=periodLabel(k),fp=$(id)._flatpickr;if(fp)fp.setDate(s,false,'d-m-Y');else $(id).value=s};
+ set('fromDate',Math.min(...ks));set('toDate',Math.max(...ks));
+}
 function apply(){
  let f=raw.slice();const ids=FILTER_IDS;
  ids.forEach(id=>{let v=$(id).value;if(v)f=f.filter(r=>val(r,id)===v)});
- let fy=+$('fromYear').value,ty=+$('toYear').value;
- if(fy)f=f.filter(r=>(year(val(r,'date'))||0)>=fy);
- if(ty)f=f.filter(r=>(year(val(r,'date'))||0)<=ty);
+ let fy=DAY_MODE?dayKey($('fromDate').value):+$('fromYear').value,ty=DAY_MODE?dayKey($('toDate').value):+$('toYear').value;
+ if(fy)f=f.filter(r=>(periodKey(r)||0)>=fy);
+ if(ty)f=f.filter(r=>(periodKey(r)||0)<=ty);
  // f = hasil filter standar (konteks riwayat penuh, dipakai untuk pasangan tahun-ke-tahun deviasi)
  wideFiltered=f;
  deviationFlags=computeDeviationFlags(f);
@@ -1745,16 +1821,29 @@ function apply(){
 }
 function makeChart(id,title,unit,keys,colors,phaseFilter){
 let el=$(id);
-let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
-if(labels.length>5)labels=labels.slice(-5);
+let labels=chartPeriods();
 const phaseCharts=TAB.phaseChartIds;
 let datasets;
-if(phaseCharts.includes(id)){
+if(TAB.seriesBy){
+ // Satu garis per nilai kolom TAB.seriesBy (mis. "Sample" pada DGA), rata-rata per periode.
+ const acc=new Map();
+ filtered.forEach(r=>{
+  const p=periodKey(r),g=val(r,TAB.seriesBy),v=num(val(r,keys[0].key));
+  if(!p||!g||v==null||v===-1000||!isSane(id,v))return;
+  const k=p+'|'+g,a=acc.get(k);if(a){a.s+=v;a.n++}else acc.set(k,{s:v,n:1});
+ });
+ const groups=[...new Set(filtered.map(r=>val(r,TAB.seriesBy)).filter(Boolean))].sort(seriesOrder);
+ datasets=groups.map((g,i)=>{const c=seriesColor(g,i);return{
+  label:g,
+  data:labels.map(p=>{const a=acc.get(p+'|'+g);return a?a.s/a.n:null}),
+  borderColor:c,backgroundColor:c,pointRadius:DAY_MODE?2:3,borderWidth:2,tension:.25,spanGaps:true
+ }});
+}else if(phaseCharts.includes(id)){
  const phases=['R','S','T'];
  datasets=phases.map((ph,i)=>({
   label:ph,
   data:labels.map(y=>{
-   let rows=filtered.filter(r=>year(val(r,'date'))===y && norm(val(r,'phasa'))===ph.toLowerCase());
+   let rows=filtered.filter(r=>periodKey(r)===y && norm(val(r,'phasa'))===ph.toLowerCase());
    let vs=rows.map(r=>num(val(r,keys[0].key))).filter(v=>v!==null&&v!==-1000&&isSane(id,v));
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
@@ -1764,7 +1853,7 @@ if(phaseCharts.includes(id)){
  datasets=keys.map((k,i)=>({
   label:k.label,
   data:labels.map(y=>{
-   let rows=filtered.filter(r=>year(val(r,'date'))===y && (!phaseFilter||norm(val(r,'phasa'))===phaseFilter));
+   let rows=filtered.filter(r=>periodKey(r)===y && (!phaseFilter||norm(val(r,'phasa'))===phaseFilter));
    let vs=rows.map(r=>num(val(r,k.key))).filter(v=>v!==null&&v!==-1000&&isSane(id,v));
    return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null
   }),
@@ -1772,14 +1861,16 @@ if(phaseCharts.includes(id)){
  }));
 }
 let ctx=$(id).getContext('2d');
-charts.push(new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('en-US',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{
+charts.push(new Chart(ctx,{type:'line',data:{labels:labels.map(periodLabel),datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('en-US',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{
  min:id==='purity'?96.5:(id==='tanDelta'?0:(id==='deviasiKapasitansi'?-10:undefined)),
  max:id==='dew'?-4:(id==='so2'?13:(id==='tanDelta'?1:(id==='deviasiKapasitansi'?20:undefined))),
  grid:{color:Theme.grid()},
  ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('en-US')}
 }}}}));
-$(id).parentElement.parentElement.querySelector('.chart-years').textContent=labels.length?`${labels.length} tahun`:'Tidak ada data'
-}function chartCard(id,title,unit,keys,colors){return `<div class="chart-card"><div class="chart-head"><div><div class="chart-title">${title}</div><div class="chart-unit">${unit}</div></div><div class="chart-years">5 tahun</div></div><div class="chart-box"><canvas id="${id}"></canvas></div></div>`}
+$(id).parentElement.parentElement.querySelector('.chart-years').textContent=labels.length?`${periodCountText(labels.length)}`:'Tidak ada data'
+}function seriesOrder(a,b){const o=TAB.seriesOrder||[],ia=o.indexOf(a),ib=o.indexOf(b);return(ia<0?99:ia)-(ib<0?99:ib)||String(a).localeCompare(String(b),'id')}
+function seriesColor(g,i){const pal=['#e53935','#f2b400','#1688f0','#7b61a8','#00a6a6','#8c6b43','#64748b','#d14d72'];return(TAB.seriesColors||{})[g]||pal[i%pal.length]}
+function chartCard(id,title,unit,keys,colors){return `<div class="chart-card"><div class="chart-head"><div><div class="chart-title">${title}</div><div class="chart-unit">${unit}</div></div><div class="chart-years">5 tahun</div></div><div class="chart-box"><canvas id="${id}"></canvas></div></div>`}
 let subTab='trend';
 function renderCharts(){
  charts.forEach(c=>c.destroy());charts=[];
@@ -1793,9 +1884,8 @@ function setChartEmpty(id,msg){const box=$(id)?.parentElement;if(!box)return;box
 function renderConditionCharts(){
  let specs=TAB.chartSpecs;
  $('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');
- let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
- if(labels.length>5)labels=labels.slice(-5);
- // Kalau filter Kondisi AHI aktif, grafik hanya menampilkan kategori itu saja (tidak ikut kategori lain),
+ let labels=chartPeriods();
+  // Kalau filter Kondisi AHI aktif, grafik hanya menampilkan kategori itu saja (tidak ikut kategori lain),
  // supaya konsisten dengan kategori yang dipilih user di filter.
  const ahiVal=$('ahiCondition')?.value;
  const catIndexes=ahiVal?[Number(ahiVal)-1]:[0,1,2,3,4];
@@ -1807,13 +1897,13 @@ function renderConditionCharts(){
   const rows=phaseFilter?filtered.filter(r=>norm(val(r,'phasa'))===phaseFilter):filtered;
   const perYearCat={};labels.forEach(y=>perYearCat[y]=[0,0,0,0,0]);
   rows.forEach(r=>{
-   const y=year(val(r,'date'));if(!labels.includes(y))return;
+   const y=periodKey(r);if(!labels.includes(y))return;
    const cat=catFn(r);if(!cat)return;
    perYearCat[y][cat-1]++;
   });
   const datasets=catIndexes.map(i=>{const meta=AHI_CAT[i+1];const col=Theme.c(meta.c);return{label:meta.n,data:labels.map(y=>perYearCat[y][i]),backgroundColor:col,borderColor:col}});
-  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:Theme.grid()},ticks:{font:{size:9},precision:0}}}}}));
-  $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels:labels.map(periodLabel),datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:Theme.grid()},ticks:{font:{size:9},precision:0}}}}}));
+  $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${periodCountText(labels.length)}`;
  });
 }
 const IMPROVE_TREND_CATEGORIES=[
@@ -1828,9 +1918,8 @@ const WORSEN_TREND_CATEGORIES=[
 function renderTrendCategoryCharts(categories){
  let specs=TAB.chartSpecs;
  $('charts').innerHTML=specs.map(s=>chartCard(s[0],s[1],s[2],s[3],s[4])).join('');
- let labels=[...new Set(filtered.map(r=>year(val(r,'date'))).filter(Boolean))].sort((a,b)=>a-b);
- if(labels.length>5)labels=labels.slice(-5);
- const trendMaps=trendConditionFlagMaps();
+ let labels=chartPeriods();
+  const trendMaps=trendConditionFlagMaps();
  // Kalau filter Kondisi Trend aktif dan kategorinya termasuk tab grafik ini, tampilkan hanya kategori itu saja.
  const trendVal=$('deviationFilter')?.value;
  const activeCats=(trendVal&&categories.some(c=>c.key===trendVal))?categories.filter(c=>c.key===trendVal):categories;
@@ -1845,15 +1934,15 @@ function renderTrendCategoryCharts(categories){
    const map=trendMaps[cat.key];
    const yearCounts={};labels.forEach(y=>yearCounts[y]=0);
    filtered.forEach(r=>{
-    const y=year(val(r,'date'));if(!labels.includes(y))return;
+    const y=periodKey(r);if(!labels.includes(y))return;
     const params=map.get(r);
     if(params&&params.includes(title))yearCounts[y]++;
    });
    const col=Theme.c(cat.color);
    return{label:cat.label,data:labels.map(y=>yearCounts[y]),backgroundColor:col,borderColor:col};
   });
-  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:Theme.grid()},ticks:{font:{size:9},precision:0}}}}}));
-  $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${labels.length} tahun`;
+  charts.push(new Chart($(id).getContext('2d'),{type:'bar',data:{labels:labels.map(periodLabel),datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:7.5}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:Theme.grid()},ticks:{font:{size:9},precision:0}}}}}));
+  $(id).parentElement.parentElement.querySelector('.chart-years').textContent=`${periodCountText(labels.length)}`;
  });
 }
 function renderImproveCharts(){renderTrendCategoryCharts(IMPROVE_TREND_CATEGORIES)}
@@ -1926,7 +2015,7 @@ if(!manual){t=await getCachedCsv(TAB.key);if(t)fromCache=true;}
 if(!t){t=await fetchSheetCsv();setCachedCsv(TAB.key,t);}
 raw=parseCSV(t);if(!raw.length)throw Error('CSV kosong');resolveCols();populateAll();$('status').className='status ok';$('status').textContent=`Data ${TAB.label} berhasil dimuat • ${raw.length.toLocaleString('id-ID')} baris ${fromCache?'(dari cache sesi, mengecek pembaruan...)':'dari Google Sheet NORM AHI '+TAB.label}`;apply();if(fromCache)revalidateInBackground(t);if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}}catch(e){console.error(e);if(manual){$('updateBtn').disabled=false;$('updateBtn').textContent='↻ Update Data'}$('status').className='status error';$('status').textContent='Google Sheet belum dapat dibaca. Pastikan spreadsheet dapat diakses publik atau dipublikasikan sebagai CSV.';$('charts').innerHTML='<div class="empty" style="grid-column:1/-1">Data belum tersedia.</div>';}}
 function populateAll(){refreshFilters();updateYears();}
-FILTER_IDS.forEach(id=>$(id).addEventListener('change',()=>{refreshFilters(id);apply()}));['fromYear','toYear','ahiCondition','deviationFilter'].forEach(id=>$(id).addEventListener('change',apply));$('search').addEventListener('input',()=>{page=1;detailRows()});$('prev').onclick=()=>{if(page>1){page--;detailRows()}};$('next').onclick=()=>{page++;detailRows()};$('resetBtn').onclick=()=>{[...FILTER_IDS,'ahiCondition','deviationFilter'].forEach(id=>$(id).value='');updateYears();apply()};$('exportBtn').onclick=exportCSV;$('updateBtn').onclick=()=>load(true);
+FILTER_IDS.forEach(id=>$(id).addEventListener('change',()=>{refreshFilters(id);apply()}));['fromYear','toYear','fromDate','toDate','ahiCondition','deviationFilter'].forEach(id=>$(id).addEventListener('change',apply));$('search').addEventListener('input',()=>{page=1;detailRows()});$('prev').onclick=()=>{if(page>1){page--;detailRows()}};$('next').onclick=()=>{page++;detailRows()};$('resetBtn').onclick=()=>{[...FILTER_IDS,'ahiCondition','deviationFilter','fromDate','toDate'].forEach(id=>$(id).value='');updateYears();apply()};$('exportBtn').onclick=exportCSV;$('updateBtn').onclick=()=>load(true);
 document.querySelectorAll('.subtab-btn').forEach(b=>{b.onclick=()=>{subTab=b.dataset.subtab;document.querySelectorAll('.subtab-btn').forEach(x=>x.classList.toggle('active',x===b));renderCharts();if(aiHasResult)aiRenderPlaceholder('Tampilan grafik berubah ke "'+b.textContent.trim()+'". Klik "Generate Insight" untuk analisis sesuai tampilan ini.')}});
 window.addEventListener('themechange',()=>{if(raw.length)renderCharts()});
 load();

@@ -44,6 +44,20 @@ html[data-theme="dark"] .filters{background:var(--surface);border-color:var(--bo
 html[data-theme="dark"] .filter label,html[data-theme="dark"] .filter-actions .check{color:var(--muted)}
 html[data-theme="dark"] select,html[data-theme="dark"] input[type="text"],html[data-theme="dark"] input[type="password"],html[data-theme="dark"] input[type="search"],html[data-theme="dark"] .search,html[data-theme="dark"] .ai-settings input{background:var(--surface-2);color:var(--text);border-color:var(--border)}
 html[data-theme="dark"] input::placeholder{color:var(--muted)}
+html[data-theme="dark"] .date-input{background:var(--surface-2);color:var(--text);border-color:var(--border)}
+/* Kalender pop-up (flatpickr) */
+html[data-theme="dark"] .flatpickr-calendar{background:var(--surface);border-color:var(--border);box-shadow:0 6px 24px rgba(0,0,0,.5)}
+html[data-theme="dark"] .flatpickr-calendar.arrowTop:after{border-bottom-color:var(--surface)}
+html[data-theme="dark"] .flatpickr-calendar.arrowBottom:after{border-top-color:var(--surface)}
+html[data-theme="dark"] .flatpickr-months .flatpickr-month,html[data-theme="dark"] .flatpickr-current-month .flatpickr-monthDropdown-months,
+html[data-theme="dark"] .flatpickr-weekdays,html[data-theme="dark"] span.flatpickr-weekday{background:var(--surface);color:var(--text);fill:var(--text)}
+html[data-theme="dark"] .flatpickr-months .flatpickr-prev-month,html[data-theme="dark"] .flatpickr-months .flatpickr-next-month{color:var(--text);fill:var(--text)}
+html[data-theme="dark"] .flatpickr-current-month input.cur-year{color:var(--text)}
+html[data-theme="dark"] .flatpickr-day{color:var(--text-2)}
+html[data-theme="dark"] .flatpickr-day:hover,html[data-theme="dark"] .flatpickr-day:focus{background:var(--surface-2);border-color:var(--surface-2)}
+html[data-theme="dark"] .flatpickr-day.prevMonthDay,html[data-theme="dark"] .flatpickr-day.nextMonthDay,html[data-theme="dark"] .flatpickr-day.flatpickr-disabled{color:#4d5f75}
+html[data-theme="dark"] .flatpickr-day.today{border-color:var(--accent)}
+html[data-theme="dark"] .flatpickr-day.selected{background:#0877d1;border-color:#0877d1;color:#fff}
 
 /* Kartu, panel, KPI */
 html[data-theme="dark"] .kpi,html[data-theme="dark"] .panel,html[data-theme="dark"] .chart-card,html[data-theme="dark"] .detail,
