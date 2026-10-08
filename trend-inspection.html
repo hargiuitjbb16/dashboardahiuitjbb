@@ -102,7 +102,7 @@
     <a class="sub active-sub" href="trend-inspection.html" data-tab-link="pmt">PMT</a>
     <a class="sub has-children" href="#" id="trafoToggle" aria-expanded="false" aria-controls="trafoMenu">TRAFO<span class="caret">▸</span></a>
     <div class="subsub-group" id="trafoMenu" hidden>
-      <a class="subsub" href="trend-inspection.html?tab=trafo-ap" data-tab-link="trafo-ap">Active Part</a><a class="subsub" href="trend-inspection.html?tab=trafo-dga" data-tab-link="trafo-dga">DGA</a><a class="subsub">Karakteristik</a><a class="subsub">Furan</a>
+      <a class="subsub" href="trend-inspection.html?tab=trafo-ap" data-tab-link="trafo-ap">Active Part</a><a class="subsub" href="trend-inspection.html?tab=trafo-dga" data-tab-link="trafo-dga">DGA</a><a class="subsub" href="trend-inspection.html?tab=trafo-kar" data-tab-link="trafo-kar">Karakteristik</a><a class="subsub">Furan</a>
     </div>
     <a class="sub" href="trend-inspection.html?tab=ct" data-tab-link="ct">CT</a><a class="sub" href="trend-inspection.html?tab=pt" data-tab-link="pt">CVT/PT</a><a class="sub">PMS</a><a class="sub">LA</a><a class="sub">NGR</a>
     <a href="ahi-evaluasi.html">AHI Evaluasi</a><a>Data Aset</a><a>Laporan</a>
@@ -1098,6 +1098,29 @@ Aturan:
    mengecualikan nilai yang tidak wajar. Jika suatu seri datanya sedikit, nyatakan "data tidak cukup".
 3. Jangan mengubah satuan (MΩ, pF, %).`;
 const TRAFO_COLORS=['#e53935','#f29a00','#1688f0','#20a46b','#7b61a8','#00a6a6'];
+// Lokasi sampel minyak (dipakai tab DGA & Karakteristik): urutan legenda + warna tetap per sampel.
+const TRAFO_SAMPLE_ORDER=['TUBULAR PHASA R','TUBULAR PHASA S','TUBULAR PHASA T','BOTTOM MAINTANK','MIDDLE MAINTANK','TOP MAINTANK','OLTC'];
+const TRAFO_SAMPLE_COLORS={'TUBULAR PHASA R':'#e53935','TUBULAR PHASA S':'#f2b400','TUBULAR PHASA T':'#1688f0','BOTTOM MAINTANK':'#7b61a8','MIDDLE MAINTANK':'#8c6b43','TOP MAINTANK':'#00a6a6','OLTC':'#64748b'};
+// TechIdentNo di sheet uji minyak rusak (format ilmiah "1.13E+24") & Serial No. banyak "-", jadi identitas trafo = GI + Bay.
+function trafoUnitKey(r){return norm(val(r,'gi'))+'|'+norm(val(r,'bay'))}
+function trafoSampleKey(r){return trafoUnitKey(r)+'|'+norm(val(r,'sample'))}
+const AI_SYSTEM_PROMPT_TRAFO_KAR=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
+TRANSFORMATOR DAYA (Power Transformer) gardu induk PLN, khusus KARAKTERISTIK MINYAK ISOLASI.
+
+Data berisi hasil uji minyak per tanggal pengujian, dipisah per lokasi sampel
+(Bottom/Top/Middle Main Tank, Tubular Phasa R/S/T, OLTC):
+- Tegangan Tembus / BDV (kV): kekuatan dielektrik minyak. TURUN = memburuk (minyak lembap/terkontaminasi partikel).
+- Kadar Air (ppm): NAIK = memburuk; menurunkan tegangan tembus & mempercepat penuaan kertas.
+- Warna (skala ASTM): NAIK/lebih gelap = memburuk, indikasi oksidasi/kontaminasi.
+- Kadar Asam (mg KOH/g): NAIK = memburuk, produk oksidasi minyak yang merusak isolasi kertas.
+- Tegangan Antarmuka / IFT (mN/m): TURUN = memburuk, indikasi kontaminan polar & produk oksidasi.
+
+Aturan:
+1. Data sampel OLTC TIDAK boleh dibandingkan dengan sampel main tank (standar OLTC berbeda).
+2. Utamakan arah & laju perubahan antar tanggal uji, bukan nilai sesaat.
+3. Jangan mengarang batas kategori AHI; bila menyebut batas, sebut sebagai acuan umum IEC 60422
+   dan nyatakan perlu verifikasi dengan standar PLN.
+4. Jangan mengubah satuan.`;
 const AI_SYSTEM_PROMPT_TRAFO_DGA=`Anda adalah AI Assistant yang bertindak sebagai EXPERT ASSESSMENT KONDISI
 TRANSFORMATOR DAYA (Power Transformer) gardu induk PLN, khusus DISSOLVED GAS ANALYSIS (DGA) minyak isolasi.
 
@@ -1209,16 +1232,31 @@ const TABS={
   filterIds:['unit','upt','ultg','gi','bay','merk','serial','phasa','tegangan','sample'],
   dateMode:'day',
   seriesBy:'sample',
-  seriesOrder:['TUBULAR PHASA R','TUBULAR PHASA S','TUBULAR PHASA T','BOTTOM MAINTANK','MIDDLE MAINTANK','TOP MAINTANK','OLTC'],
-  seriesColors:{'TUBULAR PHASA R':'#e53935','TUBULAR PHASA S':'#f2b400','TUBULAR PHASA T':'#1688f0','BOTTOM MAINTANK':'#7b61a8','MIDDLE MAINTANK':'#8c6b43','TOP MAINTANK':'#00a6a6','OLTC':'#64748b'},
-  // TechIdentNo di sheet DGA rusak (format ilmiah "1.13E+24") & Serial No. banyak "-", jadi identitas trafo = GI + Bay.
-  unitKey:r=>norm(val(r,'gi'))+'|'+norm(val(r,'bay')),
-  assetKey:r=>norm(val(r,'gi'))+'|'+norm(val(r,'bay'))+'|'+norm(val(r,'sample')),
+  seriesOrder:TRAFO_SAMPLE_ORDER,
+  seriesColors:TRAFO_SAMPLE_COLORS,
+  unitKey:trafoUnitKey,
+  assetKey:trafoSampleKey,
   phaseChartIds:[],
   categoryOf:{},
   chartSpecs:[['dgaH2','H2 (Hidrogen)','ppm',[{key:'h2',label:'H2'}],[]],['dgaCH4','CH4 (Metana)','ppm',[{key:'ch4',label:'CH4'}],[]],['dgaC2H6','C2H6 (Etana)','ppm',[{key:'c2h6',label:'C2H6'}],[]],['dgaC2H4','C2H4 (Etilen)','ppm',[{key:'c2h4',label:'C2H4'}],[]],['dgaC2H2','C2H2 (Asetilen)','ppm',[{key:'c2h2',label:'C2H2'}],[]],['dgaCO','CO (Karbon Monoksida)','ppm',[{key:'co',label:'CO'}],[]],['dgaCO2','CO2 (Karbon Dioksida)','ppm',[{key:'co2',label:'CO2'}],[]],['dgaO2','O2 (Oksigen)','ppm',[{key:'o2',label:'O2'}],[]],['dgaN2','N2 (Nitrogen)','ppm',[{key:'n2',label:'N2'}],[]],['dgaTDCG','TDCG (Total Dissolved Combustible Gas)','ppm',[{key:'tdcg',label:'TDCG'}],[]]],
   detailCols:[['NO. REGISTRASI','noReg'],['TGL. PENGUJIAN','date'],['UNIT','unit'],['UPT','upt'],['ULTG','ultg'],['GI','gi'],['BAY','bay'],['MERK','merk'],['SERIAL NO.','serial'],['PHASA','phasa'],['TEGANGAN','tegangan'],['SAMPLE','sample'],['ALASAN PENGUJIAN','alasan'],
    ['H2','h2'],['CH4','ch4'],['C2H6','c2h6'],['C2H4','c2h4'],['C2H2','c2h2'],['CO','co'],['CO2','co2'],['O2','o2'],['N2','n2'],['TDCG','tdcg']]
+ },
+ 'trafo-kar':{key:'trafo-kar',label:'TRAFO – Karakteristik',evaluasiTypeMatch:'Power Transformer',aiSystemPrompt:AI_SYSTEM_PROMPT_TRAFO_KAR,sheetCsv:'https://docs.google.com/spreadsheets/d/1vzzwvsrkg1wfKp7O0jzyPSDn0J0E4f_BLnDU6Qwfweo/export?format=csv&gid=1176522763',sourceLabel:'Google Sheet • KARAKTERISTIK',docTitle:'Trend Inspection TRAFO Karakteristik — DASHBOARD AHI UIT JBB',subtitle:'Trend Inspection – TRAFO – Karakteristik Minyak',detailTitle:'Detail Pengujian TRAFO – Karakteristik Minyak',exportFile:'Trend_Inspection_TRAFO_Karakteristik_Filtered.csv',
+  columns:{unit:['unit','unit induk'],upt:['upt'],ultg:['ultg'],gi:['gi','gardu induk'],bay:['bay'],merk:['merk','merek'],serial:['serial no.','serial no','nomor seri'],phasa:['phasa'],tegangan:['tegangan'],date:['tgl. pengujian','tanggal pengujian'],sample:['jenis sampel','sample','sampel'],noReg:['no. registrasi'],alasan:['alasan pengujian'],
+   bdv:['tegangan tembus'],air:['kadar air'],warna:['warna'],asam:['kadar asam'],ift:['tegangan antarmuka'],suhu:['suhu sampel'],ket:['keterangan pengujian']},
+  filterIds:['unit','upt','ultg','gi','bay','merk','serial','phasa','tegangan','sample'],
+  dateMode:'day',
+  seriesBy:'sample',
+  seriesOrder:TRAFO_SAMPLE_ORDER,
+  seriesColors:TRAFO_SAMPLE_COLORS,
+  unitKey:trafoUnitKey,
+  assetKey:trafoSampleKey,
+  phaseChartIds:[],
+  categoryOf:{},
+  chartSpecs:[['karBDV','Tegangan Tembus','kV',[{key:'bdv',label:'Tegangan Tembus'}],[]],['karAir','Kadar Air','ppm',[{key:'air',label:'Kadar Air'}],[]],['karWarna','Warna','Skala ASTM',[{key:'warna',label:'Warna'}],[]],['karAsam','Kadar Asam','mg KOH/g',[{key:'asam',label:'Kadar Asam'}],[]],['karIFT','Tegangan Antarmuka','mN/m',[{key:'ift',label:'Tegangan Antarmuka'}],[]]],
+  detailCols:[['NO. REGISTRASI','noReg'],['TGL. PENGUJIAN','date'],['UNIT','unit'],['UPT','upt'],['ULTG','ultg'],['GI','gi'],['BAY','bay'],['MERK','merk'],['SERIAL NO.','serial'],['PHASA','phasa'],['TEGANGAN','tegangan'],['JENIS SAMPEL','sample'],['ALASAN PENGUJIAN','alasan'],
+   ['TEGANGAN TEMBUS (kV)','bdv'],['KADAR AIR (ppm)','air'],['WARNA','warna'],['KADAR ASAM (mg KOH/g)','asam'],['TEGANGAN ANTARMUKA (mN/m)','ift'],['SUHU SAMPEL','suhu'],['KETERANGAN PENGUJIAN','ket']]
  }
 };
 const TAB=TABS[new URLSearchParams(location.search).get('tab')]||TABS.pmt;
@@ -1526,12 +1564,16 @@ const BAD_DIRECTION={irAB:'down',irAG:'down',irBG:'down',contact:'up',closing:'u
  // TRAFO Active Part. Kapasitan sengaja tidak diberi arah: yang penting perubahannya (naik/turun), bukan arah.
  trIR:'down',trIP:'down',trTDB:'up',trBushHV:'up',trBushLV:'up',trBushTV:'up',trRDC:'away-from-zero',
  // TRAFO DGA: gas kunci naik = memburuk. O2 & N2 (gas atmosfer) bukan indikator gangguan → tanpa arah.
- dgaH2:'up',dgaCH4:'up',dgaC2H6:'up',dgaC2H4:'up',dgaC2H2:'up',dgaCO:'up',dgaCO2:'up',dgaTDCG:'up'};
+ dgaH2:'up',dgaCH4:'up',dgaC2H6:'up',dgaC2H4:'up',dgaC2H2:'up',dgaCO:'up',dgaCO2:'up',dgaTDCG:'up',
+ // TRAFO Karakteristik minyak
+ karBDV:'down',karAir:'up',karWarna:'up',karAsam:'up',karIFT:'down'};
 // Batas nilai wajar per parameter, untuk mengecualikan outlier kesalahan input data (bukan hasil ukur nyata)
 // dari rata-rata grafik. 99% data Primer-Ground/Sekunder PT di bawah ~1,1 juta MΩ; beberapa baris tercatat
 // sampai ratusan juta MΩ (jelas typo/kesalahan input), yang membuat skala grafik meledak.
 // TRAFO: Index Polarity tercatat sampai 9999 dan Tan Delta sampai puluhan ribu % (typo/salah kolom) → dikecualikan.
-const MAX_SANE_VALUE={primerGround:10000000,primerSekunder:10000000,trIR:10000000,trIP:20,trKap:200000,trTDB:10,trBushHV:10,trBushLV:10,trBushTV:10};
+const MAX_SANE_VALUE={primerGround:10000000,primerSekunder:10000000,trIR:10000000,trIP:20,trKap:200000,trTDB:10,trBushHV:10,trBushLV:10,trBushTV:10,
+ // Karakteristik: tercatat BDV 632 kV & IFT 281 mN/m (typo; nilai wajar ≲100 kV & ≲55 mN/m).
+ karBDV:150,karIFT:70};
 // Batas bawah: resistansi/IP/kapasitan/tan delta negatif bukan hasil ukur nyata.
 const MIN_SANE_VALUE={trIR:0,trIP:0,trKap:0,trTDB:0,trBushHV:0,trBushLV:0,trBushTV:0};
 function isSane(id,v){const mx=MAX_SANE_VALUE[id],mn=MIN_SANE_VALUE[id];return(mx===undefined||Math.abs(v)<=mx)&&(mn===undefined||v>=mn)}
@@ -1862,8 +1904,12 @@ if(TAB.seriesBy){
 }
 let ctx=$(id).getContext('2d');
 charts.push(new Chart(ctx,{type:'line',data:{labels:labels.map(periodLabel),datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:7,font:{size:9}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y==null?'-':c.parsed.y.toLocaleString('en-US',{maximumFractionDigits:3})}`}}},scales:{x:{grid:{color:Theme.grid()},ticks:{font:{size:9}}},y:{
- min:id==='purity'?96.5:(id==='tanDelta'?0:(id==='deviasiKapasitansi'?-10:undefined)),
- max:id==='dew'?-4:(id==='so2'?13:(id==='tanDelta'?1:(id==='deviasiKapasitansi'?20:undefined))),
+ // suggestedMin/Max (bukan min/max): rentang default tetap sama, tapi sumbu melebar otomatis bila ada nilai
+ // di luar rentang — nilai ekstrem (justru kondisi terburuk) tidak boleh terpotong dari grafik.
+ suggestedMin:id==='purity'?96.5:(id==='tanDelta'?0:(id==='deviasiKapasitansi'?-10:undefined)),
+ suggestedMax:id==='dew'?-4:(id==='so2'?13:(id==='deviasiKapasitansi'?20:undefined)),
+ // Tan Delta: skala tetap 0–2% (batas Critical CT 70/150 kV = >1%), agar outlier tidak memipihkan grafik.
+ max:id==='tanDelta'?2:undefined,
  grid:{color:Theme.grid()},
  ticks:{font:{size:9},callback:v=>Number(v).toLocaleString('en-US')}
 }}}}));
