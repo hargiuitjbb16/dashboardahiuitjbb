@@ -1,0 +1,4 @@
+Tambahkan Tab CT pada trend-Inspection.html menggunakan sumber data dari "https://docs.google.com/spreadsheets/d/1BFlYecP0qpbC14wadP_UGC7Y3lSBEjByN2oIwKhIOcw/edit?gid=790904160#gid=790904160" pada sheet CT
+Pastikan dashboard style, grafik style, filter cascading, detail data yang dibuat sama persis dengan dashboard pada Tab PMT
+Sesuaikan datanya dengan "https://docs.google.com/spreadsheets/d/1BFlYecP0qpbC14wadP_UGC7Y3lSBEjByN2oIwKhIOcw/edit?gid=790904160#gid=790904160" pada sheet CT
+Khusus Grafik yang ditampilkan adalah pada kolom Primer - Ground (Mega Ohm)",	"Primer - Sekunder(Mega Ohm)", dan "Tan Delta (%)".

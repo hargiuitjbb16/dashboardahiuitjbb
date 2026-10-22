@@ -44,6 +44,11 @@ html[data-theme="dark"] .filters{background:var(--surface);border-color:var(--bo
 html[data-theme="dark"] .filter label,html[data-theme="dark"] .filter-actions .check{color:var(--muted)}
 html[data-theme="dark"] select,html[data-theme="dark"] input[type="text"],html[data-theme="dark"] input[type="password"],html[data-theme="dark"] input[type="search"],html[data-theme="dark"] .search,html[data-theme="dark"] .ai-settings input{background:var(--surface-2);color:var(--text);border-color:var(--border)}
 html[data-theme="dark"] input::placeholder{color:var(--muted)}
+html[data-theme="dark"] .ms-btn,html[data-theme="dark"] .ms-search{background:var(--surface-2);color:var(--text);border-color:var(--border)}
+html[data-theme="dark"] .ms-panel{background:var(--surface);border-color:var(--border);box-shadow:0 6px 24px rgba(0,0,0,.5)}
+html[data-theme="dark"] .ms-opt:hover{background:var(--surface-2)}
+html[data-theme="dark"] .ms-foot{border-color:var(--border)}
+html[data-theme="dark"] .ms-clear{color:var(--accent)}
 html[data-theme="dark"] .date-input{background:var(--surface-2);color:var(--text);border-color:var(--border)}
 /* Kalender pop-up (flatpickr) */
 html[data-theme="dark"] .flatpickr-calendar{background:var(--surface);border-color:var(--border);box-shadow:0 6px 24px rgba(0,0,0,.5)}

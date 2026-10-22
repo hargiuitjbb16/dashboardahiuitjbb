@@ -20,6 +20,7 @@ main{margin-left:205px;width:calc(100% - 205px);padding:14px 18px}
 .btn{border:1px solid #0d77db;background:#fff;color:#066bc5;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}.btn.primary{background:#0877d1;color:#fff}
 .filters{background:#fff;border:1px solid #dce6f0;border-radius:10px;padding:10px;margin:12px 0;display:grid;grid-template-columns:1.05fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto auto;gap:8px}
 .filter label{font-size:9px;font-weight:700;color:#53677e;display:block;margin-bottom:4px}.filter select{width:100%;height:30px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px}
+.ms{position:relative}.ms-btn{width:100%;height:30px;border:1px solid #d2ddea;border-radius:7px;background:#fff;color:#173452;padding:0 7px;display:flex;align-items:center;justify-content:space-between;gap:4px;cursor:pointer;font:inherit;text-align:left}.ms-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ms-caret{font-size:10px;color:#73839a}.ms-panel{position:absolute;top:32px;left:0;min-width:100%;width:max-content;max-width:280px;background:#fff;border:1px solid #d2ddea;border-radius:8px;box-shadow:0 6px 20px rgba(20,43,74,.15);z-index:30;padding:6px}.ms-search{width:100%;height:28px;border:1px solid #d2ddea;border-radius:6px;padding:0 7px;margin-bottom:4px}.ms-list{max-height:240px;overflow:auto}.ms-opt{display:flex;align-items:center;gap:6px;padding:4px;border-radius:5px;cursor:pointer;white-space:nowrap}.ms-opt:hover{background:#f2f7fc}.ms-empty{padding:6px;color:#73839a}.ms-foot{border-top:1px solid #edf1f5;margin-top:4px;padding-top:4px;text-align:right}.ms-clear{border:0;background:none;color:#0873d1;font-weight:700;cursor:pointer;font-size:11px}
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0}
 .kpi{background:#fff;border:1px solid #dce6f0;border-radius:9px;padding:10px}.kpi small{font-size:9px;color:#53677e}.kpi .num{font-size:24px;font-weight:800;margin-top:2px}.kpi .pct{font-size:11px;font-weight:700;color:#173452;margin-top:2px}
 .vg{color:#20a46b!important}.good{color:#d59c00!important}.fair{color:#f07800!important}.poor{color:#e53935!important}.critical{color:#111!important}
@@ -379,16 +380,23 @@ function parseCSV(t){
  return rows.map(r=>Object.fromEntries(h.map((x,i)=>[x,String(r[i]??"").trim()])));
 }
 
-function group(r,g){
- if(!g)return true;
- let t=r.__type??canonical(r["Jenis Aset"]);
- if(!t)return false;
- if(["Reactor","Capacitor"].includes(t))return true;
- let v=norm(r["Tegangan"]).replace(/\s/g,"");
- return g==="transmisi"?(v==="150kv"||v==="500kv"):(v!=="150kv"&&v!=="500kv");
-}
+
+// Filter multi-pilih: <select multiple> tersembunyi + dropdown checkbox (.ms) sebagai tampilannya.
+function selVals(sel){return sel?sel.multiple?[...sel.selectedOptions].map(o=>o.value).filter(Boolean):(sel.value?[sel.value]:[]):[]}
+function msSetup(sel){sel.multiple=true;sel.style.display="none";const w=document.createElement("div");w.className="ms";w.innerHTML='<button type="button" class="ms-btn"><span class="ms-label">Semua</span><span class="ms-caret">▾</span></button><div class="ms-panel" hidden><input type="search" class="ms-search" placeholder="Cari..."><div class="ms-list"></div><div class="ms-foot"><button type="button" class="ms-clear">Bersihkan</button></div></div>';sel.after(w);
+ const panel=w.querySelector(".ms-panel"),search=w.querySelector(".ms-search");
+ w.querySelector(".ms-btn").onclick=()=>{const open=panel.hidden;document.querySelectorAll(".ms-panel").forEach(p=>p.hidden=true);panel.hidden=!open;if(open){search.value="";msFilterList(w);search.focus()}};
+ search.oninput=()=>msFilterList(w);
+ w.querySelector(".ms-list").onchange=e=>{const o=sel.options[+e.target.dataset.i];if(!o)return;o.selected=e.target.checked;msLabel(sel);sel.dispatchEvent(new Event("change"))};
+ w.querySelector(".ms-clear").onclick=()=>{[...sel.options].forEach(o=>o.selected=false);msRender(sel);sel.dispatchEvent(new Event("change"))};
+ msRender(sel)}
+function msRender(sel){const w=sel.nextElementSibling;if(!w||!w.classList.contains("ms"))return;w.querySelector(".ms-list").innerHTML=[...sel.options].map((o,i)=>`<label class="ms-opt"><input type="checkbox" data-i="${i}"${o.selected?" checked":""}><span>${html(o.textContent)}</span></label>`).join("")||'<div class="ms-empty">Tidak ada pilihan</div>';msFilterList(w);msLabel(sel)}
+function msLabel(sel){const o=[...sel.selectedOptions].filter(x=>x.value),b=sel.nextElementSibling.querySelector(".ms-btn");b.querySelector(".ms-label").textContent=!o.length?"Semua":o.length===1?o[0].textContent:o.length+" dipilih";b.title=o.map(x=>x.textContent).join(", ")}
+function msFilterList(w){const q=norm(w.querySelector(".ms-search").value);w.querySelectorAll(".ms-opt").forEach(o=>o.style.display=!q||norm(o.textContent).includes(q)?"":"none")}
+document.addEventListener("click",e=>{if(!e.target.closest(".ms"))document.querySelectorAll(".ms-panel").forEach(p=>p.hidden=true)});
 
 function setSelectOptions(sel,values,keep=""){
+ if(sel.multiple){const old=new Set(keep||selVals(sel));sel.innerHTML=values.map(v=>`<option value="${html(v)}"${old.has(v)?" selected":""}>${html(v)}</option>`).join("");return msRender(sel)}
  let old=keep||sel.value;
  sel.innerHTML='<option value="">Semua</option>'+values.map(v=>`<option value="${html(v)}">${html(v)}</option>`).join("");
  if(values.includes(old))sel.value=old;
@@ -398,20 +406,22 @@ function refreshCascades(){
  const s=[...document.querySelectorAll("#filters select")];if(s.length<9)return;
  const ui=s[1],upt=s[2],ultg=s[3],gi=s[4],bay=s[5];
 
- setSelectOptions(ui,[...new Set(raw.map(r=>r["Unit Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ui.value);
- let a=raw.filter(r=>!ui.value||r["Unit Induk"]===ui.value);
- setSelectOptions(upt,[...new Set(a.map(r=>r["Unit Pelaksana"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),upt.value);
- a=a.filter(r=>!upt.value||r["Unit Pelaksana"]===upt.value);
- setSelectOptions(ultg,[...new Set(a.map(r=>r["Ultg"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),ultg.value);
- a=a.filter(r=>!ultg.value||r["Ultg"]===ultg.value);
- setSelectOptions(gi,[...new Set(a.map(r=>r["Gardu Induk"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),gi.value);
- a=a.filter(r=>!gi.value||r["Gardu Induk"]===gi.value);
- setSelectOptions(bay,[...new Set(a.map(r=>r["Bay"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id")),bay.value);
+ const opts=(rows,col)=>[...new Set(rows.map(r=>r[col]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id"));
+ const keep=(rows,sel,col)=>{const v=selVals(sel);return v.length?rows.filter(r=>v.includes(r[col])):rows};
+ setSelectOptions(ui,opts(raw,"Unit Induk"));
+ let a=keep(raw,ui,"Unit Induk");
+ setSelectOptions(upt,opts(a,"Unit Pelaksana"));
+ a=keep(a,upt,"Unit Pelaksana");
+ setSelectOptions(ultg,opts(a,"Ultg"));
+ a=keep(a,ultg,"Ultg");
+ setSelectOptions(gi,opts(a,"Gardu Induk"));
+ a=keep(a,gi,"Gardu Induk");
+ setSelectOptions(bay,opts(a,"Bay"));
 }
 
 function buildFilters(){
  const defs=[
-  ["Kelompok Tegangan",["transmisi","incoming"],["Transmisi (150 kV & 500 kV)","Incoming (selain 150/500 kV)"]],
+  ["Tegangan",[...new Set(raw.map(r=>r["Tegangan"]).filter(Boolean))].sort((a,b)=>(parseFloat(a)||0)-(parseFloat(b)||0)||a.localeCompare(b,"id"))],
   ["Unit Induk",[]],["UPT",[]],["ULTG",[]],["GI",[]],["Bay",[]],
   ["Phasa",[...new Set(raw.map(r=>r["Phasa"]).filter(Boolean))].sort()],
   ["Jenis Peralatan",TYPES],["Kategori AHI",AHI.map(x=>x[0])]
@@ -424,12 +434,12 @@ function buildFilters(){
    const vals=d[1],labs=d[2]||vals;
    sel.innerHTML='<option value="">Semua</option>'+vals.map((v,j)=>`<option value="${html(v)}">${html(labs[j]||v)}</option>`).join("");
    div.append(l,sel);f.append(div);
+   msSetup(sel);
  });
  const s=[...f.querySelectorAll("select")];
- s[0].value="transmisi";
  const b=document.createElement("button");b.className="btn primary";b.textContent="Terapkan Filter";b.onclick=apply;f.append(b);
  const reset=document.createElement("button");reset.className="btn";reset.textContent="Reset";reset.onclick=()=>{
-   s.forEach((x,i)=>x.value=i===0?"transmisi":"");refreshCascades();apply();
+   s.forEach(x=>{[...x.options].forEach(o=>o.selected=false);msRender(x)});refreshCascades();apply();
  };f.append(reset);
  [1,2,3,4].forEach(i=>s[i].addEventListener("change",refreshCascades));
  refreshCascades();
@@ -437,17 +447,18 @@ function buildFilters(){
 
 function getFilters(){
  const s=[...document.querySelectorAll("#filters select")];
- return {g:s[0]?.value||"",ui:s[1]?.value||"",upt:s[2]?.value||"",ultg:s[3]?.value||"",gi:s[4]?.value||"",bay:s[5]?.value||"",ph:s[6]?.value||"",type:s[7]?.value||"",ahi:s[8]?.value||""};
+ return {teg:selVals(s[0]),ui:selVals(s[1]),upt:selVals(s[2]),ultg:selVals(s[3]),gi:selVals(s[4]),bay:selVals(s[5]),ph:selVals(s[6]),type:selVals(s[7]),ahi:selVals(s[8]).map(norm)};
 }
 
 function apply(){
  currentPage=1;
  const f=getFilters();
+ const has=(arr,v)=>!arr.length||arr.includes(v);
  filtered=raw.filter(r=>
-   group(r,f.g)&&(!f.ui||r["Unit Induk"]===f.ui)&&(!f.upt||r["Unit Pelaksana"]===f.upt)&&
-   (!f.ultg||r["Ultg"]===f.ultg)&&(!f.gi||r["Gardu Induk"]===f.gi)&&
-   (!f.bay||r["Bay"]===f.bay)&&(!f.ph||r["Phasa"]===f.ph)&&
-   (!f.type||(r.__type??canonical(r["Jenis Aset"]))===f.type)&&(!f.ahi||(r.__ahi??norm(r["AHI"]))===norm(f.ahi))
+   has(f.teg,r["Tegangan"])&&has(f.ui,r["Unit Induk"])&&has(f.upt,r["Unit Pelaksana"])&&
+   has(f.ultg,r["Ultg"])&&has(f.gi,r["Gardu Induk"])&&
+   has(f.bay,r["Bay"])&&has(f.ph,r["Phasa"])&&
+   has(f.type,r.__type??canonical(r["Jenis Aset"]))&&has(f.ahi,r.__ahi??norm(r["AHI"]))
  );
  render();
  if(typeof aiHasResult!=='undefined'&&aiHasResult)aiRenderPlaceholder('Filter diperbarui. Klik "Generate Insight" untuk analisis terbaru sesuai filter saat ini.');
@@ -862,7 +873,7 @@ $("aiClearBtn").onclick=()=>{
  aiRenderPlaceholder('API key dihapus dari browser ini.');
 };
 function aiBuildSummary(){
- const activeFilters=[...document.querySelectorAll('#filters select')].map(s=>({label:s.dataset.key||'',value:s.value})).filter(x=>x.value);
+ const activeFilters=[...document.querySelectorAll('#filters select')].map(s=>({label:s.dataset.key||'',value:[...s.selectedOptions].filter(o=>o.value).map(o=>o.textContent).join(', ')})).filter(x=>x.value);
  const total=filtered.length;
  const kpi=AHI.map(([n])=>({kategori:n,jumlah:filtered.filter(r=>norm(r["AHI"])===norm(n)).length}));
  const perJenisAset=TYPES.map(t=>{
