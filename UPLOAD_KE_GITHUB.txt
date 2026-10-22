@@ -3,6 +3,9 @@ DASHBOARD AHI UIT JBB - UPLOAD
 ROOT REPOSITORY:
 - index.html
 - ahi-evaluasi.html
+- trend-inspection.html
+- theme.js                 -> mode Dark/Light (WAJIB, dipakai semua halaman)
+- theme.css                -> mode Dark/Light (WAJIB, dipakai semua halaman)
 - app.js
 - style.css
 - assets/
@@ -22,6 +25,11 @@ SETELAH UPLOAD:
    https://hargiuijbb16.github.io/dashboardahiuitjbb/
 5. AHI Evaluasi:
    https://hargiuijbb16.github.io/dashboardahiuitjbb/ahi-evaluasi.html
+6. Trend Inspection:
+   https://hargiuijbb16.github.io/dashboardahiuitjbb/trend-inspection.html
+   (TRAFO Active Part: trend-inspection.html?tab=trafo-ap)
+
+Trend Inspection mengambil data langsung dari Google Sheet (tidak perlu CSV di folder data/).
 
 FILTER CASCADING:
 Unit Induk -> UPT -> ULTG -> GI -> Bay
